@@ -208,4 +208,20 @@ export const SCENARIOS = [
     sensorQuality: "good",
     opMode: "transient",
   },
+  {
+    name: "9. Four-Stage Escalation Sequence",
+    samples: [348, 350, 352, 354, 356],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 100000,
+    sensorQuality: "good",
+    opMode: "steady",
+    isSequence: true,
+    stages: [
+      { samples: [348, 350, 352, 354, 356], equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true } },
+      { samples: [356, 358, 360, 362, 364], equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true } },
+      { samples: [364, 366, 368, 370, 372], equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: true } },
+      { samples: [372, 374, 376, 378, 380], equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: false } },
+    ]
+  },
 ];

@@ -9,8 +9,7 @@ import ExecutiveRibbon from "@/components/refinery/ExecutiveRibbon";
 import AlarmsOnlyView from "@/components/refinery/AlarmsOnlyView";
 import ScenarioSelector from "@/components/refinery/ScenarioSelector";
 import PresentationHero from "@/components/refinery/PresentationHero";
-import ProcessRibbon from "@/components/refinery/ProcessRibbon";
-import LiveTrend from "@/components/refinery/LiveTrend";
+import ProcessMap from "@/components/refinery/ProcessMap";
 import PreheatIndicator from "@/components/refinery/PreheatIndicator";
 import CoolingCapacityIndicator from "@/components/refinery/CoolingCapacityIndicator";
 import {
@@ -47,13 +46,16 @@ export default function Home() {
   // Presentation mode state
   const [presScenario, setPresScenario] = useState(0);
   const [autoCycling, setAutoCycling] = useState(false);
+  const [sequenceStage, setSequenceStage] = useState(0);
   const cycleRef = useRef(null);
+  const sequenceRef = useRef(null);
 
   // Auto-cycle logic
   useEffect(() => {
     if (autoCycling && displayMode === "presentation") {
       cycleRef.current = setInterval(() => {
         setPresScenario(prev => (prev + 1) % SCENARIOS.length);
+        setSequenceStage(0);
       }, 5000);
     }
     return () => {
@@ -61,17 +63,51 @@ export default function Home() {
     };
   }, [autoCycling, displayMode]);
 
+  // Four-stage escalation sequence logic
+  useEffect(() => {
+    const currentScenario = SCENARIOS[presScenario];
+    if (displayMode === "presentation" && currentScenario?.isSequence && !autoCycling) {
+      sequenceRef.current = setInterval(() => {
+        setSequenceStage(prev => {
+          const nextStage = prev + 1;
+          if (nextStage >= currentScenario.stages.length) {
+            return 0;
+          }
+          return nextStage;
+        });
+      }, 8000);
+    }
+    return () => {
+      if (sequenceRef.current) clearInterval(sequenceRef.current);
+    };
+  }, [presScenario, displayMode, autoCycling]);
+
   // Determine active data source
   const activeData = displayMode === "presentation"
-    ? {
-        ...DEFAULTS,
-        samples: SCENARIOS[presScenario].samples,
-        limits: SCENARIOS[presScenario].limits,
-        equipment: SCENARIOS[presScenario].equipment,
-        feedFlow: SCENARIOS[presScenario].feedFlow,
-        sensorQuality: SCENARIOS[presScenario].sensorQuality,
-        opMode: SCENARIOS[presScenario].opMode,
-      }
+    ? (() => {
+        const scenario = SCENARIOS[presScenario];
+        if (scenario.isSequence && scenario.stages) {
+          const stage = scenario.stages[sequenceStage] || scenario.stages[0];
+          return {
+            ...DEFAULTS,
+            samples: stage.samples,
+            limits: scenario.limits,
+            equipment: stage.equipment,
+            feedFlow: scenario.feedFlow,
+            sensorQuality: scenario.sensorQuality,
+            opMode: scenario.opMode,
+          };
+        }
+        return {
+          ...DEFAULTS,
+          samples: scenario.samples,
+          limits: scenario.limits,
+          equipment: scenario.equipment,
+          feedFlow: scenario.feedFlow,
+          sensorQuality: scenario.sensorQuality,
+          opMode: scenario.opMode,
+        };
+      })()
     : state;
 
   // Calculations
@@ -179,18 +215,18 @@ export default function Home() {
 
             <CoolingCapacityIndicator capacity={coolingCapacity} />
 
-            <ProcessRibbon
+            <ProcessMap
               escalationLevel={escalationLevel}
               slope={slope}
+              currentTemp={currentValue}
+              feedFlow={activeData.feedFlow}
+              equipment={activeData.equipment}
               preheatActive={preheatActive}
               preheatStatus={preheatStatus}
               coolingCapacity={coolingCapacity}
-            />
-
-            <LiveTrend
-              samples={activeData.samples}
-              limits={activeData.limits}
-              escalationLevel={escalationLevel}
+              nearest={nearest}
+              timeToNearest={timeToNearest}
+              interactive={true}
               units={activeData.units}
             />
 
@@ -229,18 +265,18 @@ export default function Home() {
               onToggleAutoCycle={handleToggleAutoCycle}
             />
 
-            <ProcessRibbon
+            <ProcessMap
               escalationLevel={escalationLevel}
               slope={slope}
+              currentTemp={currentValue}
+              feedFlow={activeData.feedFlow}
+              equipment={activeData.equipment}
               preheatActive={preheatActive}
               preheatStatus={preheatStatus}
               coolingCapacity={coolingCapacity}
-            />
-
-            <LiveTrend
-              samples={activeData.samples}
-              limits={activeData.limits}
-              escalationLevel={escalationLevel}
+              nearest={nearest}
+              timeToNearest={timeToNearest}
+              interactive={false}
               units={activeData.units}
             />
 
