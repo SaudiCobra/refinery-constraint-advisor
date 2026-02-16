@@ -9,6 +9,10 @@ import ExecutiveRibbon from "@/components/refinery/ExecutiveRibbon";
 import AlarmsOnlyView from "@/components/refinery/AlarmsOnlyView";
 import ScenarioSelector from "@/components/refinery/ScenarioSelector";
 import PresentationHero from "@/components/refinery/PresentationHero";
+import ProcessRibbon from "@/components/refinery/ProcessRibbon";
+import LiveTrend from "@/components/refinery/LiveTrend";
+import PreheatIndicator from "@/components/refinery/PreheatIndicator";
+import CoolingCapacityIndicator from "@/components/refinery/CoolingCapacityIndicator";
 import {
   computeRateOfRise,
   computeAllConstraints,
@@ -17,6 +21,8 @@ import {
   getAlarmState,
   getRecommendation,
   formatTime,
+  computeCoolingCapacity,
+  adjustTimeToConstraint,
   SCENARIOS,
 } from "@/components/refinery/calcEngine";
 
@@ -36,6 +42,7 @@ export default function Home() {
   const [displayMode, setDisplayMode] = useState("interactive");
   const [alarmsOnly, setAlarmsOnly] = useState(false);
   const [state, setState] = useState({ ...DEFAULTS });
+  const [preheatActive, setPreheatActive] = useState(false);
 
   // Presentation mode state
   const [presScenario, setPresScenario] = useState(0);
@@ -72,12 +79,39 @@ export default function Home() {
   const slope = computeRateOfRise(activeData.samples, activeData.interval);
   const constraints = computeAllConstraints(currentValue, activeData.limits, slope);
   const nearest = getNearestConstraint(constraints);
-  const timeToNearest = nearest ? nearest.time : Infinity;
-  const escalationLevel = getEscalationLevel(timeToNearest);
+  const baseTimeToNearest = nearest ? nearest.time : Infinity;
+  
+  // Cooling capacity assessment
+  const coolingCapacity = computeCoolingCapacity(activeData.equipment, slope, baseTimeToNearest);
+  
+  // Adjust time based on cooling capacity
+  const timeToNearest = adjustTimeToConstraint(baseTimeToNearest, coolingCapacity);
+  
+  // Preheat status
+  const ACTIVATION_LOWER = 280;
+  const ACTIVATION_UPPER = 330;
+  let preheatStatus = null;
+  if (preheatActive) {
+    if (currentValue < ACTIVATION_LOWER) {
+      preheatStatus = "Below activation window";
+    } else if (currentValue >= ACTIVATION_LOWER && currentValue <= ACTIVATION_UPPER) {
+      if (slope > 1.5) {
+        preheatStatus = "Thermal stress risk";
+      } else if (slope > 1.0) {
+        preheatStatus = "Above recommended ramp";
+      } else {
+        preheatStatus = "Within envelope";
+      }
+    } else {
+      preheatStatus = "Exiting safe window";
+    }
+  }
+  
+  const escalationLevel = getEscalationLevel(timeToNearest, preheatActive, slope, coolingCapacity);
   const alarmState = getAlarmState(currentValue, activeData.limits);
 
   const consequence = nearest && nearest.time < Infinity
-    ? `If unchanged: ${nearest.name} in ${formatTime(nearest.time)}`
+    ? `If unchanged: ${nearest.name} in ${formatTime(timeToNearest)}`
     : null;
 
   const handleRunDemo = useCallback((scenarioIndex) => {
@@ -97,8 +131,10 @@ export default function Home() {
     setAutoCycling(prev => !prev);
   };
 
+  const bgDimming = escalationLevel >= 2 ? "bg-[#0d0d0d]" : escalationLevel >= 1 ? "bg-[#0f0f0f]" : "bg-[#111]";
+
   return (
-    <div className="min-h-screen bg-[#111] text-white">
+    <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
       <GlobalHeader
         displayMode={displayMode}
         onModeChange={setDisplayMode}
@@ -132,6 +168,30 @@ export default function Home() {
               escalationLevel={escalationLevel}
               slope={slope}
               consequence={consequence}
+            />
+
+            <PreheatIndicator
+              preheatActive={preheatActive}
+              onToggle={setPreheatActive}
+              currentTemp={currentValue}
+              slope={slope}
+            />
+
+            <CoolingCapacityIndicator capacity={coolingCapacity} />
+
+            <ProcessRibbon
+              escalationLevel={escalationLevel}
+              slope={slope}
+              preheatActive={preheatActive}
+              preheatStatus={preheatStatus}
+              coolingCapacity={coolingCapacity}
+            />
+
+            <LiveTrend
+              samples={activeData.samples}
+              limits={activeData.limits}
+              escalationLevel={escalationLevel}
+              units={activeData.units}
             />
 
             <InputPanel
@@ -169,12 +229,30 @@ export default function Home() {
               onToggleAutoCycle={handleToggleAutoCycle}
             />
 
+            <ProcessRibbon
+              escalationLevel={escalationLevel}
+              slope={slope}
+              preheatActive={preheatActive}
+              preheatStatus={preheatStatus}
+              coolingCapacity={coolingCapacity}
+            />
+
+            <LiveTrend
+              samples={activeData.samples}
+              limits={activeData.limits}
+              escalationLevel={escalationLevel}
+              units={activeData.units}
+            />
+
             <PresentationHero
               timeToNearest={timeToNearest}
               nearestName={nearest?.name}
               escalationLevel={escalationLevel}
               slope={slope}
               equipment={activeData.equipment}
+              preheatActive={preheatActive}
+              preheatStatus={preheatStatus}
+              coolingCapacity={coolingCapacity}
             />
           </>
         )}

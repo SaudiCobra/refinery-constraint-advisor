@@ -3,13 +3,22 @@ import { cn } from "@/lib/utils";
 import { formatTime, getRecommendation } from "./calcEngine";
 
 const LEVEL_CONFIG = {
-  0: { text: "text-green-400", badge: "bg-green-900/50 text-green-400 border-green-700", label: "NORMAL" },
-  1: { text: "text-amber-400", badge: "bg-amber-900/50 text-amber-400 border-amber-700", label: "ATTENTION" },
-  2: { text: "text-red-400", badge: "bg-red-900/50 text-red-400 border-red-700", label: "ESCALATION PREPARED" },
-  3: { text: "text-red-300", badge: "bg-red-800/60 text-red-300 border-red-600", label: "IMMEDIATE RISK" },
+  0: { text: "text-[#0F9F9F]", badge: "bg-[#0F5F5F]/50 text-[#0F9F9F] border-[#0F7F7F]", label: "NORMAL" },
+  1: { text: "text-[#D4A547]", badge: "bg-[#B47A1F]/50 text-[#D4A547] border-[#B47A1F]", label: "DRIFTING" },
+  2: { text: "text-[#D4653F]", badge: "bg-[#A13A1F]/50 text-[#D4653F] border-[#A13A1F]", label: "ESCALATION PREPARED" },
+  3: { text: "text-[#B53F3F]", badge: "bg-[#7A0F0F]/60 text-[#B53F3F] border-[#7A0F0F]", label: "IMMEDIATE RISK" },
 };
 
-export default function PresentationHero({ timeToNearest, nearestName, escalationLevel, slope, equipment }) {
+export default function PresentationHero({ 
+  timeToNearest, 
+  nearestName, 
+  escalationLevel, 
+  slope, 
+  equipment,
+  preheatActive,
+  preheatStatus,
+  coolingCapacity 
+}) {
   const stable = slope <= 0 || timeToNearest === Infinity;
   const config = LEVEL_CONFIG[escalationLevel] || LEVEL_CONFIG[0];
   const displayTime = stable ? "—" : formatTime(timeToNearest);
@@ -59,6 +68,14 @@ export default function PresentationHero({ timeToNearest, nearestName, escalatio
 
       {/* Recommendation */}
       <p className="mt-4 text-[#999] text-sm italic">{recommendation}</p>
+
+      {/* Preheat & Cooling Status */}
+      {preheatActive && preheatStatus && (
+        <p className="mt-3 text-[#777] text-xs">Preheat: {preheatStatus}</p>
+      )}
+      {coolingCapacity !== "NORMAL" && (
+        <p className="mt-2 text-[#777] text-xs">Cooling Capacity: {coolingCapacity}</p>
+      )}
 
       {/* Footer */}
       <div className="mt-12 text-center">

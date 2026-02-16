@@ -46,12 +46,61 @@ export function getNearestConstraint(constraints) {
   return positive.length > 0 ? positive[0] : null;
 }
 
-export function getEscalationLevel(timeMinutes) {
-  if (timeMinutes === Infinity || timeMinutes === null) return 0;
-  if (timeMinutes > 30) return 0;
-  if (timeMinutes > 15) return 1;
-  if (timeMinutes > 10) return 2;
-  return 3;
+export function getEscalationLevel(timeMinutes, preheatActive, slope, coolingCapacity) {
+  let baseLevel = 0;
+  
+  if (timeMinutes === Infinity || timeMinutes === null) {
+    baseLevel = 0;
+  } else if (timeMinutes > 30) {
+    baseLevel = 0;
+  } else if (timeMinutes > 15) {
+    baseLevel = 1;
+  } else if (timeMinutes > 10) {
+    baseLevel = 2;
+  } else {
+    baseLevel = 3;
+  }
+
+  // Preheat stress escalation
+  if (preheatActive && slope > 1.5) {
+    baseLevel = Math.min(baseLevel + 1, 3);
+  }
+
+  // Cooling constraint escalation
+  if (coolingCapacity === "CONSTRAINED" && timeMinutes < 15) {
+    baseLevel = Math.min(baseLevel + 1, 3);
+  }
+
+  return baseLevel;
+}
+
+export function computeCoolingCapacity(equipment, slope, timeToNearest) {
+  const coolerAvailable = equipment.effluentCooler;
+  const h2Available = equipment.h2Compressor;
+
+  if (coolerAvailable && h2Available) {
+    return "NORMAL";
+  }
+
+  if (!coolerAvailable && slope > 0 && timeToNearest < 20) {
+    return "CONSTRAINED";
+  }
+
+  if (!coolerAvailable || !h2Available) {
+    return "REDUCED";
+  }
+
+  return "NORMAL";
+}
+
+export function adjustTimeToConstraint(baseTime, coolingCapacity) {
+  if (coolingCapacity === "REDUCED") {
+    return baseTime * 0.85;
+  }
+  if (coolingCapacity === "CONSTRAINED") {
+    return baseTime * 0.70;
+  }
+  return baseTime;
 }
 
 export function getAlarmState(currentValue, limits) {
