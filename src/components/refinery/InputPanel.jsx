@@ -16,7 +16,7 @@ const DEFAULTS = {
   opMode: "steady",
   sensorQuality: "good",
   equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-  feedFlow: 100000,
+  feedFlow: 84000,
 };
 
 export default function InputPanel({ state, onChange, onRunDemo }) {
