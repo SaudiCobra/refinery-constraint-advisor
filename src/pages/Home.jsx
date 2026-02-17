@@ -256,6 +256,12 @@ export default function Home() {
         alarmState={alarmState}
         escalationLevel={escalationLevel}
         alarmsOnly={alarmsOnly}
+        hotSpotRisk={hotSpotRisk}
+        timeToNearest={timeToNearest}
+        coolingCapacity={coolingCapacity}
+        equipment={activeData.equipment}
+        slope={slope}
+        preheatStatus={preheatStatus}
       />
 
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 py-6 space-y-6">

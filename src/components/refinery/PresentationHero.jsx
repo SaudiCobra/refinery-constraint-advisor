@@ -11,11 +11,31 @@ import {
 } from "./confidenceEngine";
 
 const LEVEL_CONFIG = {
-  0: { text: "text-[#0F9F9F]", badge: "bg-[#0F5F5F]/50 text-[#0F9F9F] border-[#0F7F7F]", label: "NORMAL" },
-  1: { text: "text-[#D4A547]", badge: "bg-[#B47A1F]/50 text-[#D4A547] border-[#B47A1F]", label: "DRIFTING" },
-  2: { text: "text-[#D4653F]", badge: "bg-[#A13A1F]/50 text-[#D4653F] border-[#A13A1F]", label: "ESCALATION PREPARED" },
-  3: { text: "text-[#B53F3F]", badge: "bg-[#7A0F0F]/60 text-[#B53F3F] border-[#7A0F0F]", label: "IMMEDIATE RISK" },
+  0: { text: "text-[#0F9F9F]" },
+  1: { text: "text-[#D4A547]" },
+  2: { text: "text-[#D4653F]" },
+  3: { text: "text-[#B53F3F]" },
 };
+
+function getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus) {
+  if (hotSpotRisk === "HIGH") return "Immediate Risk";
+  if (timeToNearest < 10 && timeToNearest > 0) return "Immediate Risk";
+  if (coolingCapacity === "CONSTRAINED") return "Cooling Constrained";
+  if (!equipment.h2Compressor && escalationLevel >= 1) return "Moderation Limited";
+  if (slope > 1.5 || preheatStatus?.includes("stress")) return "Rapid Temperature Rise";
+  if (escalationLevel >= 1) return "Early Drift Detected";
+  return "System Stable";
+}
+
+function getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance) {
+  if (hotSpotRisk === "HIGH") return "Bed hot spot developing";
+  if (timeToNearest < 10 && timeToNearest > 0) return `${Math.round(timeToNearest)} minutes to ${nearestName} at current trend`;
+  if (coolingCapacity === "CONSTRAINED") return "Heat removal capability reduced";
+  if (!equipment.h2Compressor && escalationLevel >= 1) return "Exotherm sensitivity increased";
+  if (slope > 1.5 || preheatStatus?.includes("stress")) return "Rate-of-rise above expected range";
+  if (escalationLevel >= 1 && timeToNearest < Infinity) return `${Math.round(timeToNearest)} minutes to ${nearestName} at current rate`;
+  return "No binding constraints detected";
+}
 
 export default function PresentationHero({ 
   timeToNearest, 
@@ -55,23 +75,16 @@ export default function PresentationHero({
 
   return (
     <div className="flex flex-col items-center justify-center px-6 py-8 space-y-5">
-      {/* Enhanced Situation Headline - TOP */}
+      {/* Enhanced Situation Headline - Two-Line Structure */}
       <div className="w-full max-w-5xl">
-        <div className={cn("px-8 py-5 rounded-lg border-2 text-center transition-all duration-700", `border-[${config.text.replace('text-', '')}]`)}>
-          <p className={cn("text-3xl font-bold tracking-tight", config.text)}>
-            {headline}
+        <div className={cn("px-8 py-6 rounded-lg border-2 text-center transition-all duration-400", `border-[${config.text.replace('text-', '')}]`)}>
+          <p className={cn("text-4xl font-bold tracking-tight leading-tight", config.text)}>
+            {getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus)}
           </p>
-          {cause && (
-            <p className="text-[#999] text-base mt-3 italic font-medium">
-              Cause: {cause}
-            </p>
-          )}
+          <p className="text-[#999] text-lg mt-3 font-medium">
+            {getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance)}
+          </p>
         </div>
-      </div>
-
-      {/* Status Badge */}
-      <div className={cn("px-6 py-2.5 rounded border-2 text-base font-bold tracking-widest uppercase", config.badge)}>
-        {config.label}
       </div>
 
       {/* Decision Window Bar */}
@@ -87,62 +100,14 @@ export default function PresentationHero({
         </div>
       )}
 
-      {/* Status Lines - Only show exceptions */}
-      <div className="flex flex-wrap justify-center gap-6 text-base">
-        {/* Hot Spot Risk - Only when MEDIUM or HIGH */}
-        {hotSpotRisk !== "LOW" && (
-          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-2.5">
-            <span className="text-[#888] text-sm">Hot Spot Risk: </span>
-            <span className={cn(
-              "font-bold text-base",
-              hotSpotRisk === "MEDIUM" && "text-[#B47A1F]",
-              hotSpotRisk === "HIGH" && "text-[#A13A1F]"
-            )}>
-              {hotSpotRisk}
-            </span>
-          </div>
-        )}
-        
-        {/* Bed Imbalance - Only when not NONE */}
-        {bedImbalance?.severity !== "NONE" && (
-          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-2.5">
-            <span className="text-[#888] text-sm">Bed Imbalance: </span>
-            <span className={cn(
-              "font-bold text-base",
-              bedImbalance.severity === "MILD" && "text-[#B47A1F]",
-              bedImbalance.severity === "SEVERE" && "text-[#A13A1F]"
-            )}>
-              {bedImbalance.severity} (Bed {bedImbalance.dominantBed})
-            </span>
-          </div>
-        )}
-        
-        {coolingCapacity !== "NORMAL" && (
-          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-2.5">
-            <span className="text-[#888] text-sm">Cooling: </span>
-            <span className={cn(
-              "font-bold text-base",
-              coolingCapacity === "REDUCED" && "text-[#B47A1F]",
-              coolingCapacity === "CONSTRAINED" && "text-[#A13A1F]"
-            )}>
-              {coolingCapacity}
-            </span>
-          </div>
-        )}
-        
-        {preheatActive && preheatStatus && (preheatStatus.includes("stress") || preheatStatus.includes("Warning")) && (
-          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-2.5">
-            <span className="text-[#888] text-sm">Preheat: </span>
-            <span className={cn(
-              "font-bold text-base",
-              preheatStatus.includes("stress") && "text-[#A13A1F]",
-              preheatStatus.includes("Warning") && "text-[#B47A1F]"
-            )}>
-              {preheatStatus}
-            </span>
-          </div>
-        )}
-      </div>
+      {/* Micro-Cause Line */}
+      {cause && (
+        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-6 py-3 text-center max-w-2xl">
+          <p className="text-[#999] text-sm font-medium">
+            Cause: {cause}
+          </p>
+        </div>
+      )}
 
       {/* Corrective Levers & Confidence Row */}
       <div className="flex gap-6 justify-center">
@@ -176,18 +141,9 @@ export default function PresentationHero({
         </div>
       </div>
 
-      {/* Recommendation */}
-      <div className="bg-[#1e1e1e] border border-[#444] rounded-lg px-8 py-4 text-center max-w-4xl">
-        <p className="text-[#bbb] text-base italic font-medium">{recommendation}</p>
-      </div>
-
       {/* Footer Disclaimers */}
-      <div className="text-center text-[#555] text-xs space-y-1 pt-4">
-        <p className="tracking-wide">Advisory-only system — Not for automatic control</p>
-        <p className="tracking-wide">Operator judgment remains primary authority</p>
-        {hotSpotRisk !== "LOW" && (
-          <p className="tracking-wide text-[#777] italic">Demo shows how earlier awareness supports operator decision-making</p>
-        )}
+      <div className="text-center text-[#555] text-xs space-y-1 pt-2">
+        <p className="tracking-wide">Advisory system — Operator judgment remains primary authority</p>
       </div>
     </div>
   );

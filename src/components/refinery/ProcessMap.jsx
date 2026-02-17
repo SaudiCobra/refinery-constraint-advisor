@@ -345,10 +345,9 @@ export default function ProcessMap({
             stroke={equipment.h2Compressor ? "#2F5D80" : "#B47A1F"} 
             strokeWidth="2" filter="url(#equipmentShadow)" />
           <text x="0" y="-5" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">H2-1</text>
-          <text x="0" y="8" fill="#888" fontSize="8" textAnchor="middle">H₂ Margin</text>
-          {!equipment.h2Compressor && (
-            <text x="0" y="35" fill="#B47A1F" fontSize="8" textAnchor="middle" fontWeight="600">LIMITED</text>
-          )}
+          <text x="0" y="8" fill="#888" fontSize="8" textAnchor="middle">
+            {equipment.h2Compressor ? "Available" : "Limited"}
+          </text>
         </g>
 
         {/* PIPE: Reactor Outlet to TCV-02A */}
