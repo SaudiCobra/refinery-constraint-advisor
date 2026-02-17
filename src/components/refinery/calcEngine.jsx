@@ -61,9 +61,9 @@ export function getEscalationLevel(timeMinutes, preheatActive, slope, coolingCap
     baseLevel = 3;
   }
 
-  // Preheat stress escalation
+  // Preheat stress escalation - force to at least Level 2
   if (preheatActive && slope > 1.5) {
-    baseLevel = Math.min(baseLevel + 1, 3);
+    baseLevel = Math.max(baseLevel, 2);
   }
 
   // Cooling constraint escalation
@@ -77,15 +77,19 @@ export function getEscalationLevel(timeMinutes, preheatActive, slope, coolingCap
 export function computeCoolingCapacity(equipment, slope, timeToNearest) {
   const coolerAvailable = equipment.effluentCooler;
   const h2Available = equipment.h2Compressor;
+  const bypassAvailable = equipment.bypassValve;
 
+  // NORMAL: Both cooler and H2 margin available
   if (coolerAvailable && h2Available) {
     return "NORMAL";
   }
 
-  if (!coolerAvailable && slope > 0 && timeToNearest < 20) {
+  // CONSTRAINED: Cooler offline AND (high slope OR time critical OR no bypass)
+  if (!coolerAvailable && (slope > 1.5 || timeToNearest < 15 || !bypassAvailable)) {
     return "CONSTRAINED";
   }
 
+  // REDUCED: Cooler offline OR H2 margin limited
   if (!coolerAvailable || !h2Available) {
     return "REDUCED";
   }
@@ -119,9 +123,29 @@ export function formatTime(minutes) {
   return `~${Math.round(minutes)} min`;
 }
 
-export function getRecommendation(level, nearest, equipment) {
+export function getRecommendation(level, nearest, equipment, coolingCapacity, preheatStatus, slope) {
   const unavailable = Object.entries(equipment).filter(([, v]) => !v).map(([k]) => k);
   
+  // Preheat stress takes priority
+  if (preheatStatus?.includes("stress") && slope > 1.5) {
+    return "Moderate heat-up rate to remain within catalyst envelope.";
+  }
+  
+  // Cooling constrained recommendations
+  if (coolingCapacity === "CONSTRAINED") {
+    return "Prepare escalation; limited heat removal available.";
+  }
+  
+  if (coolingCapacity === "REDUCED") {
+    return "Maximize available cooling paths; monitor response window.";
+  }
+  
+  // Bypass valve available recommendations
+  if (unavailable.includes("effluentCooler") && equipment.bypassValve && level >= 1) {
+    return "Consider bypass lever if permitted by procedure.";
+  }
+  
+  // Standard escalation recommendations
   if (level === 0) return "Monitor closely while response window remains open.";
   if (level === 1) {
     if (unavailable.length > 0) return "Prepare escalation — cooling capacity constrained.";

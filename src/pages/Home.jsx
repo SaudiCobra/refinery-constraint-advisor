@@ -226,6 +226,8 @@ export default function Home() {
               coolingCapacity={coolingCapacity}
               nearest={nearest}
               timeToNearest={timeToNearest}
+              sensorQuality={activeData.sensorQuality}
+              opMode={activeData.opMode}
               interactive={true}
               units={activeData.units}
             />
@@ -276,6 +278,8 @@ export default function Home() {
               coolingCapacity={coolingCapacity}
               nearest={nearest}
               timeToNearest={timeToNearest}
+              sensorQuality={activeData.sensorQuality}
+              opMode={activeData.opMode}
               interactive={false}
               units={activeData.units}
             />
