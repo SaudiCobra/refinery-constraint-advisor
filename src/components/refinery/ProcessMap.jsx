@@ -27,6 +27,8 @@ export default function ProcessMap({
   timeToNearest,
   sensorQuality,
   opMode,
+  bedImbalance,
+  hotSpotRisk,
   interactive = true,
   units = "°C",
 }) {
@@ -144,7 +146,7 @@ export default function ProcessMap({
           <animate attributeName="cx" values="255;380" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
-        {/* REACTOR R-1 */}
+        {/* REACTOR R-1 with Bed Indicators */}
         <g 
           transform="translate(450, 240)" 
           onClick={() => handleUnitClick('r1')}
@@ -154,8 +156,67 @@ export default function ProcessMap({
           <rect x="-50" y="-55" width="100" height="110" fill="#2a2a2a" stroke={baseColor} strokeWidth="4" filter="url(#equipmentShadow)" />
           <ellipse cx="0" cy="55" rx="50" ry="10" fill="#2a2a2a" stroke={baseColor} strokeWidth="2" />
           
+          {/* Catalyst bed circles */}
+          {bedImbalance && bedImbalance.beds.map((bed, idx) => {
+            const yPos = -30 + (idx * 30);
+            const isDominant = bed.id === bedImbalance.dominantBed;
+            const bedColor = isDominant && bedImbalance.severity === "SEVERE" 
+              ? "#A13A1F" 
+              : isDominant && bedImbalance.severity === "MILD" 
+              ? "#B47A1F" 
+              : "#444";
+            const glowIntensity = isDominant && hotSpotRisk !== "LOW" ? 0.4 : 0;
+            
+            return (
+              <g key={bed.id}>
+                <circle 
+                  cx="-25" 
+                  cy={yPos} 
+                  r="5" 
+                  fill={bedColor} 
+                  opacity={0.6 + glowIntensity}
+                  stroke={bedColor}
+                  strokeWidth={isDominant ? 1.5 : 0.5}
+                />
+                <circle 
+                  cx="0" 
+                  cy={yPos} 
+                  r="5" 
+                  fill={bedColor} 
+                  opacity={0.6 + glowIntensity}
+                  stroke={bedColor}
+                  strokeWidth={isDominant ? 1.5 : 0.5}
+                />
+                <circle 
+                  cx="25" 
+                  cy={yPos} 
+                  r="5" 
+                  fill={bedColor} 
+                  opacity={0.6 + glowIntensity}
+                  stroke={bedColor}
+                  strokeWidth={isDominant ? 1.5 : 0.5}
+                />
+              </g>
+            );
+          })}
+          
           {escalationLevel >= 2 && (
             <rect x="-45" y="-50" width="90" height="100" fill="url(#reactorGlow)" className={escalationLevel >= 3 ? "animate-[pulse_1.2s_ease-in-out_infinite]" : ""} />
+          )}
+          
+          {/* Dominant bed outline for imbalance */}
+          {bedImbalance && bedImbalance.severity !== "NONE" && (
+            <rect 
+              x="-48" 
+              y="-53" 
+              width="96" 
+              height="106" 
+              fill="none" 
+              stroke={bedImbalance.severity === "SEVERE" ? "#A13A1F" : "#B47A1F"} 
+              strokeWidth="2" 
+              strokeDasharray="5,5"
+              opacity="0.5"
+            />
           )}
           
           <text x="0" y="80" fill="#aaa" fontSize="13" textAnchor="middle" fontWeight="bold">R-1</text>
@@ -374,6 +435,12 @@ export default function ProcessMap({
               <h4 className="text-[#aaa] text-sm font-bold mb-2">R-1 Reactor</h4>
               <p className="text-[#ccc] text-xs leading-relaxed">Temperature: {currentTemp.toFixed(1)}{units}</p>
               <p className="text-[#ccc] text-xs leading-relaxed mt-1">Rate-of-rise: {slope.toFixed(2)} {units}/min</p>
+              {bedImbalance && bedImbalance.severity !== "NONE" && (
+                <>
+                  <p className="text-[#ccc] text-xs leading-relaxed mt-1">Dominant Bed: Bed {bedImbalance.dominantBed}</p>
+                  <p className="text-[#ccc] text-xs leading-relaxed">ΔBed: {bedImbalance.bedDelta}{units}</p>
+                </>
+              )}
               {nearest && (
                 <p className="text-[#D4A547] text-xs mt-2 font-semibold">
                   {nearest.name} in {typeof timeToNearest === 'number' && timeToNearest < Infinity ? Math.round(timeToNearest) : '—'} min

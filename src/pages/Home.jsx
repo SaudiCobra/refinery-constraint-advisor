@@ -24,7 +24,14 @@ import {
   adjustTimeToConstraint,
   SCENARIOS,
   DEMONSTRATION_STAGES,
+  HOT_SPOT_SCENARIO,
 } from "@/components/refinery/calcEngine";
+import {
+  simulateBedTemperatures,
+  computeBedImbalance,
+  computeHotSpotRisk,
+  adjustEscalationForHotSpot,
+} from "@/components/refinery/bedLogic";
 
 const DEFAULTS = {
   varName: "NHT Reactor Inlet Temperature",
@@ -154,11 +161,23 @@ export default function Home() {
   const nearest = getNearestConstraint(constraints);
   const baseTimeToNearest = nearest ? nearest.time : Infinity;
   
+  // Bed imbalance and hot spot risk
+  const beds = simulateBedTemperatures(currentValue, slope, activeData.equipment, 0);
+  const bedImbalance = computeBedImbalance(beds);
+  
   // Cooling capacity assessment
   const coolingCapacity = computeCoolingCapacity(activeData.equipment, slope, baseTimeToNearest);
   
+  // Hot spot risk
+  const hotSpotRisk = computeHotSpotRisk(bedImbalance, activeData.equipment, coolingCapacity, slope);
+  
   // Adjust time based on cooling capacity
-  const timeToNearest = adjustTimeToConstraint(baseTimeToNearest, coolingCapacity);
+  let timeToNearest = adjustTimeToConstraint(baseTimeToNearest, coolingCapacity);
+  
+  // Further compress time if hot spot risk is HIGH
+  if (hotSpotRisk === "HIGH") {
+    timeToNearest = timeToNearest * 0.9;
+  }
   
   // Preheat status - use demonstration stage preheat mode if active
   const ACTIVATION_LOWER = 280;
@@ -184,7 +203,10 @@ export default function Home() {
     }
   }
   
-  const escalationLevel = getEscalationLevel(timeToNearest, activePreheatMode, slope, coolingCapacity);
+  let escalationLevel = getEscalationLevel(timeToNearest, activePreheatMode, slope, coolingCapacity);
+  
+  // Adjust escalation for hot spot risk
+  escalationLevel = adjustEscalationForHotSpot(escalationLevel, hotSpotRisk, timeToNearest);
   const alarmState = getAlarmState(currentValue, activeData.limits);
 
   const consequence = nearest && nearest.time < Infinity
@@ -280,6 +302,8 @@ export default function Home() {
               timeToNearest={timeToNearest}
               sensorQuality={activeData.sensorQuality}
               opMode={activeData.opMode}
+              bedImbalance={bedImbalance}
+              hotSpotRisk={hotSpotRisk}
               interactive={true}
               units={activeData.units}
             />
@@ -363,6 +387,8 @@ export default function Home() {
               timeToNearest={timeToNearest}
               sensorQuality={activeData.sensorQuality}
               opMode={activeData.opMode}
+              bedImbalance={bedImbalance}
+              hotSpotRisk={hotSpotRisk}
               interactive={false}
               units={activeData.units}
             />
@@ -378,6 +404,8 @@ export default function Home() {
               coolingCapacity={coolingCapacity}
               sensorQuality={activeData.sensorQuality}
               opMode={activeData.opMode}
+              bedImbalance={bedImbalance}
+              hotSpotRisk={hotSpotRisk}
             />
           </>
         )}

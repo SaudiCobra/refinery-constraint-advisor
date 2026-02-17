@@ -341,3 +341,44 @@ export const DEMONSTRATION_STAGES = [
     message: "Immediate escalation required — Full compression event",
   },
 ];
+
+// Hot Spot Avoided Scenario (Bonus - Manual Selection Only)
+export const HOT_SPOT_SCENARIO = {
+  name: "Hot Spot Avoided (Bonus Demo)",
+  isSequence: true,
+  stages: [
+    {
+      name: "Stage A: Bed Imbalance Begins",
+      samples: [345, 347, 349, 351, 353],
+      limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+      equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+      feedFlow: 102000,
+      sensorQuality: "good",
+      opMode: "steady",
+      preheatActive: false,
+      message: "Bed imbalance detected — Risk MEDIUM",
+    },
+    {
+      name: "Stage B: Conditions Worsen",
+      samples: [353, 356, 359, 362, 365],
+      limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+      equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
+      feedFlow: 108000,
+      sensorQuality: "good",
+      opMode: "transient",
+      preheatActive: false,
+      message: "Imbalance SEVERE — Hot spot risk HIGH",
+    },
+    {
+      name: "Stage C: Mitigation Demonstrated",
+      samples: [362, 362, 361, 360, 359],
+      limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+      equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+      feedFlow: 98000,
+      sensorQuality: "good",
+      opMode: "steady",
+      preheatActive: false,
+      message: "Moderation restored — Risk reduced to MEDIUM",
+    },
+  ],
+};

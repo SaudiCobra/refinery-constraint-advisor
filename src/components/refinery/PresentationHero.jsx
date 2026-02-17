@@ -28,6 +28,8 @@ export default function PresentationHero({
   coolingCapacity,
   sensorQuality,
   opMode,
+  bedImbalance,
+  hotSpotRisk,
 }) {
   const stable = slope <= 0 || timeToNearest === Infinity;
   const config = LEVEL_CONFIG[escalationLevel] || LEVEL_CONFIG[0];
@@ -46,10 +48,10 @@ export default function PresentationHero({
   
   // Get dynamic headline and cause (single dominant cause)
   const headline = getSituationHeadline(escalationLevel, timeToNearest, nearestName, coolingCapacity, preheatStatus, slope);
-  const cause = getEscalationCause(escalationLevel, coolingCapacity, preheatStatus, slope, timeToNearest, equipment);
+  const cause = getEscalationCause(escalationLevel, coolingCapacity, preheatStatus, slope, timeToNearest, equipment, hotSpotRisk, bedImbalance);
   
-  // Get recommendation adjusted for confidence
-  const recommendation = getRecommendationWithConfidence(escalationLevel, confidence, equipment, coolingCapacity);
+  // Get recommendation adjusted for confidence and hot spot risk
+  const recommendation = getRecommendationWithConfidence(escalationLevel, confidence, equipment, coolingCapacity, hotSpotRisk);
 
   return (
     <div className="flex flex-col items-center justify-center px-6 py-8 space-y-5">
@@ -87,6 +89,34 @@ export default function PresentationHero({
 
       {/* Status Lines - Only show exceptions */}
       <div className="flex flex-wrap justify-center gap-6 text-base">
+        {/* Hot Spot Risk - Only when MEDIUM or HIGH */}
+        {hotSpotRisk !== "LOW" && (
+          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-2.5">
+            <span className="text-[#888] text-sm">Hot Spot Risk: </span>
+            <span className={cn(
+              "font-bold text-base",
+              hotSpotRisk === "MEDIUM" && "text-[#B47A1F]",
+              hotSpotRisk === "HIGH" && "text-[#A13A1F]"
+            )}>
+              {hotSpotRisk}
+            </span>
+          </div>
+        )}
+        
+        {/* Bed Imbalance - Only when not NONE */}
+        {bedImbalance?.severity !== "NONE" && (
+          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-2.5">
+            <span className="text-[#888] text-sm">Bed Imbalance: </span>
+            <span className={cn(
+              "font-bold text-base",
+              bedImbalance.severity === "MILD" && "text-[#B47A1F]",
+              bedImbalance.severity === "SEVERE" && "text-[#A13A1F]"
+            )}>
+              {bedImbalance.severity} (Bed {bedImbalance.dominantBed})
+            </span>
+          </div>
+        )}
+        
         {coolingCapacity !== "NORMAL" && (
           <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-2.5">
             <span className="text-[#888] text-sm">Cooling: </span>
@@ -164,6 +194,9 @@ export default function PresentationHero({
       <div className="text-center text-[#555] text-xs space-y-1 pt-4">
         <p className="tracking-wide">Advisory-only system — Not for automatic control</p>
         <p className="tracking-wide">Operator judgment remains primary authority</p>
+        {hotSpotRisk !== "LOW" && (
+          <p className="tracking-wide text-[#777] italic">Demo shows how earlier awareness supports operator decision-making</p>
+        )}
       </div>
     </div>
   );

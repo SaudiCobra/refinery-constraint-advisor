@@ -117,7 +117,16 @@ export function getSituationHeadline(escalationLevel, timeToNearest, nearestName
   return "System Stable — No Immediate Constraint Pressure";
 }
 
-export function getRecommendationWithConfidence(escalationLevel, confidence, equipment, coolingCapacity) {
+export function getRecommendationWithConfidence(escalationLevel, confidence, equipment, coolingCapacity, hotSpotRisk) {
+  // Hot spot risk overrides
+  if (hotSpotRisk === "HIGH") {
+    return "Increase moderation using available levers; verify bed signals";
+  }
+  
+  if (hotSpotRisk === "MEDIUM") {
+    return "Monitor bed signals and moderation capability";
+  }
+  
   // Confidence overrides
   if (confidence.level === "Reduced") {
     return "Confirm instrumentation before corrective action";
@@ -149,35 +158,45 @@ export function getRecommendationWithConfidence(escalationLevel, confidence, equ
   return "Immediate escalation required — Notify shift lead now";
 }
 
-export function getEscalationCause(escalationLevel, coolingCapacity, preheatStatus, slope, timeToNearest, equipment) {
+export function getEscalationCause(escalationLevel, coolingCapacity, preheatStatus, slope, timeToNearest, equipment, hotSpotRisk, bedImbalance) {
   // Priority order: Show only ONE dominant cause
   
-  // 1) Cooling Constrained (highest priority)
+  // 1) Hot Spot Risk (highest priority when present)
+  if (hotSpotRisk === "HIGH") {
+    return "Hot spot risk increasing";
+  }
+  
+  // 2) Cooling Constrained
   if (coolingCapacity === "CONSTRAINED") {
     return "Cooling constrained — response window compressed";
   }
   
-  // 2) Time-to-Constraint <10 min
+  // 3) Bed Temperature Imbalance (when MEDIUM hot spot or SEVERE imbalance)
+  if (hotSpotRisk === "MEDIUM" || bedImbalance?.severity === "SEVERE") {
+    return "Bed temperature imbalance increasing";
+  }
+  
+  // 4) Time-to-Constraint <10 min
   if (timeToNearest < 10 && timeToNearest > 0) {
     return "Time-to-constraint below critical threshold";
   }
   
-  // 3) Ramp-Rate Exceeded
+  // 5) Ramp-Rate Exceeded
   if (slope > 1.5 || preheatStatus?.includes("stress")) {
     return "Ramp-rate exceeds recommended envelope";
   }
   
-  // 4) Hydrogen Margin Limited
+  // 6) Hydrogen Margin Limited
   if (!equipment.h2Compressor && escalationLevel >= 1) {
     return "Hydrogen margin limited";
   }
   
-  // 5) Cooling Reduced (lower priority)
+  // 7) Cooling Reduced (lower priority)
   if (coolingCapacity === "REDUCED" && escalationLevel >= 1) {
     return "Cooling authority limited";
   }
   
-  // 6) Generic drift
+  // 8) Generic drift
   if (escalationLevel >= 1) {
     return "Early upward drift detected";
   }
