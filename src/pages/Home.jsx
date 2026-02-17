@@ -23,6 +23,7 @@ import {
   computeCoolingCapacity,
   adjustTimeToConstraint,
   SCENARIOS,
+  DEMONSTRATION_STAGES,
 } from "@/components/refinery/calcEngine";
 
 const DEFAULTS = {
@@ -47,8 +48,11 @@ export default function Home() {
   const [presScenario, setPresScenario] = useState(0);
   const [autoCycling, setAutoCycling] = useState(false);
   const [sequenceStage, setSequenceStage] = useState(0);
+  const [demonstrationActive, setDemonstrationActive] = useState(false);
+  const [demonstrationStage, setDemonstrationStage] = useState(0);
   const cycleRef = useRef(null);
   const sequenceRef = useRef(null);
+  const demoRef = useRef(null);
 
   // Auto-cycle logic
   useEffect(() => {
@@ -66,7 +70,7 @@ export default function Home() {
   // Four-stage escalation sequence logic
   useEffect(() => {
     const currentScenario = SCENARIOS[presScenario];
-    if (displayMode === "presentation" && currentScenario?.isSequence && !autoCycling) {
+    if (displayMode === "presentation" && currentScenario?.isSequence && !autoCycling && !demonstrationActive) {
       sequenceRef.current = setInterval(() => {
         setSequenceStage(prev => {
           const nextStage = prev + 1;
@@ -80,11 +84,44 @@ export default function Home() {
     return () => {
       if (sequenceRef.current) clearInterval(sequenceRef.current);
     };
-  }, [presScenario, displayMode, autoCycling]);
+  }, [presScenario, displayMode, autoCycling, demonstrationActive]);
+
+  // Operational demonstration logic
+  useEffect(() => {
+    if (displayMode === "presentation" && demonstrationActive) {
+      demoRef.current = setInterval(() => {
+        setDemonstrationStage(prev => {
+          const nextStage = prev + 1;
+          if (nextStage >= DEMONSTRATION_STAGES.length) {
+            setDemonstrationActive(false);
+            return 0;
+          }
+          return nextStage;
+        });
+      }, 7000);
+    }
+    return () => {
+      if (demoRef.current) clearInterval(demoRef.current);
+    };
+  }, [demonstrationActive, displayMode]);
 
   // Determine active data source
   const activeData = displayMode === "presentation"
     ? (() => {
+        // Demonstration mode takes priority
+        if (demonstrationActive) {
+          const stage = DEMONSTRATION_STAGES[demonstrationStage];
+          return {
+            ...DEFAULTS,
+            samples: stage.samples,
+            limits: stage.limits,
+            equipment: stage.equipment,
+            feedFlow: stage.feedFlow,
+            sensorQuality: stage.sensorQuality,
+            opMode: stage.opMode,
+          };
+        }
+        
         const scenario = SCENARIOS[presScenario];
         if (scenario.isSequence && scenario.stages) {
           const stage = scenario.stages[sequenceStage] || scenario.stages[0];
@@ -123,11 +160,15 @@ export default function Home() {
   // Adjust time based on cooling capacity
   const timeToNearest = adjustTimeToConstraint(baseTimeToNearest, coolingCapacity);
   
-  // Preheat status
+  // Preheat status - use demonstration stage preheat mode if active
   const ACTIVATION_LOWER = 280;
   const ACTIVATION_UPPER = 330;
+  const activePreheatMode = demonstrationActive 
+    ? DEMONSTRATION_STAGES[demonstrationStage]?.preheatActive 
+    : preheatActive;
+  
   let preheatStatus = null;
-  if (preheatActive) {
+  if (activePreheatMode) {
     if (currentValue < ACTIVATION_LOWER) {
       preheatStatus = "Below activation window";
     } else if (currentValue >= ACTIVATION_LOWER && currentValue <= ACTIVATION_UPPER) {
@@ -143,7 +184,7 @@ export default function Home() {
     }
   }
   
-  const escalationLevel = getEscalationLevel(timeToNearest, preheatActive, slope, coolingCapacity);
+  const escalationLevel = getEscalationLevel(timeToNearest, activePreheatMode, slope, coolingCapacity);
   const alarmState = getAlarmState(currentValue, activeData.limits);
 
   const consequence = nearest && nearest.time < Infinity
@@ -165,6 +206,17 @@ export default function Home() {
 
   const handleToggleAutoCycle = () => {
     setAutoCycling(prev => !prev);
+  };
+
+  const handleStartDemonstration = () => {
+    setDemonstrationActive(true);
+    setDemonstrationStage(0);
+    setAutoCycling(false);
+  };
+
+  const handleStopDemonstration = () => {
+    setDemonstrationActive(false);
+    setDemonstrationStage(0);
   };
 
   const bgDimming = escalationLevel >= 2 ? "bg-[#0d0d0d]" : escalationLevel >= 1 ? "bg-[#0f0f0f]" : "bg-[#111]";
@@ -260,12 +312,43 @@ export default function Home() {
         {/* PRESENTATION MODE */}
         {!alarmsOnly && displayMode === "presentation" && (
           <>
-            <ScenarioSelector
-              activeScenario={presScenario}
-              onSelect={setPresScenario}
-              autoCycling={autoCycling}
-              onToggleAutoCycle={handleToggleAutoCycle}
-            />
+            {!demonstrationActive && (
+              <ScenarioSelector
+                activeScenario={presScenario}
+                onSelect={setPresScenario}
+                autoCycling={autoCycling}
+                onToggleAutoCycle={handleToggleAutoCycle}
+              />
+            )}
+
+            {/* Demonstration Controls */}
+            <div className="flex justify-center gap-4 mb-4">
+              {!demonstrationActive ? (
+                <button
+                  onClick={handleStartDemonstration}
+                  className="px-6 py-3 bg-[#0F5F5F] hover:bg-[#0F7F7F] border border-[#0F9F9F] rounded-lg text-white font-semibold text-sm transition-all duration-300 shadow-lg"
+                >
+                  ▶ Run Full Operational Demonstration
+                </button>
+              ) : (
+                <div className="flex items-center gap-4">
+                  <div className="px-6 py-3 bg-[#1e1e1e] border border-[#444] rounded-lg">
+                    <p className="text-[#0F9F9F] text-sm font-semibold">
+                      Stage {demonstrationStage + 1} of {DEMONSTRATION_STAGES.length}: {DEMONSTRATION_STAGES[demonstrationStage]?.name}
+                    </p>
+                    <p className="text-[#888] text-xs mt-1 italic">
+                      {DEMONSTRATION_STAGES[demonstrationStage]?.message}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleStopDemonstration}
+                    className="px-5 py-3 bg-[#3a1010] hover:bg-[#4a1515] border border-[#7A0F0F] rounded-lg text-white font-semibold text-sm transition-all duration-300"
+                  >
+                    ■ Stop Demonstration
+                  </button>
+                </div>
+              )}
+            </div>
 
             <ProcessMap
               escalationLevel={escalationLevel}
@@ -273,7 +356,7 @@ export default function Home() {
               currentTemp={currentValue}
               feedFlow={activeData.feedFlow}
               equipment={activeData.equipment}
-              preheatActive={preheatActive}
+              preheatActive={activePreheatMode}
               preheatStatus={preheatStatus}
               coolingCapacity={coolingCapacity}
               nearest={nearest}
@@ -290,7 +373,7 @@ export default function Home() {
               escalationLevel={escalationLevel}
               slope={slope}
               equipment={activeData.equipment}
-              preheatActive={preheatActive}
+              preheatActive={activePreheatMode}
               preheatStatus={preheatStatus}
               coolingCapacity={coolingCapacity}
             />
