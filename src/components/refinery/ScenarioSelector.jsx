@@ -5,40 +5,54 @@ import { SCENARIOS } from "./calcEngine";
 import { Play, Square } from "lucide-react";
 
 export default function ScenarioSelector({ activeScenario, onSelect, autoCycling, onToggleAutoCycle }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+
   return (
-    <div className="bg-[#1e1e1e] border border-[#333] rounded-lg p-4">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-[#888] text-xs uppercase tracking-wider font-medium">Scenario</p>
+    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
+      <div className="flex items-center justify-center gap-3">
         <Button
           onClick={onToggleAutoCycle}
-          variant="outline"
+          variant={autoCycling ? "default" : "outline"}
           size="sm"
           className={cn(
-            "text-xs border-[#444] bg-transparent",
-            autoCycling ? "text-amber-400 border-amber-700" : "text-[#aaa] hover:text-white"
+            "h-9 px-5 text-sm font-semibold transition-all duration-400",
+            autoCycling && "bg-[#0F5F5F] border-[#0F9F9F]"
           )}
         >
-          {autoCycling ? <Square className="w-3 h-3 mr-1.5" /> : <Play className="w-3 h-3 mr-1.5" />}
-          {autoCycling ? "Stop Auto Cycle" : "Auto Cycle"}
+          {autoCycling ? <Square className="h-3.5 w-3.5 mr-2" /> : <Play className="h-3.5 w-3.5 mr-2" />}
+          {autoCycling ? "Stop Auto-Cycle" : "Auto-Cycle Scenarios"}
         </Button>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {SCENARIOS.map((s, i) => (
+        
+        <div className="relative">
           <Button
-            key={i}
-            onClick={() => onSelect(i)}
+            onClick={() => setShowDropdown(!showDropdown)}
             variant="outline"
             size="sm"
-            className={cn(
-              "text-xs bg-transparent",
-              activeScenario === i
-                ? "border-white/40 text-white"
-                : "border-[#444] text-[#888] hover:text-white"
-            )}
+            className="h-9 px-4 text-sm transition-all duration-400"
           >
-            {s.name}
+            Scenario {activeScenario + 1}
           </Button>
-        ))}
+          
+          {showDropdown && (
+            <div className="absolute top-full mt-1 right-0 bg-[#1e1e1e] border border-[#333] rounded-lg shadow-xl z-50 min-w-[280px] max-h-[320px] overflow-y-auto">
+              {SCENARIOS.map((scenario, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    onSelect(idx);
+                    setShowDropdown(false);
+                  }}
+                  className={cn(
+                    "w-full text-left px-4 py-2.5 text-xs hover:bg-[#2a2a2a] transition-colors duration-200 border-b border-[#2a2a2a] last:border-0",
+                    activeScenario === idx && "bg-[#0F5F5F]/20 text-[#0F9F9F]"
+                  )}
+                >
+                  <span className="font-semibold">{idx + 1}.</span> {scenario.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
