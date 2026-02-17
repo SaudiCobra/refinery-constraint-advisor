@@ -4,9 +4,10 @@ import DecisionWindowBar from "./DecisionWindowBar";
 import {
   computeConfidence,
   computeCorrectiveLevers,
-  getConfidenceQualifier,
+  getConfidenceQualifiers,
   getSituationHeadline,
   getEscalationCause,
+  getRecommendationWithConfidence,
 } from "./confidenceEngine";
 
 const LEVEL_CONFIG = {
@@ -31,38 +32,35 @@ export default function PresentationHero({
   const stable = slope <= 0 || timeToNearest === Infinity;
   const config = LEVEL_CONFIG[escalationLevel] || LEVEL_CONFIG[0];
   
+  // Simulate multi-transmitter consistency (85% chance of consistency)
+  const simulateMismatch = Math.random() > 0.85;
+  const transmitterMismatchCount = simulateMismatch ? (Math.random() > 0.5 ? 1 : 2) : 0;
+  const valveReliability = (Math.random() > 0.9 && escalationLevel >= 2) ? "lag" : "normal";
+  
   // Compute confidence
-  const transmitterConsistency = Math.random() > 0.15; // 85% chance of consistency (simulated)
-  const confidence = computeConfidence(sensorQuality, opMode, "normal", transmitterConsistency);
-  const confidenceQualifier = getConfidenceQualifier(sensorQuality, opMode, transmitterConsistency);
+  const confidence = computeConfidence(sensorQuality, opMode, valveReliability, transmitterMismatchCount, 3);
+  const confidenceQualifiers = getConfidenceQualifiers(sensorQuality, opMode, transmitterMismatchCount, 3, valveReliability);
   
   // Compute corrective levers
   const correctiveLevers = computeCorrectiveLevers(equipment);
   
-  // Get dynamic headline and cause
+  // Get dynamic headline and cause (single dominant cause)
   const headline = getSituationHeadline(escalationLevel, timeToNearest, nearestName, coolingCapacity, preheatStatus, slope);
-  const cause = getEscalationCause(escalationLevel, coolingCapacity, preheatStatus, slope, timeToNearest);
-
-  const recommendation = escalationLevel === 0
-    ? "Monitor closely while response window remains open."
-    : escalationLevel === 1
-    ? "Prepare escalation if trend persists."
-    : escalationLevel === 2
-    ? confidence.level === "Reduced" 
-      ? "Verify instrumentation before aggressive corrective action."
-      : "Escalate to shift lead if margin continues shrinking."
-    : "Immediate escalation required. Notify shift lead now.";
+  const cause = getEscalationCause(escalationLevel, coolingCapacity, preheatStatus, slope, timeToNearest, equipment);
+  
+  // Get recommendation adjusted for confidence
+  const recommendation = getRecommendationWithConfidence(escalationLevel, confidence, equipment, coolingCapacity);
 
   return (
-    <div className="flex flex-col items-center justify-center px-6 space-y-6">
-      {/* Enhanced Situation Headline */}
-      <div className="w-full max-w-4xl">
-        <div className={cn("px-6 py-4 rounded-lg border-2 text-center transition-all duration-500", `border-[${config.text.replace('text-', '')}]`)}>
-          <p className={cn("text-xl font-semibold", config.text)}>
+    <div className="flex flex-col items-center justify-center px-6 py-8 space-y-5">
+      {/* Enhanced Situation Headline - TOP */}
+      <div className="w-full max-w-5xl">
+        <div className={cn("px-8 py-5 rounded-lg border-2 text-center transition-all duration-700", `border-[${config.text.replace('text-', '')}]`)}>
+          <p className={cn("text-3xl font-bold tracking-tight", config.text)}>
             {headline}
           </p>
           {cause && (
-            <p className="text-[#999] text-sm mt-2 italic">
+            <p className="text-[#999] text-base mt-3 italic font-medium">
               Cause: {cause}
             </p>
           )}
@@ -70,97 +68,102 @@ export default function PresentationHero({
       </div>
 
       {/* Status Badge */}
-      <div className={cn("px-5 py-2 rounded border text-sm font-semibold tracking-widest uppercase", config.badge)}>
+      <div className={cn("px-6 py-2.5 rounded border-2 text-base font-bold tracking-widest uppercase", config.badge)}>
         {config.label}
       </div>
 
       {/* Decision Window Bar */}
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-3xl">
         <DecisionWindowBar timeToNearest={timeToNearest} />
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-3 gap-4 w-full max-w-3xl">
-        {/* Nearest Constraint */}
-        <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-4 py-3 text-center">
-          <p className="text-[#666] text-xs uppercase tracking-wider mb-1">Nearest Constraint</p>
-          <p className="text-[#aaa] text-base font-semibold">{stable ? "—" : nearestName}</p>
-        </div>
-
-        {/* Corrective Levers */}
-        <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-4 py-3 text-center">
-          <p className="text-[#666] text-xs uppercase tracking-wider mb-1">Corrective Levers</p>
-          <p className={cn(
-            "text-base font-semibold",
-            correctiveLevers === 0 && "text-[#A13A1F]",
-            correctiveLevers <= 1 && correctiveLevers > 0 && "text-[#B47A1F]",
-            correctiveLevers > 1 && "text-[#0F9F9F]"
-          )}>
-            {correctiveLevers}
-          </p>
-        </div>
-
-        {/* Confidence */}
-        <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-4 py-3 text-center">
-          <p className="text-[#666] text-xs uppercase tracking-wider mb-1">Confidence</p>
-          <p className={cn(
-            "text-base font-semibold",
-            confidence.level === "High" && "text-[#0F9F9F]",
-            confidence.level === "Moderate" && "text-[#B47A1F]",
-            confidence.level === "Reduced" && "text-[#A13A1F]"
-          )}>
-            {confidence.level}
-          </p>
-        </div>
-      </div>
-
-      {/* Confidence Qualifier */}
-      {(confidence.level !== "High" || !transmitterConsistency) && (
-        <div className="bg-[#2a1a1a] border border-[#B47A1F] rounded-lg px-4 py-2 text-center max-w-2xl">
-          <p className="text-[#D4A547] text-xs">
-            {!transmitterConsistency ? "Data Consistency: Mismatch Detected" : confidenceQualifier}
-          </p>
+      {/* Nearest Constraint Badge - Only if not stable */}
+      {!stable && nearestName && (
+        <div className="bg-[#1e1e1e] border-2 border-[#444] rounded-lg px-6 py-3 text-center">
+          <p className="text-[#888] text-xs uppercase tracking-wider mb-1">Nearest Constraint</p>
+          <p className={cn("text-2xl font-bold", config.text)}>{nearestName}</p>
         </div>
       )}
 
-      {/* Status Lines */}
-      <div className="flex flex-wrap justify-center gap-4 text-sm">
-        {preheatActive && preheatStatus && (
-          <div>
-            <span className="text-[#666]">Preheat: </span>
+      {/* Status Lines - Only show exceptions */}
+      <div className="flex flex-wrap justify-center gap-6 text-base">
+        {coolingCapacity !== "NORMAL" && (
+          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-2.5">
+            <span className="text-[#888] text-sm">Cooling: </span>
             <span className={cn(
-              "font-medium",
+              "font-bold text-base",
+              coolingCapacity === "REDUCED" && "text-[#B47A1F]",
+              coolingCapacity === "CONSTRAINED" && "text-[#A13A1F]"
+            )}>
+              {coolingCapacity}
+            </span>
+          </div>
+        )}
+        
+        {preheatActive && preheatStatus && (preheatStatus.includes("stress") || preheatStatus.includes("Warning")) && (
+          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-2.5">
+            <span className="text-[#888] text-sm">Preheat: </span>
+            <span className={cn(
+              "font-bold text-base",
               preheatStatus.includes("stress") && "text-[#A13A1F]",
-              preheatStatus.includes("Warning") && "text-[#B47A1F]",
-              !preheatStatus.includes("stress") && !preheatStatus.includes("Warning") && "text-[#0F9F9F]"
+              preheatStatus.includes("Warning") && "text-[#B47A1F]"
             )}>
               {preheatStatus}
             </span>
           </div>
         )}
-        
-        <div>
-          <span className="text-[#666]">Cooling: </span>
-          <span className={cn(
-            "font-medium",
-            coolingCapacity === "NORMAL" && "text-[#2F5D80]",
-            coolingCapacity === "REDUCED" && "text-[#B47A1F]",
-            coolingCapacity === "CONSTRAINED" && "text-[#A13A1F]"
-          )}>
-            {coolingCapacity}
-          </span>
-        </div>
       </div>
 
+      {/* Corrective Levers & Confidence Row */}
+      <div className="flex gap-6 justify-center">
+        {/* Corrective Levers - Only highlight if <=2 */}
+        {correctiveLevers <= 2 && (
+          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-6 py-3 text-center min-w-[160px]">
+            <p className="text-[#888] text-xs uppercase tracking-wider mb-1 font-semibold">Corrective Levers</p>
+            <p className={cn(
+              "text-2xl font-bold",
+              correctiveLevers === 0 && "text-[#A13A1F]",
+              correctiveLevers === 1 && "text-[#B47A1F]",
+              correctiveLevers === 2 && "text-[#D4A547]"
+            )}>
+              {correctiveLevers}
+            </p>
+          </div>
+        )}
+
+        {/* Confidence - Only if not High */}
+        {confidence.level !== "High" && (
+          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-6 py-3 text-center min-w-[160px]">
+            <p className="text-[#888] text-xs uppercase tracking-wider mb-1 font-semibold">Confidence</p>
+            <p className={cn(
+              "text-2xl font-bold uppercase",
+              confidence.level === "Moderate" && "text-[#B47A1F]",
+              confidence.level === "Reduced" && "text-[#A13A1F]"
+            )}>
+              {confidence.level}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Confidence Qualifiers - Only show if present */}
+      {confidenceQualifiers.length > 0 && (
+        <div className="bg-[#2a1a1a] border border-[#B47A1F] rounded-lg px-5 py-2 text-center max-w-2xl">
+          <p className="text-[#D4A547] text-sm font-medium">
+            {confidenceQualifiers[0]}
+          </p>
+        </div>
+      )}
+
       {/* Recommendation */}
-      <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-6 py-4 text-center max-w-3xl">
-        <p className="text-[#aaa] text-sm italic">{recommendation}</p>
+      <div className="bg-[#1e1e1e] border border-[#444] rounded-lg px-8 py-4 text-center max-w-4xl">
+        <p className="text-[#bbb] text-base italic font-medium">{recommendation}</p>
       </div>
 
       {/* Footer Disclaimers */}
-      <div className="text-center text-[#555] text-xs space-y-1 pt-2">
-        <p>Advisory-only system — Not for automatic control</p>
-        <p>Operator judgment remains primary authority</p>
+      <div className="text-center text-[#555] text-xs space-y-1 pt-4">
+        <p className="tracking-wide">Advisory-only system — Not for automatic control</p>
+        <p className="tracking-wide">Operator judgment remains primary authority</p>
       </div>
     </div>
   );
