@@ -197,9 +197,12 @@ export default function ProcessMap({
         
         {/* Feed outlet temp (after E-1) */}
         {interactive && (
-          <text x="260" y="195" fill={tubeThermalColor} fontSize="10" textAnchor="middle" fontWeight="500" className="transition-colors duration-500">
-            Tube Out: {tubeSideOutletTemp.toFixed(1)}{units}
-          </text>
+          <>
+            <text x="260" y="190" fill="#888" fontSize="8" textAnchor="middle">E-1 Tube Out</text>
+            <text x="260" y="203" fill={tubeThermalColor} fontSize="10" textAnchor="middle" fontWeight="500" className="transition-colors duration-500">
+              T = {tubeSideOutletTemp.toFixed(1)}{units}
+            </text>
+          </>
         )}
 
         {/* BYPASS PATH AROUND E-1 TUBE SIDE (TCV-01A) */}
@@ -324,12 +327,13 @@ export default function ProcessMap({
         {/* Reactor temperature and slope display */}
         {interactive && (
           <>
-            <text x="470" y="130" fill={baseColor} fontSize="12" textAnchor="middle" fontWeight="700" className="transition-colors duration-500">
-              T={currentTemp.toFixed(1)}{units}
+            <text x="470" y="120" fill="#888" fontSize="9" textAnchor="middle">R-1 Outlet</text>
+            <text x="470" y="135" fill={baseColor} fontSize="12" textAnchor="middle" fontWeight="700" className="transition-colors duration-500">
+              T = {currentTemp.toFixed(1)}{units}
             </text>
             {slope > 0 && (
-              <text x="470" y="145" fill={baseColor} fontSize="10" textAnchor="middle" className="transition-colors duration-500">
-                +{slope.toFixed(2)} {units}/min
+              <text x="470" y="150" fill={baseColor} fontSize="10" textAnchor="middle" className="transition-colors duration-500">
+                Δ = +{slope.toFixed(2)} {units}/min
               </text>
             )}
           </>
@@ -419,9 +423,12 @@ export default function ProcessMap({
 
         {/* Shell outlet temp */}
         {interactive && (
-          <text x="210" y="220" fill={getThermalColor(shellSideOutletTemp)} fontSize="9" textAnchor="middle" className="transition-colors duration-500">
-            Shell Out: {shellSideOutletTemp.toFixed(0)}{units}
-          </text>
+          <>
+            <text x="210" y="215" fill="#888" fontSize="8" textAnchor="middle">E-1 Shell Out</text>
+            <text x="210" y="228" fill={getThermalColor(shellSideOutletTemp)} fontSize="9" textAnchor="middle" className="transition-colors duration-500">
+              T = {shellSideOutletTemp.toFixed(0)}{units}
+            </text>
+          </>
         )}
 
         {/* EFFLUENT COOLER E-2 */}

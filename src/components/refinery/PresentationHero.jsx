@@ -4,7 +4,7 @@ import DecisionWindowBar from "./DecisionWindowBar";
 import {
   computeConfidence,
   computeCorrectiveLevers,
-  getConfidenceQualifiers,
+  getConfidenceLabel,
   getSituationHeadline,
   getEscalationCause,
   getRecommendationWithConfidence,
@@ -41,13 +41,13 @@ export default function PresentationHero({
   
   // Compute confidence
   const confidence = computeConfidence(sensorQuality, opMode, valveReliability, transmitterMismatchCount, 3);
-  const confidenceQualifiers = getConfidenceQualifiers(sensorQuality, opMode, transmitterMismatchCount, 3, valveReliability);
+  const confidenceLabel = getConfidenceLabel(confidence, transmitterMismatchCount, 3, sensorQuality);
   
   // Compute corrective levers
   const correctiveLevers = computeCorrectiveLevers(equipment);
   
   // Get dynamic headline and cause (single dominant cause)
-  const headline = getSituationHeadline(escalationLevel, timeToNearest, nearestName, coolingCapacity, preheatStatus, slope);
+  const headline = getSituationHeadline(escalationLevel, timeToNearest, nearestName, coolingCapacity, preheatStatus, slope, hotSpotRisk, equipment);
   const cause = getEscalationCause(escalationLevel, coolingCapacity, preheatStatus, slope, timeToNearest, equipment, hotSpotRisk, bedImbalance);
   
   // Get recommendation adjusted for confidence and hot spot risk
@@ -161,29 +161,20 @@ export default function PresentationHero({
           </div>
         )}
 
-        {/* Confidence - Only if not High */}
-        {confidence.level !== "High" && (
-          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-6 py-3 text-center min-w-[160px]">
-            <p className="text-[#888] text-xs uppercase tracking-wider mb-1 font-semibold">Confidence</p>
-            <p className={cn(
-              "text-2xl font-bold uppercase",
-              confidence.level === "Moderate" && "text-[#B47A1F]",
-              confidence.level === "Reduced" && "text-[#A13A1F]"
-            )}>
-              {confidence.level}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Confidence Qualifiers - Only show if present */}
-      {confidenceQualifiers.length > 0 && (
-        <div className="bg-[#2a1a1a] border border-[#B47A1F] rounded-lg px-5 py-2 text-center max-w-2xl">
-          <p className="text-[#D4A547] text-sm font-medium">
-            {confidenceQualifiers[0]}
+        {/* Confidence - Always show */}
+        <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-6 py-3 text-center min-w-[200px]">
+          <p className="text-[#888] text-xs uppercase tracking-wider mb-1 font-semibold">Confidence</p>
+          <p className={cn(
+            "text-base font-bold",
+            confidenceLabel.includes("HIGH") && "text-[#0F9F9F]",
+            confidenceLabel.includes("MODERATE") && "text-[#B47A1F]",
+            confidenceLabel.includes("REDUCED") && "text-[#A13A1F]",
+            confidenceLabel.includes("CRITICAL") && "text-[#7A0F0F]"
+          )}>
+            {confidenceLabel}
           </p>
         </div>
-      )}
+      </div>
 
       {/* Recommendation */}
       <div className="bg-[#1e1e1e] border border-[#444] rounded-lg px-8 py-4 text-center max-w-4xl">

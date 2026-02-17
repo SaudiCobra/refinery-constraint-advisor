@@ -54,66 +54,62 @@ export function computeCorrectiveLevers(equipment) {
   return levers;
 }
 
-export function getConfidenceQualifiers(sensorQuality, opMode, transmitterMismatchCount, totalTransmitters, valveReliability) {
-  const qualifiers = [];
-  
-  // Priority order - only show dominant issues
-  if (transmitterMismatchCount >= 2) {
-    qualifiers.push(`Data Consistency: ${transmitterMismatchCount}/${totalTransmitters} Conflict`);
-  } else if (transmitterMismatchCount === 1) {
-    qualifiers.push(`Data Consistency: ${transmitterMismatchCount}/${totalTransmitters} Mismatch`);
+export function getConfidenceLabel(confidence, transmitterMismatchCount, totalTransmitters, sensorQuality) {
+  if (confidence.level === "High") {
+    return "HIGH";
   }
   
-  if (valveReliability !== "normal") {
-    qualifiers.push("Control Valve: Response Unstable");
+  if (confidence.level === "Moderate") {
+    return "MODERATE — Data variance detected";
   }
   
-  if (sensorQuality === "bad") {
-    qualifiers.push("Instrument Quality Poor");
-  } else if (sensorQuality === "suspect") {
-    qualifiers.push("Instrument Quality Suspect");
+  if (confidence.level === "Reduced") {
+    if (transmitterMismatchCount >= 2) {
+      return "REDUCED — Instrument disagreement";
+    }
+    if (sensorQuality === "bad") {
+      return "CRITICAL — Verify instrumentation";
+    }
+    return "REDUCED — Data inconsistency";
   }
   
-  if (opMode === "transient" && qualifiers.length === 0) {
-    qualifiers.push("Transient Mode");
-  }
-  
-  return qualifiers.slice(0, 1); // Only return first/most critical
+  return "HIGH";
 }
 
-export function getSituationHeadline(escalationLevel, timeToNearest, nearestName, coolingCapacity, preheatStatus, slope) {
-  const timeStr = timeToNearest === Infinity || timeToNearest == null 
-    ? "No Immediate Constraint Pressure" 
-    : `${Math.round(timeToNearest)} Minutes to ${nearestName}`;
+export function getSituationHeadline(escalationLevel, timeToNearest, nearestName, coolingCapacity, preheatStatus, slope, hotSpotRisk, equipment) {
+  const timeMin = Math.round(timeToNearest);
   
-  // Level 3 - Always immediate risk
-  if (escalationLevel === 3) {
-    return `Immediate Risk — ${timeStr}`;
+  // Priority 1: Hot Spot Risk HIGH
+  if (hotSpotRisk === "HIGH") {
+    return "Immediate Risk — Bed Hot Spot Developing";
   }
   
-  // Level 2 - Prioritize constraint causes
-  if (escalationLevel === 2) {
-    if (coolingCapacity === "CONSTRAINED") {
-      return `Cooling Constrained — ${timeStr}`;
-    }
-    if (preheatStatus?.includes("stress")) {
-      return `Catalyst Stress Risk — ${timeStr}`;
-    }
-    return `Escalation Prepared — ${timeStr}`;
+  // Priority 2: Time-to-Constraint < 10 min
+  if (timeToNearest < 10 && timeToNearest > 0) {
+    return `Immediate Risk — ${timeMin} Minutes to ${nearestName}`;
   }
   
-  // Level 1 - Prioritize early warnings
-  if (escalationLevel === 1) {
-    if (coolingCapacity === "REDUCED") {
-      return `Cooling Authority Reduced — ${timeStr}`;
-    }
-    if (slope > 1.5) {
-      return `Ramp-Rate Sensitivity — ${timeStr}`;
-    }
-    return `Early Drift Detected — ${timeStr}`;
+  // Priority 3: Cooling Constrained
+  if (coolingCapacity === "CONSTRAINED") {
+    return `Cooling Constrained — ${timeMin} Minutes to ${nearestName}`;
   }
   
-  // Level 0
+  // Priority 4: Hydrogen Limited
+  if (!equipment.h2Compressor && escalationLevel >= 1) {
+    return "Moderation Limited — Exotherm Sensitivity Increased";
+  }
+  
+  // Priority 5: Ramp-Rate Exceeded
+  if (slope > 1.5 || preheatStatus?.includes("stress")) {
+    return "Rapid Temperature Rise Detected";
+  }
+  
+  // Priority 6: Early Drift
+  if (escalationLevel >= 1 && timeToNearest < Infinity) {
+    return `Early Drift Detected — ${timeMin} Minutes to ${nearestName}`;
+  }
+  
+  // Priority 7: Stable
   return "System Stable — No Immediate Constraint Pressure";
 }
 
@@ -159,48 +155,38 @@ export function getRecommendationWithConfidence(escalationLevel, confidence, equ
 }
 
 export function getEscalationCause(escalationLevel, coolingCapacity, preheatStatus, slope, timeToNearest, equipment, hotSpotRisk, bedImbalance) {
-  // Priority order: Show only ONE dominant cause
+  // SINGLE DOMINANT CAUSE - Strict Priority Order
   
-  // 1) Hot Spot Risk (highest priority when present)
+  // 1) Hot Spot Risk HIGH
   if (hotSpotRisk === "HIGH") {
-    return "Hot spot risk increasing";
+    return `Bed ${bedImbalance?.dominantBed || 2} temperature diverging from profile`;
   }
   
-  // 2) Cooling Constrained
-  if (coolingCapacity === "CONSTRAINED") {
-    return "Cooling constrained — response window compressed";
-  }
-  
-  // 3) Bed Temperature Imbalance (when MEDIUM hot spot or SEVERE imbalance)
-  if (hotSpotRisk === "MEDIUM" || bedImbalance?.severity === "SEVERE") {
-    return "Bed temperature imbalance increasing";
-  }
-  
-  // 4) Time-to-Constraint <10 min
+  // 2) Time-to-Constraint < 10 min
   if (timeToNearest < 10 && timeToNearest > 0) {
-    return "Time-to-constraint below critical threshold";
+    return "Time-to-limit below escalation threshold";
+  }
+  
+  // 3) Cooling Constrained
+  if (coolingCapacity === "CONSTRAINED") {
+    return "Shell-side heat recovery reduced";
+  }
+  
+  // 4) Hydrogen Limited
+  if (!equipment.h2Compressor && escalationLevel >= 1) {
+    return "Hydrogen moderation limited";
   }
   
   // 5) Ramp-Rate Exceeded
   if (slope > 1.5 || preheatStatus?.includes("stress")) {
-    return "Ramp-rate exceeds recommended envelope";
+    return "Rate-of-rise exceeding expected range";
   }
   
-  // 6) Hydrogen Margin Limited
-  if (!equipment.h2Compressor && escalationLevel >= 1) {
-    return "Hydrogen margin limited";
-  }
-  
-  // 7) Cooling Reduced (lower priority)
-  if (coolingCapacity === "REDUCED" && escalationLevel >= 1) {
-    return "Cooling authority limited";
-  }
-  
-  // 8) Generic drift
+  // 6) Early Drift
   if (escalationLevel >= 1) {
-    return "Early upward drift detected";
+    return "Minor upward temperature drift";
   }
   
-  // Level 0 - no cause
+  // Stable - no cause
   return null;
 }
