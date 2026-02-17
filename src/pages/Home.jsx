@@ -376,6 +376,8 @@ export default function Home() {
               preheatActive={activePreheatMode}
               preheatStatus={preheatStatus}
               coolingCapacity={coolingCapacity}
+              sensorQuality={activeData.sensorQuality}
+              opMode={activeData.opMode}
             />
           </>
         )}
