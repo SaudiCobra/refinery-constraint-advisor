@@ -35,7 +35,17 @@ export default function ProcessMap({
   const [selectedUnit, setSelectedUnit] = useState(null);
   const baseColor = LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0];
   const coolerColor = COOLING_COLORS[coolingCapacity] || COOLING_COLORS.NORMAL;
-  const animationSpeed = escalationLevel === 0 ? "8s" : escalationLevel === 1 ? "6s" : escalationLevel === 2 ? "4s" : "3s";
+  // Flow speed scaling based on escalation
+  const flowSpeedMultiplier = escalationLevel === 0 ? 1.0 : escalationLevel === 1 ? 1.2 : escalationLevel === 2 ? 1.5 : 1.8;
+  const animationSpeed = `${8 / flowSpeedMultiplier}s`;
+  
+  // Valve states (simulated based on equipment and escalation)
+  const valveStates = {
+    tcv01a: equipment.bypassValve ? "CLOSED" : "OOS", // Feed bypass
+    tcv01b: "OPEN", // Primary feed to tube side
+    tcv02a: escalationLevel >= 2 && !equipment.preheatExchanger ? "MODULATING" : "OPEN", // Effluent to shell
+    tcv02b: equipment.bypassValve && escalationLevel >= 2 ? "MODULATING" : "CLOSED", // Shell bypass
+  };
 
   const preheatColor = preheatActive && preheatStatus?.includes("Stress") ? "#A13A1F" 
     : preheatActive && preheatStatus?.includes("Warning") ? "#B47A1F" 
@@ -46,8 +56,27 @@ export default function ProcessMap({
     setSelectedUnit(selectedUnit === unit ? null : unit);
   };
 
+  // Thermal calculations
   const feedEffluentTemp = Math.max(currentTemp - 50, 280);
   const reactorOutletTemp = currentTemp + 15;
+  
+  // Tube side temperature (feed outlet from E-1)
+  const tubeSideOutletTemp = valveStates.tcv01a === "OPEN" ? currentTemp * 0.85 : currentTemp;
+  
+  // Shell side temperature (effluent after heat recovery)
+  const shellSideOutletTemp = valveStates.tcv02b === "OPEN" ? reactorOutletTemp * 0.95 : feedEffluentTemp;
+  
+  // Thermal colors for tube and shell
+  const getThermalColor = (temp) => {
+    if (temp < 300) return "#0F5F5F"; // Neutral teal
+    if (temp < 340) return "#2F5D80"; // Warm teal
+    if (temp < 360) return "#B47A1F"; // Amber
+    if (temp < 375) return "#D4653F"; // Burnt orange
+    return "#A13A1F"; // Deep crimson
+  };
+  
+  const tubeThermalColor = getThermalColor(tubeSideOutletTemp);
+  const shellThermalColor = getThermalColor(reactorOutletTemp);
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative">
@@ -84,153 +113,222 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* PIPE: Feed to E-1 */}
-        <line x1="82" y1="240" x2="170" y2="240" stroke="#555" strokeWidth="4" />
+        {/* PIPE: Feed to TCV-01B */}
+        <line x1="82" y1="240" x2="140" y2="240" stroke="#555" strokeWidth="4" />
         <circle cx="110" cy="240" r="4" fill={baseColor}>
-          <animate attributeName="cx" values="82;170" dur={animationSpeed} repeatCount="indefinite" />
+          <animate attributeName="cx" values="82;140" dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
+        
+        {/* TCV-01B: Primary Feed Control Valve */}
+        <g transform="translate(160, 240)" onClick={() => handleUnitClick('tcv01b')} className={cn(interactive && "cursor-pointer")}>
+          <polygon 
+            points="-10,-10 10,-10 8,0 10,10 -10,10 -8,0" 
+            fill={valveStates.tcv01b === "OPEN" ? "#2F5D80" : valveStates.tcv01b === "MODULATING" ? "#B47A1F" : "#7A0F0F"} 
+            stroke="#555" 
+            strokeWidth="2"
+          />
+          <text x="0" y="-18" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">TCV-01B</text>
+          {valveStates.tcv01b === "MODULATING" && (
+            <circle cx="0" cy="0" r="3" fill="#D4A547" opacity="0.8">
+              <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite" />
+            </circle>
+          )}
+        </g>
+        
+        {/* PIPE: TCV-01B to E-1 Tube Side */}
+        <line x1="170" y1="240" x2="195" y2="240" stroke="#555" strokeWidth="4" />
+        <circle cx="180" cy="240" r="4" fill={tubeThermalColor}>
+          <animate attributeName="cx" values="170;195" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
-        {/* FEED/EFFLUENT HEAT EXCHANGER E-1 */}
+        {/* FEED/EFFLUENT HEAT EXCHANGER E-1 - Realistic Shell & Tube */}
         <g 
-          transform="translate(220, 240)" 
+          transform="translate(260, 240)" 
           onClick={() => handleUnitClick('e1')}
           className={cn(interactive && "cursor-pointer hover:opacity-80 transition-opacity")}
         >
-          {/* Main shell */}
-          <rect x="-35" y="-50" width="70" height="100" rx="10" fill="#2a2a2a" stroke={preheatColor} strokeWidth="3" filter="url(#equipmentShadow)" />
-          {/* Tube bundle indication */}
-          <line x1="-28" y1="-35" x2="28" y2="-35" stroke="#444" strokeWidth="1.5" />
-          <line x1="-28" y1="-25" x2="28" y2="-25" stroke="#444" strokeWidth="1.5" />
-          <line x1="-28" y1="-15" x2="28" y2="-15" stroke="#444" strokeWidth="1.5" />
-          <line x1="-28" y1="-5" x2="28" y2="-5" stroke="#444" strokeWidth="1.5" />
-          <line x1="-28" y1="5" x2="28" y2="5" stroke="#444" strokeWidth="1.5" />
-          <line x1="-28" y1="15" x2="28" y2="15" stroke="#444" strokeWidth="1.5" />
-          <line x1="-28" y1="25" x2="28" y2="25" stroke="#444" strokeWidth="1.5" />
-          <line x1="-28" y1="35" x2="28" y2="35" stroke="#444" strokeWidth="1.5" />
+          {/* Horizontal shell body */}
+          <ellipse cx="-50" cy="0" rx="8" ry="35" fill="#1a1a1a" stroke={preheatColor} strokeWidth="2" />
+          <rect x="-50" y="-35" width="100" height="70" fill="#2a2a2a" stroke={preheatColor} strokeWidth="3" filter="url(#equipmentShadow)" />
+          <ellipse cx="50" cy="0" rx="8" ry="35" fill="#2a2a2a" stroke={preheatColor} strokeWidth="2" />
           
-          {/* Shell side flow arrows */}
-          <path d="M -30,-42 L -25,-42 L -27,-39 M -25,-42 L -27,-45" stroke="#666" strokeWidth="1" fill="none" />
-          <path d="M 30,42 L 25,42 L 27,39 M 25,42 L 27,45" stroke="#666" strokeWidth="1" fill="none" />
+          {/* Tube bundle (horizontal parallel tubes) */}
+          {[-22, -14, -6, 2, 10, 18, 26].map(yOffset => (
+            <line key={yOffset} x1="-42" y1={yOffset} x2="42" y2={yOffset} stroke="#444" strokeWidth="1.5" />
+          ))}
           
-          {preheatActive && preheatStatus?.includes("Stress") && (
-            <rect x="-38" y="-50" width="5" height="100" fill="#A13A1F" rx="2" />
+          {/* Tube side thermal glow */}
+          <rect 
+            x="-42" y="-25" width="84" height="50" 
+            fill={tubeThermalColor} 
+            opacity="0.15"
+            className="transition-all duration-500"
+          />
+          
+          {/* Shell side thermal glow (around tubes) */}
+          <rect 
+            x="-48" y="-33" width="96" height="66" 
+            fill={shellThermalColor} 
+            opacity="0.08"
+            className="transition-all duration-500"
+          />
+          
+          {/* Shell side inlet/outlet nozzles */}
+          <circle cx="-50" cy="-28" r="4" fill="#333" stroke={shellThermalColor} strokeWidth="1.5" />
+          <circle cx="50" cy="28" r="4" fill="#333" stroke={shellThermalColor} strokeWidth="1.5" />
+          
+          {/* Tube side inlet/outlet nozzles */}
+          <circle cx="-50" cy="0" r="4" fill="#333" stroke={tubeThermalColor} strokeWidth="1.5" />
+          <circle cx="50" cy="0" r="4" fill="#333" stroke={tubeThermalColor} strokeWidth="1.5" />
+          
+          {preheatActive && preheatStatus?.includes("stress") && (
+            <rect x="-53" y="-35" width="4" height="70" fill="#A13A1F" rx="2" opacity="0.6" />
           )}
           
-          <text x="0" y="70" fill="#aaa" fontSize="11" textAnchor="middle" fontWeight="600">E-1</text>
-          {interactive && <text x="0" y="82" fill="#888" fontSize="9" textAnchor="middle">Feed/Effluent HX</text>}
+          <text x="0" y="55" fill="#aaa" fontSize="11" textAnchor="middle" fontWeight="600">E-1</text>
+          {interactive && <text x="0" y="67" fill="#888" fontSize="9" textAnchor="middle">Shell & Tube HX</text>}
         </g>
 
+        {/* PIPE: E-1 Tube Side Outlet */}
+        <line x1="310" y1="240" x2="360" y2="240" stroke="#555" strokeWidth="4" />
+        <circle cx="330" cy="240" r="4" fill={tubeThermalColor}>
+          <animate attributeName="cx" values="310;360" dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
+        
         {/* Feed outlet temp (after E-1) */}
         {interactive && (
-          <text x="220" y="180" fill={preheatColor} fontSize="10" textAnchor="middle" fontWeight="500">
-            T={currentTemp.toFixed(1)}{units}
+          <text x="260" y="195" fill={tubeThermalColor} fontSize="10" textAnchor="middle" fontWeight="500" className="transition-colors duration-500">
+            Tube Out: {tubeSideOutletTemp.toFixed(1)}{units}
           </text>
         )}
 
-        {/* BYPASS PATH AROUND E-1 (BV-1) */}
-        <g opacity={equipment.bypassValve ? 1 : 0.4}>
-          <line x1="170" y1="240" x2="170" y2="160" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
-          <line x1="170" y1="160" x2="270" y2="160" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
-          <line x1="270" y1="160" x2="270" y2="240" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+        {/* BYPASS PATH AROUND E-1 TUBE SIDE (TCV-01A) */}
+        <g opacity={valveStates.tcv01a === "OOS" ? 0.3 : 1}>
+          <line x1="140" y1="240" x2="140" y2="180" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          <line x1="140" y1="180" x2="340" y2="180" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          <line x1="340" y1="180" x2="340" y2="240" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
           
-          <g transform="translate(220, 160)" onClick={() => handleUnitClick('bv1')} className={cn(interactive && "cursor-pointer")}>
-            <polygon points="-10,-8 10,-8 8,0 10,8 -10,8 -8,0" fill={equipment.bypassValve ? "#2F5D80" : "#7A0F0F"} stroke="#555" strokeWidth="1.5" />
-            <text x="0" y="-15" fill="#888" fontSize="8" textAnchor="middle" fontWeight="500">BV-1</text>
-            {!equipment.bypassValve && <text x="0" y="25" fill="#A13A1F" fontSize="8" textAnchor="middle">OOS</text>}
+          <g transform="translate(240, 180)" onClick={() => handleUnitClick('tcv01a')} className={cn(interactive && "cursor-pointer")}>
+            <polygon 
+              points="-10,-8 10,-8 8,0 10,8 -10,8 -8,0" 
+              fill={valveStates.tcv01a === "OPEN" ? "#2F5D80" : valveStates.tcv01a === "OOS" ? "#7A0F0F" : "#333"} 
+              stroke={valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} 
+              strokeWidth="2" 
+            />
+            <text x="0" y="-16" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">TCV-01A</text>
+            <text x="0" y="24" fill="#888" fontSize="8" textAnchor="middle">Bypass</text>
+            {valveStates.tcv01a === "OOS" && (
+              <text x="0" y="35" fill="#A13A1F" fontSize="7" textAnchor="middle" fontWeight="600">OOS</text>
+            )}
           </g>
+          
+          {valveStates.tcv01a === "OPEN" && (
+            <circle cx="180" cy="180" r="3" fill="#2F5D80">
+              <animate attributeName="cx" values="140;340" dur={animationSpeed} repeatCount="indefinite" />
+            </circle>
+          )}
         </g>
 
-        {/* PIPE: E-1 to Reactor */}
-        <line x1="255" y1="240" x2="380" y2="240" stroke="#555" strokeWidth="4" />
-        <circle cx="300" cy="240" r="4" fill={baseColor}>
-          <animate attributeName="cx" values="255;380" dur={animationSpeed} repeatCount="indefinite" />
+        {/* PIPE: Merge point to Reactor */}
+        <line x1="360" y1="240" x2="395" y2="240" stroke="#555" strokeWidth="4" />
+        <circle cx="375" cy="240" r="4" fill={baseColor}>
+          <animate attributeName="cx" values="360;395" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
-        {/* REACTOR R-1 with Bed Indicators */}
+        {/* REACTOR R-1 with Enhanced Bed Visualization */}
         <g 
-          transform="translate(450, 240)" 
+          transform="translate(470, 240)" 
           onClick={() => handleUnitClick('r1')}
           className={cn(interactive && "cursor-pointer hover:opacity-80 transition-opacity")}
         >
-          <ellipse cx="0" cy="-55" rx="50" ry="10" fill="#1a1a1a" stroke={baseColor} strokeWidth="2" />
-          <rect x="-50" y="-55" width="100" height="110" fill="#2a2a2a" stroke={baseColor} strokeWidth="4" filter="url(#equipmentShadow)" />
-          <ellipse cx="0" cy="55" rx="50" ry="10" fill="#2a2a2a" stroke={baseColor} strokeWidth="2" />
+          {/* Vessel shell */}
+          <ellipse cx="0" cy="-70" rx="45" ry="9" fill="#1a1a1a" stroke={baseColor} strokeWidth="2.5" />
+          <rect x="-45" y="-70" width="90" height="140" fill="#2a2a2a" stroke={baseColor} strokeWidth="4" filter="url(#equipmentShadow)" />
+          <ellipse cx="0" cy="70" rx="45" ry="9" fill="#2a2a2a" stroke={baseColor} strokeWidth="2.5" />
           
-          {/* Catalyst bed circles */}
+          {/* Internal bed structure with quench injection points */}
           {bedImbalance && bedImbalance.beds.map((bed, idx) => {
-            const yPos = -30 + (idx * 30);
+            const yPos = -45 + (idx * 45);
             const isDominant = bed.id === bedImbalance.dominantBed;
-            const bedColor = isDominant && bedImbalance.severity === "SEVERE" 
-              ? "#A13A1F" 
-              : isDominant && bedImbalance.severity === "MILD" 
-              ? "#B47A1F" 
-              : "#444";
-            const glowIntensity = isDominant && hotSpotRisk !== "LOW" ? 0.4 : 0;
+            
+            // Bed thermal color based on escalation and imbalance
+            const getBedColor = () => {
+              if (hotSpotRisk === "HIGH" && isDominant) return "#A13A1F";
+              if (hotSpotRisk === "MEDIUM" && isDominant) return "#B47A1F";
+              if (isDominant && bedImbalance.severity === "SEVERE") return "#A13A1F";
+              if (isDominant && bedImbalance.severity === "MILD") return "#B47A1F";
+              if (escalationLevel >= 2) return "#B47A1F";
+              if (escalationLevel >= 1) return "#2F5D80";
+              return "#0F5F5F";
+            };
+            
+            const bedColor = getBedColor();
+            const glowIntensity = isDominant && hotSpotRisk === "HIGH" ? 0.5 : isDominant && hotSpotRisk === "MEDIUM" ? 0.3 : 0;
             
             return (
               <g key={bed.id}>
-                <circle 
-                  cx="-25" 
-                  cy={yPos} 
-                  r="5" 
-                  fill={bedColor} 
-                  opacity={0.6 + glowIntensity}
-                  stroke={bedColor}
-                  strokeWidth={isDominant ? 1.5 : 0.5}
-                />
-                <circle 
-                  cx="0" 
-                  cy={yPos} 
-                  r="5" 
-                  fill={bedColor} 
-                  opacity={0.6 + glowIntensity}
-                  stroke={bedColor}
-                  strokeWidth={isDominant ? 1.5 : 0.5}
-                />
-                <circle 
-                  cx="25" 
-                  cy={yPos} 
-                  r="5" 
-                  fill={bedColor} 
-                  opacity={0.6 + glowIntensity}
-                  stroke={bedColor}
-                  strokeWidth={isDominant ? 1.5 : 0.5}
-                />
+                {/* Catalyst bed circles (3 rows per bed) */}
+                <circle cx="-28" cy={yPos} r="5" fill={bedColor} opacity={0.7 + glowIntensity} stroke={bedColor} strokeWidth={isDominant ? 2 : 1} className="transition-all duration-500" />
+                <circle cx="-10" cy={yPos} r="5" fill={bedColor} opacity={0.7 + glowIntensity} stroke={bedColor} strokeWidth={isDominant ? 2 : 1} className="transition-all duration-500" />
+                <circle cx="10" cy={yPos} r="5" fill={bedColor} opacity={0.7 + glowIntensity} stroke={bedColor} strokeWidth={isDominant ? 2 : 1} className="transition-all duration-500" />
+                <circle cx="28" cy={yPos} r="5" fill={bedColor} opacity={0.7 + glowIntensity} stroke={bedColor} strokeWidth={isDominant ? 2 : 1} className="transition-all duration-500" />
+                
+                {/* Bed label */}
+                {interactive && (
+                  <text x="-55" y={yPos + 3} fill="#666" fontSize="8" textAnchor="middle">B{bed.id}</text>
+                )}
+                
+                {/* Quench injection point between beds */}
+                {idx < bedImbalance.beds.length - 1 && (
+                  <g>
+                    <line x1="45" y1={yPos + 20} x2="55" y2={yPos + 20} stroke={equipment.h2Compressor ? "#2F5D80" : "#B47A1F"} strokeWidth="2" />
+                    <circle cx="55" cy={yPos + 20} r="3" fill={equipment.h2Compressor ? "#2F5D80" : "#B47A1F"} opacity="0.8">
+                      {equipment.h2Compressor && (
+                        <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2s" repeatCount="indefinite" />
+                      )}
+                    </circle>
+                    {interactive && (
+                      <text x="70" y={yPos + 22} fill="#888" fontSize="7" textAnchor="start">Q{idx + 1}</text>
+                    )}
+                  </g>
+                )}
               </g>
             );
           })}
           
+          {/* Overall reactor thermal glow */}
           {escalationLevel >= 2 && (
-            <rect x="-45" y="-50" width="90" height="100" fill="url(#reactorGlow)" className={escalationLevel >= 3 ? "animate-[pulse_1.2s_ease-in-out_infinite]" : ""} />
+            <rect x="-42" y="-67" width="84" height="134" fill="url(#reactorGlow)" className={escalationLevel >= 3 ? "animate-[pulse_1.2s_ease-in-out_infinite]" : "transition-opacity duration-500"} />
           )}
           
-          {/* Dominant bed outline for imbalance */}
-          {bedImbalance && bedImbalance.severity !== "NONE" && (
+          {/* Dominant bed outline for severe imbalance */}
+          {bedImbalance && bedImbalance.severity === "SEVERE" && (
             <rect 
-              x="-48" 
-              y="-53" 
-              width="96" 
-              height="106" 
+              x="-43" 
+              y="-68" 
+              width="86" 
+              height="136" 
               fill="none" 
-              stroke={bedImbalance.severity === "SEVERE" ? "#A13A1F" : "#B47A1F"} 
+              stroke="#A13A1F" 
               strokeWidth="2" 
-              strokeDasharray="5,5"
-              opacity="0.5"
+              strokeDasharray="6,4"
+              opacity="0.6"
+              className="transition-all duration-500"
             />
           )}
           
-          <text x="0" y="80" fill="#aaa" fontSize="13" textAnchor="middle" fontWeight="bold">R-1</text>
-          {interactive && <text x="0" y="93" fill="#888" fontSize="10" textAnchor="middle">Reactor</text>}
+          <text x="0" y="95" fill="#aaa" fontSize="13" textAnchor="middle" fontWeight="bold">R-1</text>
+          {interactive && <text x="0" y="108" fill="#888" fontSize="10" textAnchor="middle">Reactor</text>}
         </g>
 
         {/* Reactor temperature and slope display */}
         {interactive && (
           <>
-            <text x="450" y="135" fill={baseColor} fontSize="12" textAnchor="middle" fontWeight="700">
+            <text x="470" y="130" fill={baseColor} fontSize="12" textAnchor="middle" fontWeight="700" className="transition-colors duration-500">
               T={currentTemp.toFixed(1)}{units}
             </text>
             {slope > 0 && (
-              <text x="450" y="150" fill={baseColor} fontSize="10" textAnchor="middle">
+              <text x="470" y="145" fill={baseColor} fontSize="10" textAnchor="middle" className="transition-colors duration-500">
                 +{slope.toFixed(2)} {units}/min
               </text>
             )}
@@ -249,46 +347,93 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* PIPE: Reactor to E-2 (effluent side of E-1) */}
-        <line x1="500" y1="240" x2="580" y2="240" stroke="#555" strokeWidth="4" />
-        <circle cx="530" cy="240" r="4" fill={baseColor}>
-          <animate attributeName="cx" values="500;580" dur={animationSpeed} repeatCount="indefinite" />
+        {/* PIPE: Reactor Outlet to TCV-02A */}
+        <line x1="515" y1="240" x2="570" y2="240" stroke="#555" strokeWidth="4" />
+        <circle cx="540" cy="240" r="4" fill={shellThermalColor}>
+          <animate attributeName="cx" values="515;570" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
+        
+        {/* TCV-02A: Primary Effluent Control Valve to Shell Side */}
+        <g transform="translate(590, 240)" onClick={() => handleUnitClick('tcv02a')} className={cn(interactive && "cursor-pointer")}>
+          <polygon 
+            points="-10,-10 10,-10 8,0 10,10 -10,10 -8,0" 
+            fill={valveStates.tcv02a === "OPEN" ? "#2F5D80" : valveStates.tcv02a === "MODULATING" ? "#B47A1F" : "#7A0F0F"} 
+            stroke="#555" 
+            strokeWidth="2"
+          />
+          <text x="0" y="-18" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">TCV-02A</text>
+          {valveStates.tcv02a === "MODULATING" && (
+            <>
+              <circle cx="0" cy="0" r="3" fill="#D4A547" opacity="0.8">
+                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite" />
+              </circle>
+              <text x="0" y="25" fill="#B47A1F" fontSize="7" textAnchor="middle">RESTRICT</text>
+            </>
+          )}
+        </g>
 
-        {/* Return path to E-1 hot side (effluent cooling in E-1) */}
-        <line x1="580" y1="240" x2="580" y2="310" stroke="#555" strokeWidth="3" strokeDasharray="5,3" />
-        <line x1="580" y1="310" x2="220" y2="310" stroke="#555" strokeWidth="3" strokeDasharray="5,3" />
-        <circle cx="400" cy="310" r="3" fill="#A13A1F" opacity="0.6">
-          <animate attributeName="cx" values="580;220" dur={animationSpeed} repeatCount="indefinite" />
+        {/* PIPE: TCV-02A to E-1 Shell Side Inlet */}
+        <line x1="600" y1="240" x2="600" y2="285" stroke="#555" strokeWidth="3" />
+        <line x1="600" y1="285" x2="310" y2="285" stroke="#555" strokeWidth="3" />
+        <line x1="310" y1="285" x2="310" y2="268" stroke="#555" strokeWidth="3" />
+        <circle cx="450" cy="285" r="3" fill={shellThermalColor} opacity="0.7">
+          <animate attributeName="cx" values="600;310" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
         {interactive && (
-          <text x="400" y="330" fill="#888" fontSize="9" textAnchor="middle">Hot effluent to E-1</text>
+          <text x="450" y="300" fill={shellThermalColor} fontSize="9" textAnchor="middle" className="transition-colors duration-500">
+            Hot effluent to shell
+          </text>
         )}
+        
+        {/* SHELL BYPASS (TCV-02B) */}
+        <g opacity={valveStates.tcv02b === "CLOSED" ? 0.3 : 1}>
+          <line x1="600" y1="240" x2="650" y2="240" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          <line x1="650" y1="240" x2="650" y2="330" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          <line x1="650" y1="330" x2="210" y2="330" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          <line x1="210" y1="330" x2="210" y2="268" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          
+          <g transform="translate(430, 330)" onClick={() => handleUnitClick('tcv02b')} className={cn(interactive && "cursor-pointer")}>
+            <polygon 
+              points="-10,-8 10,-8 8,0 10,8 -10,8 -8,0" 
+              fill={valveStates.tcv02b === "OPEN" || valveStates.tcv02b === "MODULATING" ? "#B47A1F" : "#333"} 
+              stroke="#555" 
+              strokeWidth="2"
+            />
+            <text x="0" y="-16" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">TCV-02B</text>
+            <text x="0" y="24" fill="#888" fontSize="8" textAnchor="middle">Shell Bypass</text>
+          </g>
+          
+          {(valveStates.tcv02b === "OPEN" || valveStates.tcv02b === "MODULATING") && (
+            <circle cx="500" cy="330" r="3" fill="#B47A1F">
+              <animate attributeName="cx" values="650;210" dur={animationSpeed} repeatCount="indefinite" />
+            </circle>
+          )}
+        </g>
 
-        {/* PIPE: From E-1 hot side outlet to E-2 */}
-        <line x1="185" y1="310" x2="185" y2="240" stroke="#555" strokeWidth="3" strokeDasharray="5,3" />
-        <line x1="185" y1="240" x2="670" y2="240" stroke="#555" strokeWidth="4" />
-        <circle cx="400" cy="240" r="4" fill={baseColor}>
-          <animate attributeName="cx" values="185;670" dur={animationSpeed} repeatCount="indefinite" />
+        {/* PIPE: E-1 Shell Side Outlet to E-2 */}
+        <line x1="210" y1="268" x2="210" y2="240" stroke="#555" strokeWidth="3" />
+        <line x1="210" y1="240" x2="700" y2="240" stroke="#555" strokeWidth="4" />
+        <circle cx="450" cy="240" r="4" fill={getThermalColor(shellSideOutletTemp)}>
+          <animate attributeName="cx" values="210;700" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
-        {/* Effluent temp after E-1 */}
+        {/* Shell outlet temp */}
         {interactive && (
-          <text x="185" y="330" fill="#888" fontSize="9" textAnchor="middle">
-            T={feedEffluentTemp.toFixed(0)}{units}
+          <text x="210" y="220" fill={getThermalColor(shellSideOutletTemp)} fontSize="9" textAnchor="middle" className="transition-colors duration-500">
+            Shell Out: {shellSideOutletTemp.toFixed(0)}{units}
           </text>
         )}
 
         {/* EFFLUENT COOLER E-2 */}
         <g 
-          transform="translate(740, 240)" 
+          transform="translate(770, 240)" 
           onClick={() => handleUnitClick('e2')}
           className={cn(
             interactive && "cursor-pointer hover:opacity-80 transition-opacity",
             coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]"
           )}
         >
-          <rect x="-40" y="-45" width="80" height="90" rx="10" fill="#2a2a2a" stroke={coolerColor} strokeWidth="3" filter="url(#equipmentShadow)" />
+          <rect x="-40" y="-45" width="80" height="90" rx="10" fill="#2a2a2a" stroke={coolerColor} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-500" />
           
           {/* Cooling coils */}
           <line x1="-30" y1="-30" x2="30" y2="-30" stroke="#2F5D80" strokeWidth="2" opacity="0.6" />
@@ -311,31 +456,19 @@ export default function ProcessMap({
 
         {/* Cooling capacity display */}
         {interactive && (
-          <text x="740" y="330" fill={coolerColor} fontSize="10" textAnchor="middle" fontWeight="600">
+          <text x="770" y="340" fill={coolerColor} fontSize="10" textAnchor="middle" fontWeight="600" className="transition-colors duration-500">
             {coolingCapacity}
           </text>
         )}
 
-        {/* BYPASS PATH AROUND E-2 (BV-2) */}
-        <g opacity={equipment.bypassValve ? 1 : 0.4}>
-          <line x1="670" y1="240" x2="670" y2="160" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
-          <line x1="670" y1="160" x2="810" y2="160" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
-          <line x1="810" y1="160" x2="810" y2="240" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
-          
-          <g transform="translate(740, 160)" className={cn(interactive && "cursor-pointer")}>
-            <polygon points="-10,-8 10,-8 8,0 10,8 -10,8 -8,0" fill={equipment.bypassValve ? "#2F5D80" : "#7A0F0F"} stroke="#555" strokeWidth="1.5" />
-            <text x="0" y="-15" fill="#888" fontSize="8" textAnchor="middle" fontWeight="500">BV-2</text>
-          </g>
-        </g>
-
         {/* PIPE: E-2 to Separator */}
-        <line x1="780" y1="240" x2="900" y2="240" stroke="#555" strokeWidth="4" />
-        <circle cx="830" cy="240" r="4" fill={baseColor}>
-          <animate attributeName="cx" values="780;900" dur={animationSpeed} repeatCount="indefinite" />
+        <line x1="810" y1="240" x2="930" y2="240" stroke="#555" strokeWidth="4" />
+        <circle cx="860" cy="240" r="4" fill={baseColor}>
+          <animate attributeName="cx" values="810;930" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* SEPARATOR D-1 */}
-        <g transform="translate(960, 240)">
+        <g transform="translate(990, 240)">
           <ellipse cx="0" cy="-35" rx="30" ry="8" fill="#1a1a1a" stroke="#555" strokeWidth="2" />
           <rect x="-30" y="-35" width="60" height="70" fill="#2a2a2a" stroke="#555" strokeWidth="2" filter="url(#equipmentShadow)" />
           <ellipse cx="0" cy="35" rx="30" ry="8" fill="#2a2a2a" stroke="#555" strokeWidth="2" />
@@ -345,9 +478,9 @@ export default function ProcessMap({
         </g>
 
         {/* PIPE: Separator to Column */}
-        <line x1="990" y1="240" x2="1080" y2="240" stroke="#555" strokeWidth="3" />
-        <circle cx="1020" cy="240" r="3" fill="#555">
-          <animate attributeName="cx" values="990;1080" dur={animationSpeed} repeatCount="indefinite" />
+        <line x1="1020" y1="240" x2="1110" y2="240" stroke="#555" strokeWidth="3" />
+        <circle cx="1050" cy="240" r="3" fill="#555">
+          <animate attributeName="cx" values="1020;1110" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* COLUMN C-1 */}
@@ -418,14 +551,48 @@ export default function ProcessMap({
             </>
           )}
           
-          {selectedUnit === 'bv1' && (
+          {selectedUnit === 'tcv01a' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">BV-1 HX Bypass Valve</h4>
+              <h4 className="text-[#aaa] text-sm font-bold mb-2">TCV-01A Feed Bypass</h4>
               <p className="text-[#ccc] text-xs leading-relaxed">
-                Status: {equipment.bypassValve ? "Available" : "Out of Service"}
+                Status: {valveStates.tcv01a}
               </p>
-              {equipment.bypassValve && (
-                <p className="text-[#2F5D80] text-xs mt-2 italic">Bypass path ready if needed</p>
+              {valveStates.tcv01a === "OPEN" && (
+                <p className="text-[#B47A1F] text-xs mt-2 italic">Reducing preheat effectiveness</p>
+              )}
+            </>
+          )}
+          
+          {selectedUnit === 'tcv01b' && (
+            <>
+              <h4 className="text-[#aaa] text-sm font-bold mb-2">TCV-01B Primary Feed Control</h4>
+              <p className="text-[#ccc] text-xs leading-relaxed">
+                Status: {valveStates.tcv01b}
+              </p>
+              <p className="text-[#ccc] text-xs leading-relaxed mt-1">Routing feed to tube side of E-1</p>
+            </>
+          )}
+          
+          {selectedUnit === 'tcv02a' && (
+            <>
+              <h4 className="text-[#aaa] text-sm font-bold mb-2">TCV-02A Effluent Control</h4>
+              <p className="text-[#ccc] text-xs leading-relaxed">
+                Status: {valveStates.tcv02a}
+              </p>
+              {valveStates.tcv02a === "MODULATING" && (
+                <p className="text-[#B47A1F] text-xs mt-2 italic">Restriction detected — shell heat exchange limited</p>
+              )}
+            </>
+          )}
+          
+          {selectedUnit === 'tcv02b' && (
+            <>
+              <h4 className="text-[#aaa] text-sm font-bold mb-2">TCV-02B Shell Bypass</h4>
+              <p className="text-[#ccc] text-xs leading-relaxed">
+                Status: {valveStates.tcv02b}
+              </p>
+              {valveStates.tcv02b !== "CLOSED" && (
+                <p className="text-[#B47A1F] text-xs mt-2 italic">Bypassing shell side — heat recovery reduced</p>
               )}
             </>
           )}
