@@ -197,10 +197,14 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* PIPE: E-1 Tube Out to Reactor */}
+        {/* PIPE: E-1 Tube Out to Reactor Inlet (routed from ABOVE) */}
         <line x1="340" y1="260" x2="395" y2="260" stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx="365" cy="260" r="4" fill={tubeThermalColor}>
-          <animate attributeName="cx" values="340;395" dur={animationSpeed} repeatCount="indefinite" />
+        <line x1="395" y1="260" x2="395" y2="220" stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1="395" y1="220" x2="420" y2="220" stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1="420" y1="220" x2="420" y2="250" stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx="408" cy="220" r="4" fill={tubeThermalColor}>
+          <animate attributeName="cx" values="395;420;420;420" keyTimes="0;0.33;0.66;1" dur={animationSpeed} repeatCount="indefinite" />
+          <animate attributeName="cy" values="260;220;220;250" keyTimes="0;0.33;0.66;1" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* REACTOR R-1 with Horizontal Bed Zones */}
@@ -311,57 +315,52 @@ export default function ProcessMap({
           </>
         )}
 
-        {/* PIPE: R-1 Outlet to Branch Point */}
-        <line x1="518" y1="280" x2="560" y2="280" stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx="540" cy="280" r="4" fill={shellThermalColor}>
-          <animate attributeName="cx" values="518;560" dur={animationSpeed} repeatCount="indefinite" />
+        {/* PIPE: R-1 Outlet routed UNDER reactor to Branch Point */}
+        <line x1="518" y1="280" x2="540" y2="280" stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1="540" y1="280" x2="540" y2="390" stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1="540" y1="390" x2="560" y2="390" stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1="560" y1="390" x2="560" y2="280" stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx="545" cy="335" r="4" fill={shellThermalColor}>
+          <animate attributeName="cx" values="530;540;540;560;560" keyTimes="0;0.2;0.4;0.6;1" dur={animationSpeed} repeatCount="indefinite" />
+          <animate attributeName="cy" values="280;280;390;390;280" keyTimes="0;0.2;0.4;0.6;1" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* UPPER BRANCH: TCV-02A to E-1 Shell Inlet */}
         <g>
-          {/* Vertical rise to TCV-02A */}
-          <line x1="560" y1="280" x2="560" y2="250" stroke="#555" strokeWidth="3" />
-          {valveStates.tcv02a !== "CLOSED" && (
-            <circle cx="560" cy="265" r="3" fill={shellThermalColor}>
-              <animate attributeName="cy" values="280;250" dur={animationSpeed} repeatCount="indefinite" />
-            </circle>
-          )}
-          
-          {/* TCV-02A */}
-          <g transform="translate(560, 230)" onClick={() => handleUnitClick('tcv02a')} className={cn(interactive && "cursor-pointer")}>
+          {/* TCV-02A on upper branch */}
+          <g transform="translate(560, 250)" onClick={() => handleUnitClick('tcv02a')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-10,-10 10,-10 8,0 10,10 -10,10 -8,0" fill={valveStates.tcv02a === "OPEN" ? "#2F5D80" : "#B47A1F"} stroke="#555" strokeWidth="2" />
             <text x="0" y="-22" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">TCV-02A</text>
           </g>
           
-          {/* Horizontal to shell inlet */}
-          <line x1="560" y1="220" x2="560" y2="310" stroke="#555" strokeWidth="3" />
-          <line x1="560" y1="310" x2="340" y2="310" stroke="#555" strokeWidth="3" />
-          <line x1="340" y1="310" x2="340" y2="292" stroke="#555" strokeWidth="3" />
+          {/* Route to E-1 Shell Inlet */}
+          <line x1="560" y1="260" x2="340" y2="260" stroke="#555" strokeWidth="3" />
+          <line x1="340" y1="260" x2="340" y2="292" stroke="#555" strokeWidth="3" />
           {valveStates.tcv02a !== "CLOSED" && (
-            <circle cx="440" cy="310" r="3" fill={shellThermalColor}>
+            <circle cx="450" cy="260" r="3" fill={shellThermalColor}>
               <animate attributeName="cx" values="560;340" dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
         </g>
 
-        {/* LOWER BRANCH: TCV-02B Shell Bypass (BELOW reactor) */}
+        {/* LOWER BRANCH: TCV-02B Shell Bypass (repositioned lower) */}
         <g opacity={valveStates.tcv02b === "CLOSED" ? 0.3 : 1}>
-          {/* Drop from branch point */}
-          <line x1="560" y1="280" x2="560" y2="370" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          {/* Drop from branch point to bypass level */}
+          <line x1="560" y1="280" x2="560" y2="420" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
           
-          {/* TCV-02B positioned BELOW and to the right of reactor */}
-          <g transform="translate(560, 390)" onClick={() => handleUnitClick('tcv02b')} className={cn(interactive && "cursor-pointer")}>
+          {/* TCV-02B positioned well below reactor */}
+          <g transform="translate(490, 420)" onClick={() => handleUnitClick('tcv02b')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-10,-8 10,-8 8,0 10,8 -10,8 -8,0" fill={valveStates.tcv02b === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth="2" />
-            <text x="0" y="26" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">TCV-02B</text>
-            {interactive && <text x="0" y="38" fill="#888" fontSize="8" textAnchor="middle">Shell Bypass</text>}
+            <text x="-40" y="4" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">TCV-02B</text>
+            {interactive && <text x="-40" y="16" fill="#888" fontSize="8" textAnchor="middle">Shell Bypass</text>}
           </g>
           
-          {/* Horizontal bypass route */}
-          <line x1="560" y1="398" x2="240" y2="398" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
-          <line x1="240" y1="398" x2="240" y2="292" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          {/* Horizontal bypass route to E-1 outlet */}
+          <line x1="560" y1="420" x2="240" y2="420" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          <line x1="240" y1="420" x2="240" y2="292" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
           
           {valveStates.tcv02b !== "CLOSED" && (
-            <circle cx="400" cy="398" r="3" fill="#B47A1F">
+            <circle cx="400" cy="420" r="3" fill="#B47A1F">
               <animate attributeName="cx" values="560;240" dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
