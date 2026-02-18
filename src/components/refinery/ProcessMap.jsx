@@ -392,18 +392,18 @@ export default function ProcessMap({
 
         {/* COOLER BYPASS (TCV-03A) */}
         <g opacity={valveStates.tcv03a === "CLOSED" ? 0.3 : 1}>
-          <line x1="680" y1="260" x2="680" y2="330" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
-          <line x1="680" y1="330" x2="800" y2="330" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
-          <line x1="800" y1="330" x2="800" y2="260" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          <line x1="680" y1="260" x2="680" y2="350" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          <line x1="680" y1="350" x2="800" y2="350" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
+          <line x1="800" y1="350" x2="800" y2="260" stroke="#555" strokeWidth="3" strokeDasharray="4,4" />
           
-          <g transform="translate(740, 330)" onClick={() => handleUnitClick('tcv03a')} className={cn(interactive && "cursor-pointer")}>
+          <g transform="translate(740, 350)" onClick={() => handleUnitClick('tcv03a')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-10,-8 10,-8 8,0 10,8 -10,8 -8,0" fill={valveStates.tcv03a === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth="2" />
-            <text x="0" y="26" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">TCV-03A</text>
-            {interactive && <text x="0" y="38" fill="#888" fontSize="8" textAnchor="middle">Cooler Bypass</text>}
+            <text x="0" y="28" fill="#aaa" fontSize="9" textAnchor="middle" fontWeight="600">TCV-03A</text>
+            {interactive && <text x="0" y="40" fill="#888" fontSize="8" textAnchor="middle">Cooler Bypass</text>}
           </g>
           
           {valveStates.tcv03a === "OPEN" && (
-            <circle cx="720" cy="330" r="3" fill="#B47A1F">
+            <circle cx="720" cy="350" r="3" fill="#B47A1F">
               <animate attributeName="cx" values="680;800" dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
