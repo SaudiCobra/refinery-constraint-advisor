@@ -376,7 +376,7 @@ export default function ProcessMap({
 
         {/* EFFLUENT COOLER E-2 */}
         <g transform="translate(740, 260)" onClick={() => handleUnitClick('e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")}>
-          <rect x="-45" y="-50" width="90" height="100" rx="10" fill="#2a2a2a" stroke={coolerColor} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-400" opacity="0.9" />
+          <rect x="-45" y="-50" width="90" height="100" rx="10" fill="#2a2a2a" stroke={coolerColor} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-400" />
           {[-35, -22, -9, 4, 17, 30].map(y => (
             <line key={y} x1="-35" y1={y} x2="35" y2={y} stroke="#2F5D80" strokeWidth="2" opacity="0.54" />
           ))}
