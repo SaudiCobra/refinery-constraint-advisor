@@ -15,9 +15,14 @@ export default function ScenarioSelector({ activeScenario, onSelect, autoCycling
           variant={autoCycling ? "default" : "outline"}
           size="sm"
           className={cn(
-            "h-9 px-5 text-sm font-semibold transition-all duration-400",
+            "h-9 px-5 text-sm transition-all duration-400",
             autoCycling && "bg-[#0F5F5F] border-[#0F9F9F]"
           )}
+          style={{ 
+            color: '#F4B860', 
+            fontWeight: 600,
+            textShadow: '0 0 2px rgba(244, 184, 96, 0.3)'
+          }}
         >
           {autoCycling ? <Square className="h-3.5 w-3.5 mr-2" /> : <Play className="h-3.5 w-3.5 mr-2" />}
           {autoCycling ? "Stop Auto-Cycle" : "Auto-Cycle Scenarios"}
@@ -29,6 +34,11 @@ export default function ScenarioSelector({ activeScenario, onSelect, autoCycling
             variant="outline"
             size="sm"
             className="h-9 px-4 text-sm transition-all duration-400"
+            style={{ 
+              color: '#F4B860', 
+              fontWeight: 600,
+              textShadow: '0 0 2px rgba(244, 184, 96, 0.3)'
+            }}
           >
             Scenario {activeScenario + 1}
           </Button>

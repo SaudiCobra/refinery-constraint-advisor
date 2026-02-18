@@ -117,7 +117,7 @@ export default function ProcessMap({
         </g>
 
         {/* PIPE: F-1 to TCV-01B */}
-        <line x1="78" y1="260" x2="155" y2="260" stroke="#555" strokeWidth="4" />
+        <line x1="78" y1="260" x2="155" y2="260" stroke="#555" strokeWidth="4" opacity="0.9" />
         <circle cx="110" cy="260" r="4" fill="#2F5D80">
           <animate attributeName="cx" values="78;155" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
@@ -129,7 +129,7 @@ export default function ProcessMap({
         </g>
         
         {/* PIPE: TCV-01B to E-1 Tube Inlet */}
-        <line x1="185" y1="260" x2="225" y2="260" stroke="#555" strokeWidth="4" />
+        <line x1="185" y1="260" x2="225" y2="260" stroke="#555" strokeWidth="4" opacity="0.9" />
         <circle cx="205" cy="260" r="3" fill="#2F5D80">
           <animate attributeName="cx" values="185;225" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
@@ -143,12 +143,12 @@ export default function ProcessMap({
           
           {/* Tube bundle */}
           {[-28, -20, -12, -4, 4, 12, 20, 28].map(yOffset => (
-            <line key={yOffset} x1="-45" y1={yOffset} x2="45" y2={yOffset} stroke="#444" strokeWidth="1.2" />
+            <line key={yOffset} x1="-45" y1={yOffset} x2="45" y2={yOffset} stroke="#444" strokeWidth="1.2" opacity="0.9" />
           ))}
           
           {/* Thermal glows */}
-          <rect x="-45" y="-30" width="90" height="60" fill={tubeThermalColor} opacity="0.12" className="transition-all duration-500" />
-          <rect x="-48" y="-36" width="96" height="72" fill={shellThermalColor} opacity="0.08" className="transition-all duration-500" />
+          <rect x="-45" y="-30" width="90" height="60" fill={tubeThermalColor} opacity="0.108" className="transition-all duration-500" />
+          <rect x="-48" y="-36" width="96" height="72" fill={shellThermalColor} opacity="0.072" className="transition-all duration-500" />
           
           {/* Nozzles */}
           <circle cx="-50" cy="0" r="5" fill="#333" stroke={tubeThermalColor} strokeWidth="1.5" />
@@ -198,7 +198,7 @@ export default function ProcessMap({
         </g>
 
         {/* PIPE: E-1 Tube Out to Reactor */}
-        <line x1="340" y1="260" x2="395" y2="260" stroke="#555" strokeWidth="4" />
+        <line x1="340" y1="260" x2="395" y2="260" stroke="#555" strokeWidth="4" opacity="0.9" />
         <circle cx="365" cy="260" r="4" fill={tubeThermalColor}>
           <animate attributeName="cx" values="340;395" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
@@ -287,9 +287,9 @@ export default function ProcessMap({
             );
           })}
           
-          {/* Overall reactor thermal glow */}
+          {/* Overall reactor thermal glow - enhanced dominance */}
           {escalationLevel >= 2 && (
-            <rect x="-45" y="-77" width="90" height="154" fill="url(#reactorGlow)" className={escalationLevel >= 3 ? "animate-[pulse_1.2s_ease-in-out_infinite]" : "transition-opacity duration-500"} />
+            <rect x="-45" y="-77" width="90" height="154" fill="url(#reactorGlow)" opacity="1.08" className={escalationLevel >= 3 ? "animate-[pulse_1.2s_ease-in-out_infinite]" : "transition-opacity duration-500"} />
           )}
           
           <text x="0" y="105" fill="#aaa" fontSize="13" textAnchor="middle" fontWeight="bold">R-1</text>
@@ -312,7 +312,7 @@ export default function ProcessMap({
         )}
 
         {/* PIPE: R-1 Outlet to Branch Point */}
-        <line x1="518" y1="280" x2="560" y2="280" stroke="#555" strokeWidth="4" />
+        <line x1="518" y1="280" x2="560" y2="280" stroke="#555" strokeWidth="4" opacity="0.9" />
         <circle cx="540" cy="280" r="4" fill={shellThermalColor}>
           <animate attributeName="cx" values="518;560" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
@@ -368,17 +368,17 @@ export default function ProcessMap({
         </g>
 
         {/* PIPE: E-1 Shell Out to E-2 (direct, shorter) */}
-        <line x1="240" y1="292" x2="240" y2="260" stroke="#555" strokeWidth="3" />
-        <line x1="240" y1="260" x2="680" y2="260" stroke="#555" strokeWidth="4" />
+        <line x1="240" y1="292" x2="240" y2="260" stroke="#555" strokeWidth="3" opacity="0.9" />
+        <line x1="240" y1="260" x2="680" y2="260" stroke="#555" strokeWidth="4" opacity="0.9" />
         <circle cx="440" cy="260" r="4" fill={getThermalColor(shellSideOutletTemp)}>
           <animate attributeName="cx" values="240;680" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* EFFLUENT COOLER E-2 */}
         <g transform="translate(740, 260)" onClick={() => handleUnitClick('e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")}>
-          <rect x="-45" y="-50" width="90" height="100" rx="10" fill="#2a2a2a" stroke={coolerColor} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-400" />
+          <rect x="-45" y="-50" width="90" height="100" rx="10" fill="#2a2a2a" stroke={coolerColor} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-400" opacity="0.9" />
           {[-35, -22, -9, 4, 17, 30].map(y => (
-            <line key={y} x1="-35" y1={y} x2="35" y2={y} stroke="#2F5D80" strokeWidth="2" opacity="0.6" />
+            <line key={y} x1="-35" y1={y} x2="35" y2={y} stroke="#2F5D80" strokeWidth="2" opacity="0.54" />
           ))}
           {!equipment.effluentCooler && (
             <>
@@ -410,7 +410,7 @@ export default function ProcessMap({
         </g>
 
         {/* PIPE: E-2 to D-1 */}
-        <line x1="785" y1="260" x2="880" y2="260" stroke="#555" strokeWidth="4" />
+        <line x1="785" y1="260" x2="880" y2="260" stroke="#555" strokeWidth="4" opacity="0.9" />
         <circle cx="830" cy="260" r="4" fill={cooledThermalColor}>
           <animate attributeName="cx" values="785;880" dur={animationSpeed} repeatCount="indefinite" />
         </circle>
