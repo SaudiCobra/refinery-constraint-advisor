@@ -42,7 +42,7 @@ const DEFAULTS = {
   opMode: "steady",
   sensorQuality: "good",
   equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-  feedFlow: 100000,
+  feedFlow: 84000,
 };
 
 export default function Home() {
@@ -241,7 +241,7 @@ export default function Home() {
     setDemonstrationStage(0);
   };
 
-  const bgDimming = escalationLevel >= 2 ? "bg-[#0d0d0d]" : escalationLevel >= 1 ? "bg-[#0f0f0f]" : "bg-[#111]";
+  const bgDimming = escalationLevel >= 2 ? "bg-[#0b1220]" : escalationLevel >= 1 ? "bg-[#0b1324]" : "bg-[#0b1220]";
 
   return (
     <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
@@ -264,7 +264,7 @@ export default function Home() {
         preheatStatus={preheatStatus}
       />
 
-      <div className="max-w-[1600px] mx-auto px-4 md:px-6 py-6 space-y-6">
+      <div className="max-w-[2200px] mx-auto px-20 py-10 space-y-10">
         {/* ALARMS-ONLY VIEW */}
         {alarmsOnly && (
           <AlarmsOnlyView

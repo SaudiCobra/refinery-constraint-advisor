@@ -34,7 +34,6 @@ export function computeAllConstraints(currentValue, limits, slope) {
     constraints.push({ name: "Trip", value: Number(limits.trip), time: t, margin: Number(limits.trip) - currentValue });
   }
   if (limits.rampRate != null && limits.rampRate !== "") {
-    // Ramp-rate constraint: time until rate exceeds limit (already exceeded or not)
     constraints.push({ name: "Ramp-rate", value: Number(limits.rampRate), time: slope > Number(limits.rampRate) ? 0 : Infinity, margin: Number(limits.rampRate) - slope });
   }
 
@@ -61,12 +60,10 @@ export function getEscalationLevel(timeMinutes, preheatActive, slope, coolingCap
     baseLevel = 3;
   }
 
-  // Preheat stress escalation - force to at least Level 2
   if (preheatActive && slope > 1.5) {
     baseLevel = Math.max(baseLevel, 2);
   }
 
-  // Cooling constraint escalation
   if (coolingCapacity === "CONSTRAINED" && timeMinutes < 15) {
     baseLevel = Math.min(baseLevel + 1, 3);
   }
@@ -79,17 +76,14 @@ export function computeCoolingCapacity(equipment, slope, timeToNearest) {
   const h2Available = equipment.h2Compressor;
   const bypassAvailable = equipment.bypassValve;
 
-  // NORMAL: Both cooler and H2 margin available
   if (coolerAvailable && h2Available) {
     return "NORMAL";
   }
 
-  // CONSTRAINED: Cooler offline AND (high slope OR time critical OR no bypass)
   if (!coolerAvailable && (slope > 1.5 || timeToNearest < 15 || !bypassAvailable)) {
     return "CONSTRAINED";
   }
 
-  // REDUCED: Cooler offline OR H2 margin limited
   if (!coolerAvailable || !h2Available) {
     return "REDUCED";
   }
@@ -126,12 +120,10 @@ export function formatTime(minutes) {
 export function getRecommendation(level, nearest, equipment, coolingCapacity, preheatStatus, slope) {
   const unavailable = Object.entries(equipment).filter(([, v]) => !v).map(([k]) => k);
   
-  // Preheat stress takes priority
   if (preheatStatus?.includes("stress") && slope > 1.5) {
     return "Moderate heat-up rate to remain within catalyst envelope.";
   }
   
-  // Cooling constrained recommendations
   if (coolingCapacity === "CONSTRAINED") {
     return "Prepare escalation; limited heat removal available.";
   }
@@ -140,12 +132,10 @@ export function getRecommendation(level, nearest, equipment, coolingCapacity, pr
     return "Maximize available cooling paths; monitor response window.";
   }
   
-  // Bypass valve available recommendations
   if (unavailable.includes("effluentCooler") && equipment.bypassValve && level >= 1) {
     return "Consider bypass lever if permitted by procedure.";
   }
   
-  // Standard escalation recommendations
   if (level === 0) return "Monitor closely while response window remains open.";
   if (level === 1) {
     if (unavailable.length > 0) return "Prepare escalation — cooling capacity constrained.";
@@ -158,86 +148,41 @@ export function getRecommendation(level, nearest, equipment, coolingCapacity, pr
   return "Immediate escalation required. Notify shift lead now.";
 }
 
-// Preset scenarios for presentation mode
+// Curated Presentation Scenarios (7 only)
 export const SCENARIOS = [
   {
-    name: "1. Stable Normal Condition",
+    name: "1. Stable Baseline",
     samples: [348, 348.2, 348.1, 348.3, 348.2],
-    limits: { hi: 370, hihi: 380, spec: 375, trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 100000,
-    sensorQuality: "good",
-    opMode: "steady",
-  },
-  {
-    name: "2. Approaching Spec Limit",
-    samples: [355, 357, 359, 361, 363],
-    limits: { hi: 380, hihi: 390, spec: 375, trip: 400, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 105000,
-    sensorQuality: "good",
-    opMode: "transient",
-  },
-  {
-    name: "3. Fast Rise to High-High",
-    samples: [365, 367, 369, 371, 373],
-    limits: { hi: 370, hihi: 380, spec: 375, trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 110000,
-    sensorQuality: "good",
-    opMode: "transient",
-  },
-  {
-    name: "4. Ramp-Rate Exceeded",
-    samples: [340, 343.5, 347, 350.5, 354],
-    limits: { hi: 380, hihi: 390, spec: "", trip: 400, rampRate: 1.5 },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 108000,
-    sensorQuality: "good",
-    opMode: "transient",
-  },
-  {
-    name: "5. Sensor Quality Suspect",
-    samples: [352, 354, 361, 356, 358],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 100000,
-    sensorQuality: "suspect",
+    feedFlow: 84000,
+    sensorQuality: "good",
     opMode: "steady",
   },
   {
-    name: "6. Cooling Equipment Unavailable",
+    name: "2. Early Drift (Level 1)",
     samples: [350, 352, 354, 356, 358],
-    limits: { hi: 370, hihi: 380, spec: 375, trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: false, effluentCooler: false, bypassValve: true, h2Compressor: true },
-    feedFlow: 102000,
-    sensorQuality: "good",
-    opMode: "steady",
-  },
-  {
-    name: "7. Hydrogen Compressor Margin Limited",
-    samples: [340, 342, 344, 346, 348],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
-    feedFlow: 98000,
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 88000,
     sensorQuality: "good",
     opMode: "steady",
   },
   {
-    name: "8. Approaching Trip Limit",
-    samples: [378, 380, 382, 384, 386],
-    limits: { hi: 370, hihi: 375, spec: 378, trip: 395, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 115000,
+    name: "3. Cooling Compression (Level 2)",
+    samples: [360, 362, 364, 366, 368],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: true },
+    feedFlow: 92000,
     sensorQuality: "good",
     opMode: "transient",
   },
   {
-    name: "9. Four-Stage Escalation Sequence",
+    name: "4. Four-Level Escalation Sequence",
     samples: [348, 350, 352, 354, 356],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 100000,
+    feedFlow: 84000,
     sensorQuality: "good",
     opMode: "steady",
     isSequence: true,
@@ -248,16 +193,43 @@ export const SCENARIOS = [
       { samples: [372, 374, 376, 378, 380], equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: false } },
     ]
   },
+  {
+    name: "5. Hydrogen Moderation Limited",
+    samples: [352, 354, 356, 358, 360],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
+    feedFlow: 86000,
+    sensorQuality: "good",
+    opMode: "steady",
+  },
+  {
+    name: "6. False Escalation (Sensor Conflict)",
+    samples: [355, 358, 362, 359, 361],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 84000,
+    sensorQuality: "suspect",
+    opMode: "transient",
+  },
+  {
+    name: "7. True Escalation (Aligned)",
+    samples: [365, 367, 369, 371, 373],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 94000,
+    sensorQuality: "good",
+    opMode: "transient",
+  },
 ];
 
-// Operational Escalation Demonstration - 8 stage showcase
+// Operational Demonstration (8 stages - keep for full demo)
 export const DEMONSTRATION_STAGES = [
   {
     name: "Stage 1: Stable Baseline",
     samples: [330, 330.1, 330, 330.2, 330.1],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 100000,
+    feedFlow: 84000,
     sensorQuality: "good",
     opMode: "steady",
     preheatActive: false,
@@ -268,7 +240,7 @@ export const DEMONSTRATION_STAGES = [
     samples: [340, 342, 344, 346, 348],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 102000,
+    feedFlow: 86000,
     sensorQuality: "good",
     opMode: "steady",
     preheatActive: false,
@@ -279,7 +251,7 @@ export const DEMONSTRATION_STAGES = [
     samples: [338, 342, 346, 350, 354],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: 1.5 },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 108000,
+    feedFlow: 90000,
     sensorQuality: "good",
     opMode: "transient",
     preheatActive: false,
@@ -290,7 +262,7 @@ export const DEMONSTRATION_STAGES = [
     samples: [290, 293, 296, 299, 302],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 95000,
+    feedFlow: 78000,
     sensorQuality: "good",
     opMode: "transient",
     preheatActive: true,
@@ -301,7 +273,7 @@ export const DEMONSTRATION_STAGES = [
     samples: [352, 354, 356, 358, 360],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
-    feedFlow: 105000,
+    feedFlow: 88000,
     sensorQuality: "good",
     opMode: "steady",
     preheatActive: false,
@@ -312,7 +284,7 @@ export const DEMONSTRATION_STAGES = [
     samples: [358, 360, 362, 364, 366],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: false, h2Compressor: true },
-    feedFlow: 110000,
+    feedFlow: 92000,
     sensorQuality: "good",
     opMode: "transient",
     preheatActive: false,
@@ -323,7 +295,7 @@ export const DEMONSTRATION_STAGES = [
     samples: [348, 351, 354, 357, 360],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
-    feedFlow: 107000,
+    feedFlow: 89000,
     sensorQuality: "good",
     opMode: "transient",
     preheatActive: false,
@@ -334,7 +306,7 @@ export const DEMONSTRATION_STAGES = [
     samples: [372, 374, 376, 378, 380],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: false, h2Compressor: false },
-    feedFlow: 115000,
+    feedFlow: 96000,
     sensorQuality: "good",
     opMode: "transient",
     preheatActive: false,
@@ -342,7 +314,6 @@ export const DEMONSTRATION_STAGES = [
   },
 ];
 
-// Hot Spot Avoided Scenario (Bonus - Manual Selection Only)
 export const HOT_SPOT_SCENARIO = {
   name: "Hot Spot Avoided (Bonus Demo)",
   isSequence: true,
@@ -352,7 +323,7 @@ export const HOT_SPOT_SCENARIO = {
       samples: [345, 347, 349, 351, 353],
       limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
       equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-      feedFlow: 102000,
+      feedFlow: 86000,
       sensorQuality: "good",
       opMode: "steady",
       preheatActive: false,
@@ -363,7 +334,7 @@ export const HOT_SPOT_SCENARIO = {
       samples: [353, 356, 359, 362, 365],
       limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
       equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
-      feedFlow: 108000,
+      feedFlow: 90000,
       sensorQuality: "good",
       opMode: "transient",
       preheatActive: false,
@@ -374,7 +345,7 @@ export const HOT_SPOT_SCENARIO = {
       samples: [362, 362, 361, 360, 359],
       limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
       equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-      feedFlow: 98000,
+      feedFlow: 80000,
       sensorQuality: "good",
       opMode: "steady",
       preheatActive: false,
