@@ -451,11 +451,15 @@ export default function ProcessMap({
           {interactive && <text x="0" y="77" fill="#888" fontSize="9" textAnchor="middle">3-Phase Separator</text>}
         </g>
 
-        {/* H2O Pot (below separator, outside body) */}
-        <g transform="translate(905, 296)">
-          <rect x="-20" y="0" width="30" height="22" rx="3" fill="#2a2a2a" stroke="#555" strokeWidth="1.5" />
-          <line x1="-5" y1="-4" x2="-5" y2="0" stroke="#2F5D80" strokeWidth="2" />
-          {interactive && <text x="-5" y="35" fill="#888" fontSize="7" textAnchor="middle">H₂O Pot</text>}
+        {/* H2O Pot (below separator) */}
+        <g transform="translate(970, 296)">
+          <ellipse cx="0" cy="0" rx="12" ry="4" fill="#1a1a1a" stroke="#555" strokeWidth="2.5" />
+          <rect x="-12" y="0" width="24" height="30" fill="#2a2a2a" stroke="#555" strokeWidth="2.5" />
+          <ellipse cx="0" cy="30" rx="12" ry="4" fill="#2a2a2a" stroke="#555" strokeWidth="2.5" />
+          <line x1="0" y1="-4" x2="0" y2="0" stroke="#2F5D80" strokeWidth="2" />
+          <rect x="-10" y="18" width="20" height="8" fill="#2F5D80" opacity="0.25" />
+          <line x1="-8" y1="24" x2="8" y2="24" stroke="#2F5D80" strokeWidth="1.5" opacity="0.6" />
+          {interactive && <text x="0" y="46" fill="#888" fontSize="7" textAnchor="middle">H₂O Pot</text>}
         </g>
 
         {/* Gas Recycle System (from D-1 to H2 quenches) */}
