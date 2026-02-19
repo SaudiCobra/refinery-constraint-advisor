@@ -41,7 +41,7 @@ const VALVES = {
   TCV01B: { x: 460, y: Y_MID },
   TCV01A: { x: 700, y: Y_MID - 120 },
   TCV02A: { x: 1260, y: Y_MID - 30 },
-  TCV02B: { x: 1080, y: Y_MID + 200 },
+  TCV02B: { x: 1080, y: Y_MID + 170 },
   TCV03A: { x: 1560, y: Y_MID + 150 },
 };
 
@@ -309,12 +309,12 @@ export default function ProcessMap({
         {/* R-1 Temperature Display */}
         {interactive && (
           <>
-            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 - 12} fill="#888" fontSize="18" textAnchor="start">R-1 Outlet</text>
-            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 + 8} fill={baseColor} fontSize="22" textAnchor="start" fontWeight="700" className="transition-colors duration-400">
+            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 14} y={ANCHORS.R1.y - SIZES.R1.h/2 - 12} fill="#888" fontSize="18" textAnchor="start">R-1 Outlet</text>
+            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 14} y={ANCHORS.R1.y - SIZES.R1.h/2 + 12} fill={baseColor} fontSize="22" textAnchor="start" fontWeight="700" className="transition-colors duration-400">
               T = {currentTemp.toFixed(1)}{units}
             </text>
             {slope > 0 && (
-              <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 + 28} fill={baseColor} fontSize="18" textAnchor="start" className="transition-colors duration-400">
+              <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 14} y={ANCHORS.R1.y - SIZES.R1.h/2 + 34} fill={baseColor} fontSize="18" textAnchor="start" className="transition-colors duration-400">
                 Δ = +{slope.toFixed(2)} {units}/min
               </text>
             )}
@@ -360,8 +360,8 @@ export default function ProcessMap({
           
           <g transform={`translate(${VALVES.TCV02B.x}, ${VALVES.TCV02B.y})`} onClick={() => handleUnitClick('tcv02b')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv02b === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth="2" />
-            {interactive && <text x="0" y="-24" fill="#aaa" fontSize="20" textAnchor="middle" fontWeight="600">TCV-02B</text>}
-            {interactive && <text x="0" y="38" fill="#888" fontSize="18" textAnchor="middle">Shell Bypass</text>}
+            <text x="0" y="38" fill="#aaa" fontSize="20" textAnchor="middle" fontWeight="600">TCV-02B</text>
+            {interactive && <text x="0" y="58" fill="#888" fontSize="18" textAnchor="middle">Shell Bypass</text>}
           </g>
           
           <line x1={VALVES.TCV02B.x} y1={VALVES.TCV02B.y + 14} x2={VALVES.TCV02B.x} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
@@ -468,7 +468,7 @@ export default function ProcessMap({
           <text x={ANCHORS.D1.x} y={ANCHORS.D1.y - SIZES.D1.h/2 - 90} fill="#888" fontSize="16" textAnchor="middle">To H₂ Compressor</text>
           
           <line x1={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y1={ANCHORS.R1.y - SIZES.R1.h/2 - 60} x2={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y2={ANCHORS.R1.y - SIZES.R1.h/2 - 20} stroke="#0FC9C9" strokeWidth="2.5" strokeDasharray="4,4" />
-          <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y={ANCHORS.R1.y - SIZES.R1.h/2 - 84} fill="#888" fontSize="18" textAnchor="middle" opacity="0.7">From H₂ System</text>
+          <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y={ANCHORS.R1.y - SIZES.R1.h/2 - 70} fill="#888" fontSize="16" textAnchor="middle">From H₂ System</text>
         </g>
 
         {/* Status indicators */}
