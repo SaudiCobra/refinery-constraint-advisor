@@ -41,7 +41,7 @@ const VALVES = {
   TCV01B: { x: 460, y: Y_MID },
   TCV01A: { x: 700, y: Y_MID - 120 },
   TCV02A: { x: 1260, y: Y_MID - 30 },
-  TCV02B: { x: 1080, y: Y_MID + 170 },
+  TCV02B: { x: 1080, y: Y_MID + 200 },
   TCV03A: { x: 1560, y: Y_MID + 150 },
 };
 
