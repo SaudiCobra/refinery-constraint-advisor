@@ -309,12 +309,12 @@ export default function ProcessMap({
         {/* R-1 Temperature Display */}
         {interactive && (
           <>
-            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 14} y={ANCHORS.R1.y - SIZES.R1.h/2 - 12} fill="#888" fontSize="18" textAnchor="start">R-1 Outlet</text>
-            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 14} y={ANCHORS.R1.y - SIZES.R1.h/2 + 12} fill={baseColor} fontSize="22" textAnchor="start" fontWeight="700" className="transition-colors duration-400">
+            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 - 12} fill="#888" fontSize="18" textAnchor="start">R-1 Outlet</text>
+            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 + 8} fill={baseColor} fontSize="22" textAnchor="start" fontWeight="700" className="transition-colors duration-400">
               T = {currentTemp.toFixed(1)}{units}
             </text>
             {slope > 0 && (
-              <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 14} y={ANCHORS.R1.y - SIZES.R1.h/2 + 34} fill={baseColor} fontSize="18" textAnchor="start" className="transition-colors duration-400">
+              <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 + 28} fill={baseColor} fontSize="18" textAnchor="start" className="transition-colors duration-400">
                 Δ = +{slope.toFixed(2)} {units}/min
               </text>
             )}
