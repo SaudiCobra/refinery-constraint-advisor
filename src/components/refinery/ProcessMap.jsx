@@ -468,7 +468,7 @@ export default function ProcessMap({
           <text x={ANCHORS.D1.x} y={ANCHORS.D1.y - SIZES.D1.h/2 - 90} fill="#888" fontSize="16" textAnchor="middle">To H₂ Compressor</text>
           
           <line x1={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y1={ANCHORS.R1.y - SIZES.R1.h/2 - 60} x2={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y2={ANCHORS.R1.y - SIZES.R1.h/2 - 20} stroke="#0FC9C9" strokeWidth="2.5" strokeDasharray="4,4" />
-          <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y={ANCHORS.R1.y - SIZES.R1.h/2 - 70} fill="#888" fontSize="16" textAnchor="middle">From H₂ System</text>
+          <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y={ANCHORS.R1.y - SIZES.R1.h/2 - 84} fill="#888" fontSize="18" textAnchor="middle" opacity="0.7">From H₂ System</text>
         </g>
 
         {/* Status indicators */}
