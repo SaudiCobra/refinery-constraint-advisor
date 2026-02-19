@@ -360,8 +360,8 @@ export default function ProcessMap({
           
           <g transform={`translate(${VALVES.TCV02B.x}, ${VALVES.TCV02B.y})`} onClick={() => handleUnitClick('tcv02b')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv02b === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth="2" />
-            <text x="0" y="38" fill="#aaa" fontSize="20" textAnchor="middle" fontWeight="600">TCV-02B</text>
-            {interactive && <text x="0" y="58" fill="#888" fontSize="18" textAnchor="middle">Shell Bypass</text>}
+            {interactive && <text x="0" y="-24" fill="#aaa" fontSize="20" textAnchor="middle" fontWeight="600">TCV-02B</text>}
+            {interactive && <text x="0" y="38" fill="#888" fontSize="18" textAnchor="middle">Shell Bypass</text>}
           </g>
           
           <line x1={VALVES.TCV02B.x} y1={VALVES.TCV02B.y + 14} x2={VALVES.TCV02B.x} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
