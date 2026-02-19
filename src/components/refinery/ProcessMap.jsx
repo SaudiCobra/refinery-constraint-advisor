@@ -283,14 +283,14 @@ export default function ProcessMap({
                 
                 {idx < bedImbalance.beds.length - 1 && (
                   <g>
-                    <line x1={SIZES.R1.w/2} y1={yStart + bedHeight + 3} x2={SIZES.R1.w/2 + 30} y2={yStart + bedHeight + 3} stroke={equipment.h2Compressor ? "#0FC9C9" : "#B47A1F"} strokeWidth="2.5" />
-                    <circle cx={SIZES.R1.w/2 + 15} cy={yStart + bedHeight + 3} r="3.5" fill={equipment.h2Compressor ? "#0FC9C9" : "#B47A1F"} opacity="0.8">
+                    <line x1={SIZES.R1.w/2} y1={yStart + bedHeight + 3} x2={SIZES.R1.w/2 + 30} y2={yStart + bedHeight + 3} stroke={equipment.h2Compressor ? "#4A90E2" : "#B47A1F"} strokeWidth="2.5" strokeDasharray="4,4" opacity="0.7" />
+                    <circle cx={SIZES.R1.w/2 + 15} cy={yStart + bedHeight + 3} r="3.5" fill={equipment.h2Compressor ? "#4A90E2" : "#B47A1F"} opacity="0.8">
                       {equipment.h2Compressor && (
                         <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite" />
                       )}
                     </circle>
                     {interactive && (
-                      <text x={SIZES.R1.w/2 + 45} y={yStart + bedHeight + 8} fill="#888" fontSize="16" textAnchor="start">H₂ Q{idx + 1}</text>
+                      <text x={SIZES.R1.w/2 + 45} y={yStart + bedHeight + 8} fill={equipment.h2Compressor ? "#4A90E2" : "#888"} fontSize="16" textAnchor="start" opacity="0.7">H₂ Q{idx + 1}</text>
                     )}
                   </g>
                 )}
