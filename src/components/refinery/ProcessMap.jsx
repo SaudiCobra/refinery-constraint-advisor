@@ -154,15 +154,15 @@ export default function ProcessMap({
           <animate attributeName="cx" values={`${ANCHORS.F1.x + SIZES.F1.w/2};${VALVES.TCV01B.x - 20}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
         
-        {/* TCV-01B: Primary Feed Control */}
+        {/* TCV-01B: Main Feed Control (on spine) */}
         <g transform={`translate(${VALVES.TCV01B.x}, ${VALVES.TCV01B.y})`} onClick={() => handleUnitClick('tcv01b')} className={cn(interactive && "cursor-pointer")}>
           <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill="#2F5D80" stroke="#555" strokeWidth="2" />
-          <text x="0" y="-24" fill="#aaa" fontSize="20" textAnchor="middle" fontWeight="600">TCV-01B</text>
+          {interactive && <text x="0" y="-20" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-01B</text>}
         </g>
         
-        {/* PIPE: TCV-01B to E-1 Tube Inlet */}
-        <line x1={VALVES.TCV01B.x + 20} y1={Y_MID} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={Y_MID} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={(VALVES.TCV01B.x + ANCHORS.E1.x)/2} cy={Y_MID} r="4" fill="#2F5D80">
+        {/* SPINE: TCV-01B → E-1 Tube Inlet */}
+        <line x1={VALVES.TCV01B.x + 20} y1={Y_SPINE} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={(VALVES.TCV01B.x + ANCHORS.E1.x)/2} cy={Y_SPINE} r="4" fill="#2F5D80">
           <animate attributeName="cx" values={`${VALVES.TCV01B.x + 20};${ANCHORS.E1.x - SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
