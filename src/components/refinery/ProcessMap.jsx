@@ -129,6 +129,8 @@ export default function ProcessMap({
           </linearGradient>
         </defs>
 
+        {/* === MAIN PROCESS SPINE === */}
+        
         {/* FEED FILTER F-1 */}
         <g transform={`translate(${ANCHORS.F1.x}, ${ANCHORS.F1.y})`} onClick={() => handleUnitClick('f1')} className={cn(interactive && "cursor-pointer")}>
           <ellipse cx="0" cy={-SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#1a1a1a" stroke="#555" strokeWidth="2.5" />
@@ -140,15 +142,15 @@ export default function ProcessMap({
           <text x="0" y={SIZES.F1.h/2 + 24} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">F-1</text>
           {interactive && (
             <>
-              <text x="0" y={SIZES.F1.h/2 + 42} fill="#888" fontSize="18" textAnchor="middle">Filter</text>
-              <text x="0" y={-SIZES.F1.h/2 - 16} fill="#999" fontSize="18" textAnchor="middle">{feedFlow.toLocaleString()} kg/h</text>
+              <text x="0" y={SIZES.F1.h/2 + 42} fill="#888" fontSize="16" textAnchor="middle">Filter</text>
+              <text x="0" y={-SIZES.F1.h/2 - 16} fill="#888" fontSize="16" textAnchor="middle">{feedFlow.toLocaleString()} kg/h</text>
             </>
           )}
         </g>
 
-        {/* PIPE: F-1 to TCV-01B */}
-        <line x1={ANCHORS.F1.x + SIZES.F1.w/2} y1={Y_MID} x2={VALVES.TCV01B.x - 20} y2={Y_MID} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={(ANCHORS.F1.x + VALVES.TCV01B.x)/2} cy={Y_MID} r="4" fill="#2F5D80">
+        {/* SPINE: F-1 → TCV-01B */}
+        <line x1={ANCHORS.F1.x + SIZES.F1.w/2} y1={Y_SPINE} x2={VALVES.TCV01B.x - 20} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={(ANCHORS.F1.x + VALVES.TCV01B.x)/2} cy={Y_SPINE} r="4" fill="#2F5D80">
           <animate attributeName="cx" values={`${ANCHORS.F1.x + SIZES.F1.w/2};${VALVES.TCV01B.x - 20}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
         
