@@ -224,11 +224,11 @@ export default function ProcessMap({
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x - SIZES.R1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
-        {/* REACTOR R-1 with Horizontal Bed Zones */}
+        {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
         <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")}>
-          <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="12" fill="#1a1a1a" stroke={baseColor} strokeWidth="3" />
+          <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#1a1a1a" stroke={baseColor} strokeWidth="3" />
           <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill="#2a2a2a" stroke={baseColor} strokeWidth="4" filter="url(#equipmentShadow)" />
-          <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="12" fill="#2a2a2a" stroke={baseColor} strokeWidth="3" />
+          <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#2a2a2a" stroke={baseColor} strokeWidth="3" />
           
           {bedImbalance && bedImbalance.beds.map((bed, idx) => {
             const bedHeight = 70;
