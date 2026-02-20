@@ -14,35 +14,38 @@ const COOLING_COLORS = {
   CONSTRAINED: "#A13A1F",
 };
 
-// Master Layout Spec Constants (QHD 2560×1440)
-const SAFE_ZONE = { x: 180, y: 340, width: 2200, height: 640 };
-const Y_MID = 660;
+// LAYOUT DISCIPLINE CONSTANTS — QHD 2560×1440
+// Enforces single-spine horizontal flow with upper/lower bypass zones
 
-// Equipment Anchors (absolute centers)
+const Y_SPINE = 660;  // Primary horizontal axis — main process ONLY
+const Y_UPPER_ZONE = Y_SPINE - 140;  // Input control zone (pre-reactor bypasses)
+const Y_LOWER_ZONE = Y_SPINE + 180;  // Output control zone (post-reactor bypasses)
+
+// MAIN PROCESS EQUIPMENT — All centered on Y_SPINE
 const ANCHORS = {
-  F1: { x: 260, y: Y_MID },
-  E1: { x: 700, y: Y_MID },
-  R1: { x: 1080, y: Y_MID },
-  E2: { x: 1560, y: Y_MID },
-  D1: { x: 2020, y: Y_MID },
+  F1: { x: 220, y: Y_SPINE },
+  E1: { x: 620, y: Y_SPINE },
+  R1: { x: 1100, y: Y_SPINE },
+  E2: { x: 1660, y: Y_SPINE },
+  D1: { x: 2140, y: Y_SPINE },
 };
 
 // Equipment Sizes (bounding boxes)
 const SIZES = {
   F1: { w: 90, h: 140 },
-  E1: { w: 280, h: 160 },
-  R1: { w: 180, h: 260 },
-  E2: { w: 180, h: 180 },
-  D1: { w: 260, h: 140 },
+  E1: { w: 260, h: 160 },
+  R1: { w: 160, h: 280 },
+  E2: { w: 160, h: 180 },
+  D1: { w: 280, h: 140 },
 };
 
-// Valve Positions (absolute)
+// CONTROL VALVES — Strictly zoned (upper = input, lower = output)
 const VALVES = {
-  TCV01B: { x: 460, y: Y_MID },
-  TCV01A: { x: 700, y: Y_MID - 120 },
-  TCV02A: { x: 1260, y: Y_MID - 30 },
-  TCV02B: { x: 1080, y: Y_MID + 170 },
-  TCV03A: { x: 1560, y: Y_MID + 150 },
+  TCV01B: { x: 420, y: Y_SPINE },           // Main feed control (on spine)
+  TCV01A: { x: 540, y: Y_UPPER_ZONE },      // Tube bypass (upper zone)
+  TCV02A: { x: 1300, y: Y_LOWER_ZONE - 40 },// Shell return control (lower zone)
+  TCV02B: { x: 980, y: Y_LOWER_ZONE },      // Shell bypass (lower zone)
+  TCV03A: { x: 1780, y: Y_LOWER_ZONE },     // Cooler bypass (lower zone)
 };
 
 export default function ProcessMap({
