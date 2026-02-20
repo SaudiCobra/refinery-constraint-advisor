@@ -488,13 +488,17 @@ export default function ProcessMap({
           {interactive && <text x="0" y="80" fill="#888" fontSize="14" textAnchor="middle">H₂O</text>}
         </g>
 
-        {/* Gas Recycle System */}
-        <g opacity="0.5">
-          <line x1={ANCHORS.D1.x} y1={ANCHORS.D1.y - SIZES.D1.h/2 - 40} x2={ANCHORS.D1.x} y2={ANCHORS.D1.y - SIZES.D1.h/2 - 80} stroke="#0FC9C9" strokeWidth="2.5" strokeDasharray="4,4" />
-          <text x={ANCHORS.D1.x} y={ANCHORS.D1.y - SIZES.D1.h/2 - 90} fill="#888" fontSize="16" textAnchor="middle">To H₂ Compressor</text>
+        {/* === SUPPORT SYSTEMS === */}
+        
+        {/* H₂ System — Light visual weight, vertical only */}
+        <g opacity="0.4">
+          {/* Gas recycle to H₂ system */}
+          <line x1={ANCHORS.D1.x} y1={ANCHORS.D1.y - SIZES.D1.h/2 - 50} x2={ANCHORS.D1.x} y2={ANCHORS.D1.y - SIZES.D1.h/2 - 90} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
+          {interactive && <text x={ANCHORS.D1.x} y={ANCHORS.D1.y - SIZES.D1.h/2 - 98} fill="#888" fontSize="14" textAnchor="middle">H₂ System</text>}
           
-          <line x1={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y1={ANCHORS.R1.y - SIZES.R1.h/2 - 60} x2={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y2={ANCHORS.R1.y - SIZES.R1.h/2 - 20} stroke="#0FC9C9" strokeWidth="2.5" strokeDasharray="4,4" />
-          <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 15} y={ANCHORS.R1.y - SIZES.R1.h/2 - 70} fill="#888" fontSize="16" textAnchor="middle">From H₂ System</text>
+          {/* Fresh H₂ to reactor */}
+          <line x1={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y1={ANCHORS.R1.y - SIZES.R1.h/2 - 70} x2={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y2={ANCHORS.R1.y - SIZES.R1.h/2 - 20} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
+          {interactive && <text x={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y={ANCHORS.R1.y - SIZES.R1.h/2 - 78} fill="#888" fontSize="14" textAnchor="middle">H₂</text>}
         </g>
 
         {/* Status indicators */}
