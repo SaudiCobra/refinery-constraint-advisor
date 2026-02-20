@@ -330,26 +330,36 @@ export default function ProcessMap({
           <animate attributeName="cy" values={`${ANCHORS.R1.y + SIZES.R1.h/2};${Y_LOWER_ZONE - 60}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
-        {/* UPPER BRANCH: TCV-02A to E-1 Shell Inlet - OUTSIDE reactor */}
+        {/* === LOWER ZONE: OUTPUT CONTROL === */}
+        
+        {/* TCV-02A: Shell Return Control (Lower Zone) */}
         <g>
-          <line x1={ANCHORS.R1.x + SIZES.R1.w/2 + 30} y1={ANCHORS.R1.y + SIZES.R1.h/2 + 40} x2={VALVES.TCV02A.x} y2={ANCHORS.R1.y + SIZES.R1.h/2 + 40} stroke="#555" strokeWidth="3" opacity="0.9" />
+          {/* Horizontal run in lower zone */}
+          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 60} x2={VALVES.TCV02A.x} y2={Y_LOWER_ZONE - 60} stroke="#555" strokeWidth="3" opacity="0.9" />
           {valveStates.tcv02a !== "CLOSED" && (
-            <circle cx={(ANCHORS.R1.x + VALVES.TCV02A.x)/2} cy={ANCHORS.R1.y + SIZES.R1.h/2 + 40} r="4" fill={shellThermalColor}>
-              <animate attributeName="cx" values={`${ANCHORS.R1.x + SIZES.R1.w/2 + 30};${VALVES.TCV02A.x}`} dur={animationSpeed} repeatCount="indefinite" />
+            <circle cx={(ANCHORS.R1.x + VALVES.TCV02A.x)/2} cy={Y_LOWER_ZONE - 60} r="4" fill={shellThermalColor}>
+              <animate attributeName="cx" values={`${ANCHORS.R1.x};${VALVES.TCV02A.x}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
           
-          <line x1={VALVES.TCV02A.x} y1={ANCHORS.R1.y + SIZES.R1.h/2 + 40} x2={VALVES.TCV02A.x} y2={VALVES.TCV02A.y + 14} stroke="#555" strokeWidth="3" opacity="0.9" />
+          {/* Valve position */}
+          <line x1={VALVES.TCV02A.x} y1={Y_LOWER_ZONE - 60} x2={VALVES.TCV02A.x} y2={VALVES.TCV02A.y + 14} stroke="#555" strokeWidth="3" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV02A.x}, ${VALVES.TCV02A.y})`} onClick={() => handleUnitClick('tcv02a')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv02a === "OPEN" ? "#2F5D80" : "#B47A1F"} stroke="#555" strokeWidth="2" />
-            <text x="0" y="-24" fill="#aaa" fontSize="20" textAnchor="middle" fontWeight="600">TCV-02A</text>
+            {interactive && (
+              <>
+                <text x="0" y="28" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-02A</text>
+                <text x="0" y="44" fill="#888" fontSize="14" textAnchor="middle">Shell Return</text>
+              </>
+            )}
           </g>
           
-          <line x1={VALVES.TCV02A.x} y1={VALVES.TCV02A.y - 14} x2={VALVES.TCV02A.x} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 20} stroke="#555" strokeWidth="3" opacity="0.9" />
-          <line x1={VALVES.TCV02A.x} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 20} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 20} stroke="#555" strokeWidth="3" opacity="0.9" />
+          {/* Rise to E-1 shell inlet */}
+          <line x1={VALVES.TCV02A.x} y1={VALVES.TCV02A.y - 14} x2={VALVES.TCV02A.x} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" opacity="0.9" />
+          <line x1={VALVES.TCV02A.x} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" opacity="0.9" />
           {valveStates.tcv02a !== "CLOSED" && (
-            <circle cx={(VALVES.TCV02A.x + ANCHORS.E1.x)/2} cy={ANCHORS.E1.y + SIZES.E1.h/2 - 20} r="4" fill={shellThermalColor}>
+            <circle cx={(VALVES.TCV02A.x + ANCHORS.E1.x)/2} cy={ANCHORS.E1.y + SIZES.E1.h/2 - 18} r="4" fill={shellThermalColor}>
               <animate attributeName="cx" values={`${VALVES.TCV02A.x};${ANCHORS.E1.x + SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
