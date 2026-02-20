@@ -400,9 +400,9 @@ export default function ProcessMap({
 
         {/* EFFLUENT COOLER E-2 */}
         <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={() => handleUnitClick('e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")}>
-          <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="12" fill="#2a2a2a" stroke={coolerColor} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-400" />
+          <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={coolerColor} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-400" />
           {[-60, -40, -20, 0, 20, 40, 60].map(y => (
-            <line key={y} x1={-SIZES.E2.w/2 + 20} y1={y} x2={SIZES.E2.w/2 - 20} y2={y} stroke="#2F5D80" strokeWidth="2.5" opacity="0.54" />
+            <line key={y} x1={-SIZES.E2.w/2 + 16} y1={y} x2={SIZES.E2.w/2 - 16} y2={y} stroke="#2F5D80" strokeWidth="2.5" opacity="0.54" />
           ))}
           {!equipment.effluentCooler && (
             <>
@@ -411,7 +411,7 @@ export default function ProcessMap({
             </>
           )}
           <text x="0" y={SIZES.E2.h/2 + 28} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">E-2</text>
-          {interactive && <text x="0" y={SIZES.E2.h/2 + 48} fill="#888" fontSize="18" textAnchor="middle">Effluent Cooler</text>}
+          {interactive && <text x="0" y={SIZES.E2.h/2 + 46} fill="#888" fontSize="16" textAnchor="middle">Cooler</text>}
         </g>
 
         {/* COOLER BYPASS (TCV-03A) */}
