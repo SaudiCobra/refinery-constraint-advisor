@@ -440,9 +440,9 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* PIPE: E-2 to D-1 */}
-        <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_MID} x2={ANCHORS.D1.x - SIZES.D1.w/2} y2={Y_MID} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={(ANCHORS.E2.x + ANCHORS.D1.x)/2} cy={Y_MID} r="4" fill={cooledThermalColor}>
+        {/* SPINE: E-2 → D-1 */}
+        <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_SPINE} x2={ANCHORS.D1.x - SIZES.D1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={(ANCHORS.E2.x + ANCHORS.D1.x)/2} cy={Y_SPINE} r="4" fill={cooledThermalColor}>
           <animate attributeName="cx" values={`${ANCHORS.E2.x + SIZES.E2.w/2};${ANCHORS.D1.x - SIZES.D1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
