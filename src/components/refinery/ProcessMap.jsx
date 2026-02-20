@@ -186,16 +186,15 @@ export default function ProcessMap({
 
 {/* Minimal E-1 labels */}
 
-        {/* TUBE BYPASS (TCV-01A) - positioned ABOVE E-1 */}
+        {/* UPPER ZONE: TUBE BYPASS (TCV-01A) - ORBITS ABOVE SPINE */}
         <g opacity={valveStates.tcv01a === "OOS" ? 0.3 : 1}>
-          <line x1={VALVES.TCV01B.x + 20} y1={Y_MID} x2={VALVES.TCV01B.x + 20} y2={VALVES.TCV01A.y} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
-          <line x1={VALVES.TCV01B.x + 20} y1={VALVES.TCV01A.y} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={VALVES.TCV01A.y} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
-          <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={VALVES.TCV01A.y} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_MID} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={VALVES.TCV01B.x + 20} y1={Y_SPINE} x2={VALVES.TCV01B.x + 20} y2={Y_UPPER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={VALVES.TCV01B.x + 20} y1={Y_UPPER_ZONE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_UPPER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_UPPER_ZONE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV01A.x}, ${VALVES.TCV01A.y})`} onClick={() => handleUnitClick('tcv01a')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv01a === "OPEN" ? "#2F5D80" : "#333"} stroke={valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} strokeWidth="2" />
-            <text x="0" y="-24" fill="#aaa" fontSize="20" textAnchor="middle" fontWeight="600">TCV-01A</text>
-            {interactive && <text x="0" y="36" fill="#888" fontSize="18" textAnchor="middle">Tube Bypass</text>}
+            {interactive && <text x="0" y="-24" fill="#aaa" fontSize="18" textAnchor="middle" fontWeight="600">TCV-01A</text>}
           </g>
           
           {valveStates.tcv01a === "OPEN" && (
@@ -205,9 +204,9 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* PIPE: E-1 Tube Out to Reactor */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_MID} x2={ANCHORS.R1.x - SIZES.R1.w/2} y2={Y_MID} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={(ANCHORS.E1.x + ANCHORS.R1.x)/2} cy={Y_MID} r="4" fill={tubeThermalColor}>
+        {/* SPINE: E-1 Tube Out to Reactor */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.R1.x - SIZES.R1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={(ANCHORS.E1.x + ANCHORS.R1.x)/2} cy={Y_SPINE} r="4" fill={tubeThermalColor}>
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x - SIZES.R1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
