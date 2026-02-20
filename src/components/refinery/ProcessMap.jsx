@@ -309,26 +309,25 @@ export default function ProcessMap({
           {interactive && <text x="0" y={SIZES.R1.h/2 + 52} fill="#888" fontSize="18" textAnchor="middle">Reactor</text>}
         </g>
 
-        {/* R-1 Temperature Display - Anchored to top-right corner */}
+        {/* R-1 Outlet — Drops vertically before split */}
         {interactive && (
           <>
-            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 - 18} fill="#888" fontSize="20" textAnchor="start">Outlet</text>
-            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 + 4} fill={baseColor} fontSize="22" textAnchor="start" fontWeight="700" className="transition-colors duration-400">
+            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 - 24} fill="#888" fontSize="18" textAnchor="start">Outlet</text>
+            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 - 4} fill={baseColor} fontSize="20" textAnchor="start" fontWeight="700" className="transition-colors duration-400">
               {currentTemp.toFixed(1)}{units}
             </text>
             {slope > 0 && (
-              <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 + 24} fill={baseColor} fontSize="18" textAnchor="start" className="transition-colors duration-400">
+              <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 + 14} fill={baseColor} fontSize="16" textAnchor="start" className="transition-colors duration-400">
                 ΔT +{slope.toFixed(2)} {units}/min
               </text>
             )}
           </>
         )}
 
-        {/* PIPE: R-1 Outlet - Routes UNDER reactor */}
-        <line x1={ANCHORS.R1.x + SIZES.R1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2 + 30} x2={ANCHORS.R1.x + SIZES.R1.w/2 + 30} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 30} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <line x1={ANCHORS.R1.x + SIZES.R1.w/2 + 30} y1={ANCHORS.R1.y - SIZES.R1.h/2 + 30} x2={ANCHORS.R1.x + SIZES.R1.w/2 + 30} y2={ANCHORS.R1.y + SIZES.R1.h/2 + 40} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={ANCHORS.R1.x + SIZES.R1.w/2 + 30} cy={(ANCHORS.R1.y - SIZES.R1.h/2 + ANCHORS.R1.y + SIZES.R1.h/2)/2} r="4" fill={shellThermalColor}>
-          <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2 + 30};${ANCHORS.R1.y + SIZES.R1.h/2 + 40}`} dur={animationSpeed} repeatCount="indefinite" />
+        {/* Vertical drop from reactor bottom */}
+        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y + SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={Y_LOWER_ZONE - 60} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y + SIZES.R1.h/2 + 30} r="4" fill={shellThermalColor}>
+          <animate attributeName="cy" values={`${ANCHORS.R1.y + SIZES.R1.h/2};${Y_LOWER_ZONE - 60}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* UPPER BRANCH: TCV-02A to E-1 Shell Inlet - OUTSIDE reactor */}
