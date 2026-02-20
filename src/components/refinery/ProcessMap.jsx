@@ -14,35 +14,36 @@ const COOLING_COLORS = {
   CONSTRAINED: "#A13A1F",
 };
 
-// Master Layout Spec Constants (QHD 2560×1440)
-const SAFE_ZONE = { x: 180, y: 340, width: 2200, height: 640 };
-const Y_MID = 660;
+// Master Layout Spec Constants (QHD 2560×1440) - DIRECTIVE COMPLIANT
+const Y_SPINE = 680; // Main process spine - slightly above vertical center
+const Y_UPPER_ZONE = Y_SPINE - 160; // Upper zone for input control
+const Y_LOWER_ZONE = Y_SPINE + 200; // Lower zone for output control
 
-// Equipment Anchors (absolute centers)
+// Equipment Anchors - ALL ON SPINE
 const ANCHORS = {
-  F1: { x: 260, y: Y_MID },
-  E1: { x: 700, y: Y_MID },
-  R1: { x: 1080, y: Y_MID },
-  E2: { x: 1560, y: Y_MID },
-  D1: { x: 2020, y: Y_MID },
+  F1: { x: 280, y: Y_SPINE },
+  E1: { x: 720, y: Y_SPINE },
+  R1: { x: 1120, y: Y_SPINE },
+  E2: { x: 1600, y: Y_SPINE },
+  D1: { x: 2100, y: Y_SPINE },
 };
 
-// Equipment Sizes (bounding boxes)
+// Equipment Sizes
 const SIZES = {
   F1: { w: 90, h: 140 },
   E1: { w: 280, h: 160 },
-  R1: { w: 180, h: 260 },
+  R1: { w: 180, h: 200 }, // 2-bed reactor (reduced height)
   E2: { w: 180, h: 180 },
-  D1: { w: 260, h: 140 },
+  D1: { w: 280, h: 140 },
 };
 
-// Valve Positions (absolute)
+// Valve Positions - ZONED
 const VALVES = {
-  TCV01B: { x: 460, y: Y_MID },
-  TCV01A: { x: 700, y: Y_MID - 120 },
-  TCV02A: { x: 1260, y: Y_MID - 30 },
-  TCV02B: { x: 1080, y: Y_MID + 170 },
-  TCV03A: { x: 1560, y: Y_MID + 150 },
+  TCV01B: { x: 500, y: Y_SPINE }, // On spine - main feed control
+  TCV01A: { x: 720, y: Y_UPPER_ZONE }, // Upper zone - tube bypass
+  TCV02A: { x: 1300, y: Y_UPPER_ZONE }, // Upper zone - shell inlet control
+  TCV02B: { x: 1120, y: Y_LOWER_ZONE }, // Lower zone - shell bypass
+  TCV03A: { x: 1600, y: Y_LOWER_ZONE }, // Lower zone - cooler bypass
 };
 
 export default function ProcessMap({
