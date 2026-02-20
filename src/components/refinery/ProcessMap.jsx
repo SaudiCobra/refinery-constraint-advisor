@@ -477,15 +477,15 @@ export default function ProcessMap({
           {interactive && <text x="0" y={SIZES.D1.h/2 + 46} fill="#888" fontSize="16" textAnchor="middle">Separator</text>}
         </g>
 
-        {/* H2O Pot (below separator) */}
-        <g transform={`translate(${ANCHORS.D1.x}, ${ANCHORS.D1.y + SIZES.D1.h/2 + 6})`}>
-          <ellipse cx="0" cy="0" rx="21" ry="6" fill="#1a1a1a" stroke="#555" strokeWidth="3" />
-          <rect x="-21" y="0" width="42" height="70" fill="#2a2a2a" stroke="#555" strokeWidth="3" />
-          <ellipse cx="0" cy="70" rx="21" ry="6" fill="#2a2a2a" stroke="#555" strokeWidth="3" />
-          <line x1="0" y1="-6" x2="0" y2="0" stroke="#2F5D80" strokeWidth="2.5" />
-          <rect x="-18" y="42" width="36" height="18" fill="#2F5D80" opacity="0.25" />
-          <line x1="-14" y1="54" x2="14" y2="54" stroke="#2F5D80" strokeWidth="2" opacity="0.6" />
-          {interactive && <text x="0" y="92" fill="#888" fontSize="16" textAnchor="middle">H₂O Pot</text>}
+        {/* H₂O Pot (below separator) */}
+        <g transform={`translate(${ANCHORS.D1.x}, ${ANCHORS.D1.y + SIZES.D1.h/2 + 10})`}>
+          <ellipse cx="0" cy="0" rx="18" ry="5" fill="#1a1a1a" stroke="#555" strokeWidth="2.5" />
+          <rect x="-18" y="0" width="36" height="60" fill="#2a2a2a" stroke="#555" strokeWidth="2.5" />
+          <ellipse cx="0" cy="60" rx="18" ry="5" fill="#2a2a2a" stroke="#555" strokeWidth="2.5" />
+          <line x1="0" y1="-5" x2="0" y2="0" stroke="#2F5D80" strokeWidth="2.5" />
+          <rect x="-15" y="36" width="30" height="16" fill="#2F5D80" opacity="0.25" />
+          <line x1="-12" y1="46" x2="12" y2="46" stroke="#2F5D80" strokeWidth="2" opacity="0.6" />
+          {interactive && <text x="0" y="80" fill="#888" fontSize="14" textAnchor="middle">H₂O</text>}
         </g>
 
         {/* Gas Recycle System */}
