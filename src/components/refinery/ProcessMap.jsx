@@ -223,15 +223,16 @@ export default function ProcessMap({
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x - SIZES.R1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
-        {/* REACTOR R-1 with Horizontal Bed Zones */}
+        {/* REACTOR R-1 - 2 BED CONFIGURATION */}
         <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")}>
           <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="12" fill="#1a1a1a" stroke={baseColor} strokeWidth="3" />
           <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill="#2a2a2a" stroke={baseColor} strokeWidth="4" filter="url(#equipmentShadow)" />
           <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="12" fill="#2a2a2a" stroke={baseColor} strokeWidth="3" />
           
-          {bedImbalance && bedImbalance.beds.map((bed, idx) => {
-            const bedHeight = 70;
-            const yStart = -95 + (idx * 80);
+          {/* 2-BED SYSTEM */}
+          {bedImbalance && [bedImbalance.beds[0], bedImbalance.beds[1]].filter(Boolean).map((bed, idx) => {
+            const bedHeight = 85;
+            const yStart = -85 + (idx * 95);
             const isDominant = bed.id === bedImbalance.dominantBed;
             
             const getBedColor = () => {
@@ -260,11 +261,11 @@ export default function ProcessMap({
                   className="transition-all duration-500"
                 />
                 
-                {Array.from({ length: 72 }).map((_, pidx) => {
+                {Array.from({ length: 84 }).map((_, pidx) => {
                   const row = Math.floor(pidx / 12);
                   const col = pidx % 12;
                   const px = -SIZES.R1.w/2 + 20 + col * 12;
-                  const py = yStart + 10 + row * 10;
+                  const py = yStart + 12 + row * 10;
                   return (
                     <circle
                       key={pidx}
@@ -279,19 +280,20 @@ export default function ProcessMap({
                 })}
                 
                 {interactive && (
-                  <text x={-SIZES.R1.w/2 - 20} y={yStart + bedHeight / 2 + 4} fill="#666" fontSize="18" textAnchor="middle">B{bed.id}</text>
+                  <text x={-SIZES.R1.w/2 - 24} y={yStart + bedHeight / 2 + 4} fill="#666" fontSize="18" textAnchor="middle">B{bed.id}</text>
                 )}
                 
-                {idx < bedImbalance.beds.length - 1 && (
-                  <g>
-                    <line x1={SIZES.R1.w/2} y1={yStart + bedHeight + 3} x2={SIZES.R1.w/2 + 30} y2={yStart + bedHeight + 3} stroke={equipment.h2Compressor ? "#4A90E2" : "#B47A1F"} strokeWidth="2.5" strokeDasharray="4,4" opacity="0.7" />
-                    <circle cx={SIZES.R1.w/2 + 15} cy={yStart + bedHeight + 3} r="3.5" fill={equipment.h2Compressor ? "#4A90E2" : "#B47A1F"} opacity="0.8">
+                {/* H₂ QUENCH - VERTICAL, LIGHT WEIGHT, SUBORDINATE */}
+                {idx === 0 && (
+                  <g opacity="0.5">
+                    <line x1={SIZES.R1.w/2 + 20} y1={yStart + bedHeight + 4} x2={SIZES.R1.w/2 + 40} y2={yStart + bedHeight + 4} stroke="#4A90E2" strokeWidth="1.5" strokeDasharray="3,3" />
+                    <circle cx={SIZES.R1.w/2 + 30} cy={yStart + bedHeight + 4} r="2.5" fill="#4A90E2" opacity="0.6">
                       {equipment.h2Compressor && (
-                        <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.5s" repeatCount="indefinite" />
                       )}
                     </circle>
                     {interactive && (
-                      <text x={SIZES.R1.w/2 + 45} y={yStart + bedHeight + 8} fill={equipment.h2Compressor ? "#4A90E2" : "#888"} fontSize="16" textAnchor="start" opacity="0.7">H₂ Q{idx + 1}</text>
+                      <text x={SIZES.R1.w/2 + 52} y={yStart + bedHeight + 7} fill="#4A90E2" fontSize="14" textAnchor="start" opacity="0.5">H₂</text>
                     )}
                   </g>
                 )}
@@ -304,7 +306,6 @@ export default function ProcessMap({
           )}
           
           <text x="0" y={SIZES.R1.h/2 + 30} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="bold">R-1</text>
-          {interactive && <text x="0" y={SIZES.R1.h/2 + 52} fill="#888" fontSize="18" textAnchor="middle">Reactor</text>}
         </g>
 
         {/* R-1 Temperature Display - Anchored to top-right corner */}
