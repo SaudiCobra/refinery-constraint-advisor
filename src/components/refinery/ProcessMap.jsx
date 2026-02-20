@@ -184,19 +184,7 @@ export default function ProcessMap({
           {interactive && <text x="0" y={SIZES.E1.h/2 + 48} fill="#888" fontSize="18" textAnchor="middle">Shell & Tube HX</text>}
         </g>
 
-        {/* E-1 Temperature Labels */}
-        {interactive && (
-          <>
-            <text x={ANCHORS.E1.x + SIZES.E1.w/2 + 14} y={ANCHORS.E1.y - SIZES.E1.h/2 - 8} fill="#888" fontSize="18" textAnchor="start">E-1 Tube Out</text>
-            <text x={ANCHORS.E1.x + SIZES.E1.w/2 + 14} y={ANCHORS.E1.y - SIZES.E1.h/2 + 12} fill={tubeThermalColor} fontSize="18" textAnchor="start" fontWeight="500" className="transition-colors duration-400">
-              T = {tubeSideOutletTemp.toFixed(1)}{units}
-            </text>
-            <text x={ANCHORS.E1.x - SIZES.E1.w/2 - 14} y={ANCHORS.E1.y + SIZES.E1.h/2 + 28} fill="#888" fontSize="18" textAnchor="end">E-1 Shell In</text>
-            <text x={ANCHORS.E1.x - SIZES.E1.w/2 - 14} y={ANCHORS.E1.y + SIZES.E1.h/2 + 48} fill={shellThermalColor} fontSize="18" textAnchor="end" className="transition-colors duration-400">
-              T = {reactorOutletTemp.toFixed(0)}{units}
-            </text>
-          </>
-        )}
+{/* Minimal E-1 labels */}
 
         {/* TUBE BYPASS (TCV-01A) - positioned ABOVE E-1 */}
         <g opacity={valveStates.tcv01a === "OOS" ? 0.3 : 1}>
