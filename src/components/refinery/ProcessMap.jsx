@@ -365,22 +365,27 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* LOWER BRANCH: TCV-02B Shell Bypass (BELOW reactor, moved down 30px) */}
+        {/* TCV-02B: Shell Bypass (Lower Zone) */}
         <g opacity={valveStates.tcv02b === "CLOSED" ? 0.3 : 1}>
-          <line x1={ANCHORS.R1.x + SIZES.R1.w/2 + 30} y1={ANCHORS.R1.y + SIZES.R1.h/2 + 40} x2={VALVES.TCV02B.x} y2={ANCHORS.R1.y + SIZES.R1.h/2 + 40} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
-          <line x1={VALVES.TCV02B.x} y1={ANCHORS.R1.y + SIZES.R1.h/2 + 40} x2={VALVES.TCV02B.x} y2={VALVES.TCV02B.y + 30 - 14} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Horizontal run in lower zone */}
+          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
-          <g transform={`translate(${VALVES.TCV02B.x}, ${VALVES.TCV02B.y + 30})`} onClick={() => handleUnitClick('tcv02b')} className={cn(interactive && "cursor-pointer")}>
+          <g transform={`translate(${VALVES.TCV02B.x}, ${VALVES.TCV02B.y})`} onClick={() => handleUnitClick('tcv02b')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv02b === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth="2" />
-            <text x="0" y="28" fill="#aaa" fontSize="20" textAnchor="middle" fontWeight="600">TCV-02B</text>
-            {interactive && <text x="0" y="46" fill="#888" fontSize="18" textAnchor="middle">Shell Bypass</text>}
+            {interactive && (
+              <>
+                <text x="0" y="28" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-02B</text>
+                <text x="0" y="44" fill="#888" fontSize="14" textAnchor="middle">Shell Bypass</text>
+              </>
+            )}
           </g>
           
-          <line x1={VALVES.TCV02B.x} y1={VALVES.TCV02B.y + 30 + 14} x2={VALVES.TCV02B.x} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
-          <line x1={VALVES.TCV02B.x} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 20} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Rise to E-1 shell outlet */}
+          <line x1={VALVES.TCV02B.x} y1={VALVES.TCV02B.y - 14} x2={VALVES.TCV02B.x} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={VALVES.TCV02B.x} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           {valveStates.tcv02b !== "CLOSED" && (
-            <circle cx={(VALVES.TCV02B.x + ANCHORS.E1.x)/2} cy={ANCHORS.E1.y + SIZES.E1.h/2 - 20} r="4" fill="#B47A1F">
+            <circle cx={(VALVES.TCV02B.x + ANCHORS.E1.x)/2} cy={ANCHORS.E1.y + SIZES.E1.h/2 - 18} r="4" fill="#B47A1F">
               <animate attributeName="cx" values={`${VALVES.TCV02B.x};${ANCHORS.E1.x - SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
