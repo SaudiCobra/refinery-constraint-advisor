@@ -414,20 +414,27 @@ export default function ProcessMap({
           {interactive && <text x="0" y={SIZES.E2.h/2 + 46} fill="#888" fontSize="16" textAnchor="middle">Cooler</text>}
         </g>
 
-        {/* COOLER BYPASS (TCV-03A) */}
+        {/* TCV-03A: Cooler Bypass (Lower Zone) */}
         <g opacity={valveStates.tcv03a === "CLOSED" ? 0.3 : 1}>
-          <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_MID} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={VALVES.TCV03A.y} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
-          <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={VALVES.TCV03A.y} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={VALVES.TCV03A.y} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
-          <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={VALVES.TCV03A.y} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_MID} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Drop from spine */}
+          <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_SPINE} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_LOWER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Horizontal run in lower zone */}
+          <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_LOWER_ZONE} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_LOWER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Rise to spine */}
+          <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_LOWER_ZONE} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV03A.x}, ${VALVES.TCV03A.y})`} onClick={() => handleUnitClick('tcv03a')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv03a === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth="2" />
-            <text x="0" y="38" fill="#aaa" fontSize="20" textAnchor="middle" fontWeight="600">TCV-03A</text>
-            {interactive && <text x="0" y="58" fill="#888" fontSize="18" textAnchor="middle">Cooler Bypass</text>}
+            {interactive && (
+              <>
+                <text x="0" y="28" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-03A</text>
+                <text x="0" y="44" fill="#888" fontSize="14" textAnchor="middle">Cooler Bypass</text>
+              </>
+            )}
           </g>
           
           {valveStates.tcv03a === "OPEN" && (
-            <circle cx={VALVES.TCV03A.x} cy={VALVES.TCV03A.y} r="4" fill="#B47A1F">
+            <circle cx={VALVES.TCV03A.x} cy={Y_LOWER_ZONE} r="4" fill="#B47A1F">
               <animate attributeName="cx" values={`${ANCHORS.E2.x - SIZES.E2.w/2};${ANCHORS.E2.x + SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
