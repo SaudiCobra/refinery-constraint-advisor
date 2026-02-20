@@ -501,31 +501,7 @@ export default function ProcessMap({
           {interactive && <text x={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y={ANCHORS.R1.y - SIZES.R1.h/2 - 78} fill="#888" fontSize="14" textAnchor="middle">H₂</text>}
         </g>
 
-        {/* Status indicators */}
-        {interactive && (
-          <>
-            <g transform="translate(200, 200)">
-              <rect x="0" y="0" width="240" height="40" rx="6" fill="#1e1e1e" stroke="#444" strokeWidth="1.5" />
-              <text x="120" y="26" fill={sensorQuality === "good" ? "#0F9F9F" : sensorQuality === "suspect" ? "#D4A547" : "#D4653F"} fontSize="18" textAnchor="middle" fontWeight="500">
-                Instrument: {sensorQuality.toUpperCase()}
-              </text>
-            </g>
-            <g transform="translate(460, 200)">
-              <rect x="0" y="0" width="200" height="40" rx="6" fill="#1e1e1e" stroke="#444" strokeWidth="1.5" />
-              <text x="100" y="26" fill="#999" fontSize="18" textAnchor="middle" fontWeight="500">
-                Mode: {opMode === "steady" ? "Steady" : "Transient"}
-              </text>
-            </g>
-            {preheatActive && (
-              <g transform="translate(680, 200)">
-                <rect x="0" y="0" width="280" height="40" rx="6" fill="#1e1e1e" stroke={preheatColor} strokeWidth="1.5" />
-                <text x="140" y="26" fill={preheatColor} fontSize="18" textAnchor="middle" fontWeight="500">
-                  Preheat: {preheatStatus || "OK"}
-                </text>
-              </g>
-            )}
-          </>
-        )}
+
       </svg>
 
       {/* Interactive detail panel */}
