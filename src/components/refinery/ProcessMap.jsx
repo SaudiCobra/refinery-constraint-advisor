@@ -466,13 +466,15 @@ export default function ProcessMap({
           <line x1={-SIZES.D1.w/2 + 20} y1={-SIZES.D1.h/2 + 52} x2={-SIZES.D1.w/2 + 30} y2={-SIZES.D1.h/2 + 52} stroke="#D4A547" strokeWidth="2.5" />
           <line x1={-SIZES.D1.w/2 + 20} y1={SIZES.D1.h/2 - 10} x2={-SIZES.D1.w/2 + 30} y2={SIZES.D1.h/2 - 10} stroke="#2F5D80" strokeWidth="2.5" />
           
-          <line x1="0" y1={-SIZES.D1.h/2} x2="0" y2={-SIZES.D1.h/2 - 40} stroke="#888" strokeWidth="2.5" />
-          <text x="0" y={-SIZES.D1.h/2 - 48} fill="#888" fontSize="18" textAnchor="middle">Gas Out</text>
+          {/* Gas outlet — Vertical only */}
+          <line x1="0" y1={-SIZES.D1.h/2 + 4} x2="0" y2={-SIZES.D1.h/2 - 50} stroke="#888" strokeWidth="2.5" />
+          {interactive && <text x="0" y={-SIZES.D1.h/2 - 58} fill="#888" fontSize="16" textAnchor="middle">Gas</text>}
           
+          {/* Naphtha outlet */}
           <line x1={SIZES.D1.w/2} y1={-SIZES.D1.h/2 + 52} x2={SIZES.D1.w/2 + 30} y2={-SIZES.D1.h/2 + 52} stroke="#D4A547" strokeWidth="2.5" />
           
           <text x="0" y={SIZES.D1.h/2 + 28} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">D-1</text>
-          {interactive && <text x="0" y={SIZES.D1.h/2 + 48} fill="#888" fontSize="18" textAnchor="middle">3-Phase Separator</text>}
+          {interactive && <text x="0" y={SIZES.D1.h/2 + 46} fill="#888" fontSize="16" textAnchor="middle">Separator</text>}
         </g>
 
         {/* H2O Pot (below separator) */}
