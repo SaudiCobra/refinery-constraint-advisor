@@ -218,9 +218,9 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* PIPE: E-1 Tube Out to Reactor */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_MID} x2={ANCHORS.R1.x - SIZES.R1.w/2} y2={Y_MID} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={(ANCHORS.E1.x + ANCHORS.R1.x)/2} cy={Y_MID} r="4" fill={tubeThermalColor}>
+        {/* SPINE: E-1 Tube Out → Reactor Inlet */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.R1.x - SIZES.R1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={(ANCHORS.E1.x + ANCHORS.R1.x)/2} cy={Y_SPINE} r="4" fill={tubeThermalColor}>
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x - SIZES.R1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
