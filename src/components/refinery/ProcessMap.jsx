@@ -166,26 +166,26 @@ export default function ProcessMap({
           <animate attributeName="cx" values={`${VALVES.TCV01B.x + 20};${ANCHORS.E1.x - SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
-        {/* FEED/EFFLUENT HEAT EXCHANGER E-1 */}
+        {/* MAIN EXCHANGER E-1 (Tube = Cold Feed, Shell = Hot Effluent) */}
         <g transform={`translate(${ANCHORS.E1.x}, ${ANCHORS.E1.y})`} onClick={() => handleUnitClick('e1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")}>
-          <ellipse cx={-SIZES.E1.w/2} cy="0" rx="12" ry={SIZES.E1.h/2 - 10} fill="#1a1a1a" stroke={preheatColor} strokeWidth="2.5" />
-          <rect x={-SIZES.E1.w/2} y={-SIZES.E1.h/2 + 10} width={SIZES.E1.w} height={SIZES.E1.h - 20} fill="#2a2a2a" stroke={preheatColor} strokeWidth="3" filter="url(#equipmentShadow)" />
-          <ellipse cx={SIZES.E1.w/2} cy="0" rx="12" ry={SIZES.E1.h/2 - 10} fill="#2a2a2a" stroke={preheatColor} strokeWidth="2.5" />
+          <ellipse cx={-SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#1a1a1a" stroke={preheatColor} strokeWidth="2.5" />
+          <rect x={-SIZES.E1.w/2} y={-SIZES.E1.h/2 + 8} width={SIZES.E1.w} height={SIZES.E1.h - 16} fill="#2a2a2a" stroke={preheatColor} strokeWidth="3" filter="url(#equipmentShadow)" />
+          <ellipse cx={SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#2a2a2a" stroke={preheatColor} strokeWidth="2.5" />
           
           {[-50, -35, -20, -5, 10, 25, 40, 55].map(yOffset => (
-            <line key={yOffset} x1={-SIZES.E1.w/2 + 15} y1={yOffset} x2={SIZES.E1.w/2 - 15} y2={yOffset} stroke="#444" strokeWidth="1.5" opacity="0.9" />
+            <line key={yOffset} x1={-SIZES.E1.w/2 + 12} y1={yOffset} x2={SIZES.E1.w/2 - 12} y2={yOffset} stroke="#444" strokeWidth="1.5" opacity="0.9" />
           ))}
           
-          <rect x={-SIZES.E1.w/2 + 15} y={-SIZES.E1.h/2 + 20} width={SIZES.E1.w - 30} height={SIZES.E1.h - 40} fill={tubeThermalColor} opacity="0.108" className="transition-all duration-500" />
-          <rect x={-SIZES.E1.w/2 + 10} y={-SIZES.E1.h/2 + 15} width={SIZES.E1.w - 20} height={SIZES.E1.h - 30} fill={shellThermalColor} opacity="0.072" className="transition-all duration-500" />
+          <rect x={-SIZES.E1.w/2 + 12} y={-SIZES.E1.h/2 + 18} width={SIZES.E1.w - 24} height={SIZES.E1.h - 36} fill={tubeThermalColor} opacity="0.108" className="transition-all duration-500" />
+          <rect x={-SIZES.E1.w/2 + 8} y={-SIZES.E1.h/2 + 14} width={SIZES.E1.w - 16} height={SIZES.E1.h - 28} fill={shellThermalColor} opacity="0.072" className="transition-all duration-500" />
           
-          <circle cx={-SIZES.E1.w/2} cy="0" r="6" fill="#333" stroke={tubeThermalColor} strokeWidth="2" />
-          <circle cx={SIZES.E1.w/2} cy="0" r="6" fill="#333" stroke={tubeThermalColor} strokeWidth="2" />
-          <circle cx={-SIZES.E1.w/2} cy={-SIZES.E1.h/2 + 20} r="6" fill="#333" stroke={shellThermalColor} strokeWidth="2" />
-          <circle cx={SIZES.E1.w/2} cy={SIZES.E1.h/2 - 20} r="6" fill="#333" stroke={shellThermalColor} strokeWidth="2" />
+          <circle cx={-SIZES.E1.w/2} cy="0" r="5" fill="#333" stroke={tubeThermalColor} strokeWidth="2" />
+          <circle cx={SIZES.E1.w/2} cy="0" r="5" fill="#333" stroke={tubeThermalColor} strokeWidth="2" />
+          <circle cx={-SIZES.E1.w/2} cy={-SIZES.E1.h/2 + 18} r="5" fill="#333" stroke={shellThermalColor} strokeWidth="2" />
+          <circle cx={SIZES.E1.w/2} cy={SIZES.E1.h/2 - 18} r="5" fill="#333" stroke={shellThermalColor} strokeWidth="2" />
           
           <text x="0" y={SIZES.E1.h/2 + 28} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">E-1</text>
-          {interactive && <text x="0" y={SIZES.E1.h/2 + 48} fill="#888" fontSize="18" textAnchor="middle">Shell & Tube HX</text>}
+          {interactive && <text x="0" y={SIZES.E1.h/2 + 46} fill="#888" fontSize="16" textAnchor="middle">Exchanger</text>}
         </g>
 
         {/* E-1 Temperature Labels */}
