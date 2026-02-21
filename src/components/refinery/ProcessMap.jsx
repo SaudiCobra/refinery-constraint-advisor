@@ -19,7 +19,7 @@ const COOLING_COLORS = {
 
 const Y_SPINE = 660;  // Primary horizontal axis — main process ONLY
 const Y_UPPER_ZONE = Y_SPINE - 140;  // Input control zone (pre-reactor bypasses)
-const Y_LOWER_ZONE = Y_SPINE + 180;  // Output control zone (post-reactor bypasses)
+const Y_LOWER_ZONE = Y_SPINE + 240;  // Output control zone (post-reactor bypasses)
 
 // MAIN PROCESS EQUIPMENT — All centered on Y_SPINE
 const ANCHORS = {
@@ -43,8 +43,8 @@ const SIZES = {
 const VALVES = {
   TCV01B: { x: 420, y: Y_SPINE },           // Main feed control (on spine)
   TCV01A: { x: 540, y: Y_UPPER_ZONE },      // Tube bypass (upper zone)
-  TCV02A: { x: 1300, y: Y_LOWER_ZONE - 40 },// Shell return control (lower zone)
-  TCV02B: { x: 980, y: Y_LOWER_ZONE },      // Shell bypass (lower zone)
+  TCV02A: { x: 1400, y: Y_LOWER_ZONE - 40 },// Shell return control (lower zone)
+  TCV02B: { x: 1260, y: Y_LOWER_ZONE },      // Shell bypass (lower zone)
   TCV03A: { x: 1780, y: Y_LOWER_ZONE },     // Cooler bypass (lower zone)
 };
 
