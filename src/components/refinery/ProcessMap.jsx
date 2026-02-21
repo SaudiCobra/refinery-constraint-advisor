@@ -298,15 +298,15 @@ export default function ProcessMap({
                 
                 {idx < bedImbalance.beds.length - 1 && (
                   <g>
-                    {/* H₂ Quench — Vertical injection only */}
-                    <line x1={SIZES.R1.w/2 + 10} y1={yStart + bedHeight + 3} x2={SIZES.R1.w/2 + 24} y2={yStart + bedHeight + 3} stroke={equipment.h2Compressor ? "#4A90E2" : "#888"} strokeWidth="1.5" strokeDasharray="3,3" opacity="0.5" />
-                    <circle cx={SIZES.R1.w/2 + 17} cy={yStart + bedHeight + 3} r="2.5" fill={equipment.h2Compressor ? "#4A90E2" : "#888"} opacity="0.6">
+                    {/* H₂ Quench — From right-side header */}
+                    <line x1={SIZES.R1.w/2} y1={yStart + bedHeight + 3} x2={SIZES.R1.w/2 + 40} y2={yStart + bedHeight + 3} stroke={equipment.h2Compressor ? "#4A90E2" : "#888"} strokeWidth="1.5" strokeDasharray="3,3" opacity="0.5" />
+                    <circle cx={SIZES.R1.w/2 + 20} cy={yStart + bedHeight + 3} r="2.5" fill={equipment.h2Compressor ? "#4A90E2" : "#888"} opacity="0.6">
                       {equipment.h2Compressor && (
                         <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.5s" repeatCount="indefinite" />
                       )}
                     </circle>
                     {interactive && (
-                      <text x={SIZES.R1.w/2 + 32} y={yStart + bedHeight + 7} fill="#888" fontSize="13" textAnchor="start" opacity="0.5">Q{idx + 1}</text>
+                      <text x={SIZES.R1.w/2 + 48} y={yStart + bedHeight + 7} fill="#888" fontSize="13" textAnchor="start" opacity="0.5">Q{idx + 1}</text>
                     )}
                   </g>
                 )}
@@ -536,15 +536,33 @@ export default function ProcessMap({
 
         {/* === SUPPORT SYSTEMS === */}
         
-        {/* H₂ System — Light visual weight, vertical only */}
+        {/* H₂ System — Right-side header with quench branches */}
         <g opacity="0.4">
+          {/* H₂ header — vertical dashed blue line on right side */}
+          <line 
+            x1={ANCHORS.R1.x + SIZES.R1.w/2 + 40} 
+            y1={ANCHORS.R1.y - SIZES.R1.h/2 - 30} 
+            x2={ANCHORS.R1.x + SIZES.R1.w/2 + 40} 
+            y2={ANCHORS.R1.y + SIZES.R1.h/2 - 10} 
+            stroke="#4A90E2" 
+            strokeWidth="2.5" 
+            strokeDasharray="4,4" 
+          />
+          {interactive && (
+            <text 
+              x={ANCHORS.R1.x + SIZES.R1.w/2 + 40} 
+              y={ANCHORS.R1.y - SIZES.R1.h/2 - 38} 
+              fill="#888" 
+              fontSize="14" 
+              textAnchor="middle"
+            >
+              H₂
+            </text>
+          )}
+          
           {/* Gas recycle to H₂ system */}
           <line x1={ANCHORS.D1.x} y1={ANCHORS.D1.y - SIZES.D1.h/2 - 50} x2={ANCHORS.D1.x} y2={ANCHORS.D1.y - SIZES.D1.h/2 - 90} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
           {interactive && <text x={ANCHORS.D1.x} y={ANCHORS.D1.y - SIZES.D1.h/2 - 98} fill="#888" fontSize="14" textAnchor="middle">H₂ System</text>}
-          
-          {/* Fresh H₂ to reactor */}
-          <line x1={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y1={ANCHORS.R1.y - SIZES.R1.h/2 - 70} x2={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y2={ANCHORS.R1.y - SIZES.R1.h/2 - 20} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
-          {interactive && <text x={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y={ANCHORS.R1.y - SIZES.R1.h/2 - 78} fill="#888" fontSize="14" textAnchor="middle">H₂</text>}
         </g>
 
 
