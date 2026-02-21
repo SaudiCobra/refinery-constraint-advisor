@@ -433,11 +433,15 @@ export default function ProcessMap({
           <circle cx={ANCHORS.E2.x - SIZES.E2.w/2 - 70} cy={Y_SPINE} r="5" fill="#1a1a1a" stroke="#B47A1F" strokeWidth="2" />
         </g>
 
-        {/* SPINE: E-1 Shell Out → E-2 */}
-        <line x1={ANCHORS.E1.x - SIZES.E1.w/2} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" opacity="0.9" />
-        <line x1={ANCHORS.E1.x - SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={(ANCHORS.E1.x + ANCHORS.E2.x)/2} cy={Y_SPINE} r="4" fill={getThermalColor(shellSideOutletTemp)}>
-          <animate attributeName="cx" values={`${ANCHORS.E1.x - SIZES.E1.w/2};${ANCHORS.E2.x - SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
+        {/* SPINE: E-1 Shell Out → E-2 (clean dogleg below reactor) */}
+        {/* Vertical drop from E-1 shell outlet */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18 + 140} stroke="#555" strokeWidth="4" opacity="0.9" />
+        {/* Horizontal run below reactor */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18 + 140} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18 + 140} stroke="#555" strokeWidth="4" opacity="0.9" />
+        {/* Vertical rise to E-2 inlet on spine */}
+        <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18 + 140} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={(ANCHORS.E1.x + ANCHORS.E2.x)/2} cy={ANCHORS.E1.y + SIZES.E1.h/2 - 18 + 140} r="4" fill={getThermalColor(shellSideOutletTemp)}>
+          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.E2.x - SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* EFFLUENT COOLER E-2 */}
