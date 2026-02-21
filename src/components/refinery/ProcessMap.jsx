@@ -218,10 +218,17 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* SPINE: E-1 Tube Out → Reactor Inlet */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.R1.x - SIZES.R1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        {/* E-1 Tube Out → Reactor Inlet (Top Nozzle Entry) */}
+        {/* Horizontal run from E-1 outlet to reactor centerline */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.R1.x} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
         <circle cx={(ANCHORS.E1.x + ANCHORS.R1.x)/2} cy={Y_SPINE} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x - SIZES.R1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
+          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
+        
+        {/* Vertical rise to reactor top nozzle */}
+        <line x1={ANCHORS.R1.x} y1={Y_SPINE} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={ANCHORS.R1.x} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
