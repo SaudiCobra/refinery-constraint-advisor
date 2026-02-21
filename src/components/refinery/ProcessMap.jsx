@@ -318,8 +318,8 @@ export default function ProcessMap({
             <rect x={-SIZES.R1.w/2 + 5} y={-SIZES.R1.h/2 + 5} width={SIZES.R1.w - 10} height={SIZES.R1.h - 10} fill="url(#reactorGlow)" opacity="1.08" className={escalationLevel >= 3 ? "animate-[pulse_1.2s_ease-in-out_infinite]" : "transition-opacity duration-500"} />
           )}
           
-          <text x="0" y={SIZES.R1.h/2 + 30} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="bold">R-1</text>
-          {interactive && <text x="0" y={SIZES.R1.h/2 + 52} fill="#888" fontSize="18" textAnchor="middle">Reactor</text>}
+          <text x={-SIZES.R1.w/2 - 40} y={SIZES.R1.h/2 + 12} fill="#aaa" fontSize="22" textAnchor="end" fontWeight="bold">R-1</text>
+          {interactive && <text x={-SIZES.R1.w/2 - 40} y={SIZES.R1.h/2 + 26} fill="#888" fontSize="18" textAnchor="end">Reactor</text>}
         </g>
 
         {/* R-1 Outlet — Drops vertically before split */}
