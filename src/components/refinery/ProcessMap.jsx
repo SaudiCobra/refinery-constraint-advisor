@@ -219,16 +219,16 @@ export default function ProcessMap({
         </g>
 
         {/* E-1 Tube Out → Reactor Inlet (Top Nozzle Entry) */}
-        {/* Horizontal run from E-1 outlet to reactor centerline */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.R1.x} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={(ANCHORS.E1.x + ANCHORS.R1.x)/2} cy={Y_SPINE} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
+        {/* Vertical rise from E-1 outlet to top nozzle elevation */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
         
-        {/* Vertical rise to reactor top nozzle */}
-        <line x1={ANCHORS.R1.x} y1={Y_SPINE} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={ANCHORS.R1.x} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
+        {/* Horizontal run to reactor centerline at top */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
@@ -344,7 +344,7 @@ export default function ProcessMap({
 
         {/* === LOWER ZONE: SHELL-SIDE CONTROL === */}
         
-        {/* TCV-02A Path: Shell Return Control (Vertical → Horizontal → Vertical → E-1) */}
+        {/* TCV-02A Path: Shell Return Control (Below-Reactor Return Bus) */}
         <g>
           {/* From split point: Drop vertically to valve elevation */}
           <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 60} x2={ANCHORS.R1.x} y2={VALVES.TCV02A.y} stroke="#555" strokeWidth="3" opacity="0.9" />
@@ -368,19 +368,22 @@ export default function ProcessMap({
             )}
           </g>
           
-          {/* Rise vertically to E-1 shell inlet elevation */}
-          <line x1={VALVES.TCV02A.x} y1={VALVES.TCV02A.y} x2={VALVES.TCV02A.x} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" opacity="0.9" />
+          {/* Drop to return bus below reactor */}
+          <line x1={VALVES.TCV02A.x} y1={VALVES.TCV02A.y} x2={VALVES.TCV02A.x} y2={Y_LOWER_ZONE + 20} stroke="#555" strokeWidth="3" opacity="0.9" />
           
-          {/* Horizontal run to E-1 shell inlet */}
-          <line x1={VALVES.TCV02A.x} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" opacity="0.9" />
+          {/* Horizontal run at return bus to E-1 connection point */}
+          <line x1={VALVES.TCV02A.x} y1={Y_LOWER_ZONE + 20} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_LOWER_ZONE + 20} stroke="#555" strokeWidth="3" opacity="0.9" />
           {valveStates.tcv02a !== "CLOSED" && (
-            <circle cx={(VALVES.TCV02A.x + ANCHORS.E1.x)/2} cy={ANCHORS.E1.y + SIZES.E1.h/2 - 18} r="4" fill={shellThermalColor}>
+            <circle cx={(VALVES.TCV02A.x + ANCHORS.E1.x + SIZES.E1.w/2)/2} cy={Y_LOWER_ZONE + 20} r="4" fill={shellThermalColor}>
               <animate attributeName="cx" values={`${VALVES.TCV02A.x};${ANCHORS.E1.x + SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
+          
+          {/* Rise vertically to E-1 shell inlet elevation */}
+          <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_LOWER_ZONE + 20} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" opacity="0.9" />
         </g>
 
-        {/* TCV-02B Path: Shell Bypass (Vertical → Horizontal → Vertical → E-1) */}
+        {/* TCV-02B Path: Shell Bypass (Below-Reactor Return Bus) */}
         <g opacity={valveStates.tcv02b === "CLOSED" ? 0.3 : 1}>
           {/* From split point: Drop vertically to valve elevation */}
           <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 60} x2={ANCHORS.R1.x} y2={VALVES.TCV02B.y} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
@@ -404,16 +407,19 @@ export default function ProcessMap({
             )}
           </g>
           
-          {/* Rise vertically to E-1 shell outlet elevation */}
-          <line x1={VALVES.TCV02B.x} y1={VALVES.TCV02B.y} x2={VALVES.TCV02B.x} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Drop to return bus below reactor */}
+          <line x1={VALVES.TCV02B.x} y1={VALVES.TCV02B.y} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE + 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
-          {/* Horizontal run to E-1 shell outlet */}
-          <line x1={VALVES.TCV02B.x} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Horizontal run at return bus to E-1 connection point */}
+          <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE + 20} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={Y_LOWER_ZONE + 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {valveStates.tcv02b !== "CLOSED" && (
-            <circle cx={(VALVES.TCV02B.x + ANCHORS.E1.x)/2} cy={ANCHORS.E1.y + SIZES.E1.h/2 - 18} r="4" fill="#B47A1F">
+            <circle cx={(VALVES.TCV02B.x + ANCHORS.E1.x - SIZES.E1.w/2)/2} cy={Y_LOWER_ZONE + 20} r="4" fill="#B47A1F">
               <animate attributeName="cx" values={`${VALVES.TCV02B.x};${ANCHORS.E1.x - SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
+          
+          {/* Rise vertically to E-1 shell outlet elevation */}
+          <line x1={ANCHORS.E1.x - SIZES.E1.w/2} y1={Y_LOWER_ZONE + 20} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
         </g>
 
         {/* SPINE: E-1 Shell Out → E-2 */}
