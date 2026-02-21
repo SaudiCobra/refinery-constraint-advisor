@@ -344,18 +344,21 @@ export default function ProcessMap({
 
         {/* === LOWER ZONE: SHELL-SIDE CONTROL === */}
         
-        {/* TCV-02A Path: Shell Return Control (Below-Reactor Return Bus) */}
+        {/* TCV-02A Path: Shell Return Control (Lane A) */}
         <g>
-          {/* From split point: Drop vertically to valve elevation */}
-          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 60} x2={ANCHORS.R1.x} y2={VALVES.TCV02A.y} stroke="#555" strokeWidth="3" opacity="0.9" />
+          {/* From split point: Drop vertically to bus A level */}
+          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 60} x2={ANCHORS.R1.x} y2={Y_LOWER_ZONE + 10} stroke="#555" strokeWidth="3" opacity="0.9" />
           
-          {/* Horizontal run to valve location */}
-          <line x1={ANCHORS.R1.x} y1={VALVES.TCV02A.y} x2={VALVES.TCV02A.x} y2={VALVES.TCV02A.y} stroke="#555" strokeWidth="3" opacity="0.9" />
+          {/* Horizontal run on bus A to valve location */}
+          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE + 10} x2={VALVES.TCV02A.x} y2={Y_LOWER_ZONE + 10} stroke="#555" strokeWidth="3" opacity="0.9" />
           {valveStates.tcv02a !== "CLOSED" && (
-            <circle cx={(ANCHORS.R1.x + VALVES.TCV02A.x)/2} cy={VALVES.TCV02A.y} r="4" fill={shellThermalColor}>
+            <circle cx={(ANCHORS.R1.x + VALVES.TCV02A.x)/2} cy={Y_LOWER_ZONE + 10} r="4" fill={shellThermalColor}>
               <animate attributeName="cx" values={`${ANCHORS.R1.x};${VALVES.TCV02A.x}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
+          
+          {/* Short vertical to valve symbol */}
+          <line x1={VALVES.TCV02A.x} y1={Y_LOWER_ZONE + 10} x2={VALVES.TCV02A.x} y2={VALVES.TCV02A.y} stroke="#555" strokeWidth="3" opacity="0.9" />
           
           {/* Valve symbol */}
           <g transform={`translate(${VALVES.TCV02A.x}, ${VALVES.TCV02A.y})`} onClick={() => handleUnitClick('tcv02a')} className={cn(interactive && "cursor-pointer")}>
@@ -368,33 +371,36 @@ export default function ProcessMap({
             )}
           </g>
           
-          {/* Drop to return bus below reactor */}
-          <line x1={VALVES.TCV02A.x} y1={VALVES.TCV02A.y} x2={VALVES.TCV02A.x} y2={Y_LOWER_ZONE + 20} stroke="#555" strokeWidth="3" opacity="0.9" />
+          {/* After valve: return to bus A */}
+          <line x1={VALVES.TCV02A.x} y1={VALVES.TCV02A.y} x2={VALVES.TCV02A.x} y2={Y_LOWER_ZONE + 10} stroke="#555" strokeWidth="3" opacity="0.9" />
           
-          {/* Horizontal run at return bus to E-1 connection point */}
-          <line x1={VALVES.TCV02A.x} y1={Y_LOWER_ZONE + 20} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_LOWER_ZONE + 20} stroke="#555" strokeWidth="3" opacity="0.9" />
+          {/* Horizontal run on bus A to E-1 shell inlet x-position */}
+          <line x1={VALVES.TCV02A.x} y1={Y_LOWER_ZONE + 10} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_LOWER_ZONE + 10} stroke="#555" strokeWidth="3" opacity="0.9" />
           {valveStates.tcv02a !== "CLOSED" && (
-            <circle cx={(VALVES.TCV02A.x + ANCHORS.E1.x + SIZES.E1.w/2)/2} cy={Y_LOWER_ZONE + 20} r="4" fill={shellThermalColor}>
+            <circle cx={(VALVES.TCV02A.x + ANCHORS.E1.x + SIZES.E1.w/2)/2} cy={Y_LOWER_ZONE + 10} r="4" fill={shellThermalColor}>
               <animate attributeName="cx" values={`${VALVES.TCV02A.x};${ANCHORS.E1.x + SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
           
           {/* Rise vertically to E-1 shell inlet elevation */}
-          <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_LOWER_ZONE + 20} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" opacity="0.9" />
+          <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_LOWER_ZONE + 10} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" opacity="0.9" />
         </g>
 
-        {/* TCV-02B Path: Shell Bypass (Below-Reactor Return Bus) */}
+        {/* TCV-02B Path: Shell Bypass (Lane B) */}
         <g opacity={valveStates.tcv02b === "CLOSED" ? 0.3 : 1}>
-          {/* From split point: Drop vertically to valve elevation */}
-          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 60} x2={ANCHORS.R1.x} y2={VALVES.TCV02B.y} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* From split point: Drop vertically to bus B level */}
+          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 60} x2={ANCHORS.R1.x} y2={Y_LOWER_ZONE + 60} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
-          {/* Horizontal run to valve location */}
-          <line x1={ANCHORS.R1.x} y1={VALVES.TCV02B.y} x2={VALVES.TCV02B.x} y2={VALVES.TCV02B.y} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Horizontal run on bus B to valve location */}
+          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE + 60} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE + 60} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {valveStates.tcv02b !== "CLOSED" && (
-            <circle cx={(ANCHORS.R1.x + VALVES.TCV02B.x)/2} cy={VALVES.TCV02B.y} r="4" fill="#B47A1F">
+            <circle cx={(ANCHORS.R1.x + VALVES.TCV02B.x)/2} cy={Y_LOWER_ZONE + 60} r="4" fill="#B47A1F">
               <animate attributeName="cx" values={`${ANCHORS.R1.x};${VALVES.TCV02B.x}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
+          
+          {/* Short vertical to valve symbol */}
+          <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE + 60} x2={VALVES.TCV02B.x} y2={VALVES.TCV02B.y} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           {/* Valve symbol */}
           <g transform={`translate(${VALVES.TCV02B.x}, ${VALVES.TCV02B.y})`} onClick={() => handleUnitClick('tcv02b')} className={cn(interactive && "cursor-pointer")}>
@@ -407,19 +413,19 @@ export default function ProcessMap({
             )}
           </g>
           
-          {/* Drop to return bus below reactor */}
-          <line x1={VALVES.TCV02B.x} y1={VALVES.TCV02B.y} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE + 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* After valve: return to bus B */}
+          <line x1={VALVES.TCV02B.x} y1={VALVES.TCV02B.y} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE + 60} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
-          {/* Horizontal run at return bus to E-1 connection point */}
-          <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE + 20} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={Y_LOWER_ZONE + 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Horizontal run on bus B to E-1 shell outlet x-position */}
+          <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE + 60} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={Y_LOWER_ZONE + 60} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {valveStates.tcv02b !== "CLOSED" && (
-            <circle cx={(VALVES.TCV02B.x + ANCHORS.E1.x - SIZES.E1.w/2)/2} cy={Y_LOWER_ZONE + 20} r="4" fill="#B47A1F">
+            <circle cx={(VALVES.TCV02B.x + ANCHORS.E1.x - SIZES.E1.w/2)/2} cy={Y_LOWER_ZONE + 60} r="4" fill="#B47A1F">
               <animate attributeName="cx" values={`${VALVES.TCV02B.x};${ANCHORS.E1.x - SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
           
           {/* Rise vertically to E-1 shell outlet elevation */}
-          <line x1={ANCHORS.E1.x - SIZES.E1.w/2} y1={Y_LOWER_ZONE + 20} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={ANCHORS.E1.x - SIZES.E1.w/2} y1={Y_LOWER_ZONE + 60} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
         </g>
 
         {/* SPINE: E-1 Shell Out → E-2 */}
