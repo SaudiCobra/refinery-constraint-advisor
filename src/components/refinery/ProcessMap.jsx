@@ -41,8 +41,8 @@ const SIZES = {
 
 // CONTROL VALVES — Strictly zoned (upper = input, lower = output)
 const VALVES = {
-  TCV01A: { x: 500, y: Y_UPPER_ZONE },      // Tube bypass (upper zone)
-  TCV01B: { x: 640, y: Y_SPINE },           // Main feed control (on spine)
+  TCV01B: { x: 500, y: Y_SPINE },           // Main feed control (on spine)
+  TCV01A: { x: 640, y: Y_UPPER_ZONE },      // Tube bypass (upper zone)
   TCV02A: { x: 1580, y: Y_LOWER_ZONE + 5 }, // Shell return control (lower zone)
   TCV02B: { x: 1400, y: Y_LOWER_ZONE + 85 },// Shell bypass (lower zone)
   TCV03A: { x: 2000, y: Y_LOWER_ZONE },     // Cooler bypass (lower zone)
@@ -520,7 +520,7 @@ export default function ProcessMap({
           <line x1={SIZES.D1.w/2} y1={-SIZES.D1.h/2 + 52} x2={SIZES.D1.w/2 + 30} y2={-SIZES.D1.h/2 + 52} stroke="#D4A547" strokeWidth="2.5" />
           
           <text x="0" y={SIZES.D1.h/2 + 28} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">D-1</text>
-          {interactive && <text x="70" y={SIZES.D1.h/2 + 46} fill="#888" fontSize="16" textAnchor="start">3-Phase Separator</text>}
+          {interactive && <text x="0" y={SIZES.D1.h/2 + 46} fill="#888" fontSize="16" textAnchor="middle">Separator</text>}
         </g>
 
         {/* H₂O Pot (below separator) */}
@@ -536,23 +536,15 @@ export default function ProcessMap({
 
         {/* === SUPPORT SYSTEMS === */}
         
-        {/* H₂ System — Quench injection between beds */}
+        {/* H₂ System — Light visual weight, vertical only */}
         <g opacity="0.4">
           {/* Gas recycle to H₂ system */}
           <line x1={ANCHORS.D1.x} y1={ANCHORS.D1.y - SIZES.D1.h/2 - 50} x2={ANCHORS.D1.x} y2={ANCHORS.D1.y - SIZES.D1.h/2 - 90} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
           {interactive && <text x={ANCHORS.D1.x} y={ANCHORS.D1.y - SIZES.D1.h/2 - 98} fill="#888" fontSize="14" textAnchor="middle">H₂ System</text>}
           
-          {/* H₂ header left of reactor */}
-          <line x1={ANCHORS.R1.x - SIZES.R1.w/2 - 40} y1={ANCHORS.R1.y - SIZES.R1.h/2 - 30} x2={ANCHORS.R1.x - SIZES.R1.w/2 - 40} y2={ANCHORS.R1.y + SIZES.R1.h/2 - 10} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
-          {interactive && <text x={ANCHORS.R1.x - SIZES.R1.w/2 - 40} y={ANCHORS.R1.y - SIZES.R1.h/2 - 38} fill="#888" fontSize="14" textAnchor="middle">H₂</text>}
-          
-          {/* Quench 1: between B1-B2 */}
-          <line x1={ANCHORS.R1.x - SIZES.R1.w/2 - 40} y1={ANCHORS.R1.y - SIZES.R1.h/2 + SIZES.R1.h * 0.42} x2={ANCHORS.R1.x - SIZES.R1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2 + SIZES.R1.h * 0.42} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
-          {interactive && <text x={ANCHORS.R1.x - SIZES.R1.w/2 - 52} y={ANCHORS.R1.y - SIZES.R1.h/2 + SIZES.R1.h * 0.42 + 4} fill="#888" fontSize="12" textAnchor="middle">Q1</text>}
-          
-          {/* Quench 2: between B2-B3 */}
-          <line x1={ANCHORS.R1.x - SIZES.R1.w/2 - 40} y1={ANCHORS.R1.y - SIZES.R1.h/2 + SIZES.R1.h * 0.70} x2={ANCHORS.R1.x - SIZES.R1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2 + SIZES.R1.h * 0.70} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
-          {interactive && <text x={ANCHORS.R1.x - SIZES.R1.w/2 - 52} y={ANCHORS.R1.y - SIZES.R1.h/2 + SIZES.R1.h * 0.70 + 4} fill="#888" fontSize="12" textAnchor="middle">Q2</text>}
+          {/* Fresh H₂ to reactor */}
+          <line x1={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y1={ANCHORS.R1.y - SIZES.R1.h/2 - 70} x2={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y2={ANCHORS.R1.y - SIZES.R1.h/2 - 20} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
+          {interactive && <text x={ANCHORS.R1.x - SIZES.R1.w/2 - 20} y={ANCHORS.R1.y - SIZES.R1.h/2 - 78} fill="#888" fontSize="14" textAnchor="middle">H₂</text>}
         </g>
 
 
