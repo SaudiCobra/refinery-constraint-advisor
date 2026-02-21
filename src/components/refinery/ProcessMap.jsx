@@ -325,12 +325,12 @@ export default function ProcessMap({
         {/* R-1 Outlet — Drops vertically before split */}
         {interactive && (
           <>
-            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 - 24} fill="#888" fontSize="18" textAnchor="start">Outlet</text>
-            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 - 4} fill={baseColor} fontSize="20" textAnchor="start" fontWeight="700" className="transition-colors duration-400">
+            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 120} y={ANCHORS.R1.y - SIZES.R1.h/2 + 12} fill="#888" fontSize="18" textAnchor="start">Outlet</text>
+            <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 120} y={ANCHORS.R1.y - SIZES.R1.h/2 + 32} fill={baseColor} fontSize="20" textAnchor="start" fontWeight="700" className="transition-colors duration-400">
               {currentTemp.toFixed(1)}{units}
             </text>
             {slope > 0 && (
-              <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 16} y={ANCHORS.R1.y - SIZES.R1.h/2 + 14} fill={baseColor} fontSize="16" textAnchor="start" className="transition-colors duration-400">
+              <text x={ANCHORS.R1.x + SIZES.R1.w/2 + 120} y={ANCHORS.R1.y - SIZES.R1.h/2 + 50} fill={baseColor} fontSize="16" textAnchor="start" className="transition-colors duration-400">
                 ΔT +{slope.toFixed(2)} {units}/min
               </text>
             )}
