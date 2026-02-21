@@ -23,11 +23,11 @@ const Y_LOWER_ZONE = Y_SPINE + 240;  // Output control zone (post-reactor bypass
 
 // MAIN PROCESS EQUIPMENT — All centered on Y_SPINE
 const ANCHORS = {
-  F1: { x: 220, y: Y_SPINE },
-  E1: { x: 620, y: Y_SPINE },
-  R1: { x: 1100, y: Y_SPINE },
-  E2: { x: 1660, y: Y_SPINE },
-  D1: { x: 2140, y: Y_SPINE },
+  F1: { x: 260, y: Y_SPINE },
+  E1: { x: 720, y: Y_SPINE },
+  R1: { x: 1260, y: Y_SPINE },
+  E2: { x: 1860, y: Y_SPINE },
+  D1: { x: 2320, y: Y_SPINE },
 };
 
 // Equipment Sizes (bounding boxes)
@@ -41,11 +41,11 @@ const SIZES = {
 
 // CONTROL VALVES — Strictly zoned (upper = input, lower = output)
 const VALVES = {
-  TCV01B: { x: 420, y: Y_SPINE },           // Main feed control (on spine)
-  TCV01A: { x: 540, y: Y_UPPER_ZONE },      // Tube bypass (upper zone)
-  TCV02A: { x: 1400, y: Y_LOWER_ZONE + 5 }, // Shell return control (lower zone)
-  TCV02B: { x: 1180, y: Y_LOWER_ZONE + 85 },// Shell bypass (lower zone)
-  TCV03A: { x: 1780, y: Y_LOWER_ZONE },     // Cooler bypass (lower zone)
+  TCV01B: { x: 500, y: Y_SPINE },           // Main feed control (on spine)
+  TCV01A: { x: 640, y: Y_UPPER_ZONE },      // Tube bypass (upper zone)
+  TCV02A: { x: 1580, y: Y_LOWER_ZONE + 5 }, // Shell return control (lower zone)
+  TCV02B: { x: 1400, y: Y_LOWER_ZONE + 85 },// Shell bypass (lower zone)
+  TCV03A: { x: 2000, y: Y_LOWER_ZONE },     // Cooler bypass (lower zone)
 };
 
 export default function ProcessMap({
@@ -230,6 +230,12 @@ export default function ProcessMap({
         <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
+        
+        {/* Short vertical nozzle penetration into reactor top */}
+        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
         <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")}>
@@ -380,7 +386,7 @@ export default function ProcessMap({
           <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_LOWER_ZONE + 5} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" opacity="0.9" />
         </g>
 
-        {/* TCV-02B Path: Shell Bypass (Lane B) */}
+        {/* TCV-02B Path: Shell Bypass (Lane B) — Bypasses E-1, merges to E-2 line */}
         <g opacity={valveStates.tcv02b === "CLOSED" ? 0.3 : 1}>
           {/* Branch B: From split point horizontal to valve X, then drop to bus B */}
           <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 20} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE - 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
@@ -404,16 +410,27 @@ export default function ProcessMap({
             )}
           </g>
           
-          {/* Horizontal run on bus B to E-1 shell outlet x-position */}
-          <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE + 85} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={Y_LOWER_ZONE + 85} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* After valve: Horizontal run on bus B to merge point before E-2 */}
+          <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE + 85} x2={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y2={Y_LOWER_ZONE + 85} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {valveStates.tcv02b !== "CLOSED" && (
-            <circle cx={(VALVES.TCV02B.x + ANCHORS.E1.x - SIZES.E1.w/2)/2} cy={Y_LOWER_ZONE + 85} r="4" fill="#B47A1F">
-              <animate attributeName="cx" values={`${VALVES.TCV02B.x};${ANCHORS.E1.x - SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
+            <circle cx={(VALVES.TCV02B.x + ANCHORS.E2.x - SIZES.E2.w/2 - 70)/2} cy={Y_LOWER_ZONE + 85} r="4" fill="#B47A1F">
+              <animate attributeName="cx" values={`${VALVES.TCV02B.x};${ANCHORS.E2.x - SIZES.E2.w/2 - 70}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
           
-          {/* Rise vertically to E-1 shell outlet elevation */}
-          <line x1={ANCHORS.E1.x - SIZES.E1.w/2} y1={Y_LOWER_ZONE + 85} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Rise vertically to spine */}
+          <line x1={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y1={Y_LOWER_ZONE + 85} x2={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {valveStates.tcv02b !== "CLOSED" && (
+            <circle cx={ANCHORS.E2.x - SIZES.E2.w/2 - 70} cy={(Y_LOWER_ZONE + 85 + Y_SPINE)/2} r="4" fill="#B47A1F">
+              <animate attributeName="cy" values={`${Y_LOWER_ZONE + 85};${Y_SPINE}`} dur={animationSpeed} repeatCount="indefinite" />
+            </circle>
+          )}
+          
+          {/* Horizontal run on spine to E-2 inlet */}
+          <line x1={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y1={Y_SPINE} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          
+          {/* Merge node indicator */}
+          <circle cx={ANCHORS.E2.x - SIZES.E2.w/2 - 70} cy={Y_SPINE} r="5" fill="#1a1a1a" stroke="#B47A1F" strokeWidth="2" />
         </g>
 
         {/* SPINE: E-1 Shell Out → E-2 */}
