@@ -13,7 +13,6 @@ import ProcessMap from "@/components/refinery/ProcessMap";
 import PreheatIndicator from "@/components/refinery/PreheatIndicator";
 import CoolingCapacityIndicator from "@/components/refinery/CoolingCapacityIndicator";
 import H2AvailabilityIndicator from "@/components/refinery/H2AvailabilityIndicator";
-import SystemStateBanner from "@/components/refinery/SystemStateBanner";
 import {
   computeRateOfRise,
   computeAllConstraints,
@@ -252,13 +251,6 @@ export default function Home() {
         onModeChange={setDisplayMode}
         alarmsOnly={alarmsOnly}
         onAlarmsOnlyChange={setAlarmsOnly}
-      />
-
-      <SystemStateBanner
-        escalationLevel={escalationLevel}
-        hotSpotRisk={hotSpotRisk}
-        slope={slope}
-        coolingCapacity={coolingCapacity}
       />
 
       <AlarmBanner
