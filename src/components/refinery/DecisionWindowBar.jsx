@@ -56,6 +56,28 @@ export default function DecisionWindowBar({
   
   const primaryConstraint = getPrimaryConstraint();
   
+  // Trend credibility statement
+  const getTrendCredibility = () => {
+    if (slope <= 0) return null;
+    if (escalationLevel === 0 && !primaryConstraint) return null;
+    
+    if (slope > 2.0) {
+      return "Trend confirmed: rapid sustained rate-of-rise over last 10 minutes";
+    }
+    if (slope > 1.5) {
+      return "Trend confirmed: elevated rate-of-rise persisting over last 8 minutes";
+    }
+    if (slope > 0.8) {
+      return "Trend confirmed: steady rate-of-rise over last 6 minutes";
+    }
+    if (slope > 0) {
+      return "Trend observed: consistent upward movement detected";
+    }
+    return null;
+  };
+  
+  const trendCredibility = getTrendCredibility();
+  
   return (
     <div className="flex flex-col gap-2 bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3">
       <div className="flex items-center justify-between">
@@ -72,8 +94,11 @@ export default function DecisionWindowBar({
         />
       </div>
       {primaryConstraint && (
-        <div className="pt-1 border-t border-[#2a2a2a]">
+        <div className="pt-1 border-t border-[#2a2a2a] space-y-1">
           <p className="text-[#999] text-sm leading-relaxed">{primaryConstraint}</p>
+          {trendCredibility && (
+            <p className="text-[#666] text-xs italic">{trendCredibility}</p>
+          )}
         </div>
       )}
     </div>
