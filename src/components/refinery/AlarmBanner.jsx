@@ -5,38 +5,38 @@ const BANNER_CONFIG = {
   STABLE: {
     bg: "bg-[#0d2a2a]",
     border: "border-[#0F5F5F]",
-    text: "text-[#0F9F9F]",
-    label: "System Stable",
+    text: "text-[#5FB9B9]",
+    message: "System State: Normal — All parameters within range",
   },
   DRIFT: {
-    bg: "bg-[#2a1a0d]",
+    bg: "bg-[#1a1410]",
     border: "border-[#B47A1F]",
     text: "text-[#D4A547]",
-    label: "Early Drift Detected",
+    message: "System State: Early Drift — Temperature trending upward",
   },
   CONSTRAINED: {
-    bg: "bg-[#2a0d0d]",
+    bg: "bg-[#1a1210]",
     border: "border-[#A13A1F]",
     text: "text-[#D4653F]",
-    label: "Cooling Constrained",
+    message: "System State: Heat Removal Constrained — Cooling capacity limited",
   },
   MODERATION: {
-    bg: "bg-[#2a0d0d]",
+    bg: "bg-[#1a1210]",
     border: "border-[#A13A1F]",
     text: "text-[#D4653F]",
-    label: "Moderation Limited",
+    message: "System State: Moderation Limited — Hydrogen authority reduced",
   },
   IMMEDIATE: {
-    bg: "bg-[#1a0a0a]",
+    bg: "bg-[#1a0f0f]",
     border: "border-[#7A0F0F]",
-    text: "text-[#B53F3F]",
-    label: "Immediate Risk",
+    text: "text-[#C97A7A]",
+    message: "System State: Immediate Risk — Escalation projected within minutes",
   },
   HOTSPOT: {
-    bg: "bg-[#1a0a0a]",
+    bg: "bg-[#1a0f0f]",
     border: "border-[#7A0F0F]",
-    text: "text-[#B53F3F]",
-    label: "Immediate Risk — Hot Spot Developing",
+    text: "text-[#C97A7A]",
+    message: "System State: Immediate Risk — Hot spot developing in reactor bed",
   },
 };
 
@@ -78,21 +78,21 @@ export default function AlarmBanner({
   return (
     <div
       className={cn(
-        "border-b-4 px-6 py-4 transition-all duration-400",
+        "border-b-2 px-6 py-3 transition-all duration-500",
         config.bg,
         config.border
       )}
     >
-      <div className="max-w-[1600px] mx-auto flex items-center gap-4">
+      <div className="max-w-[1600px] mx-auto flex items-center gap-3">
         <div
           className={cn(
-            "w-3 h-3 rounded-full flex-shrink-0",
+            "w-2 h-2 rounded-full flex-shrink-0",
             config.text.replace("text-", "bg-")
           )}
         />
-        <h2 className={cn("text-xl font-bold tracking-tight", config.text)}>
-          {config.label}
-        </h2>
+        <p className={cn("text-base font-medium tracking-wide", config.text)}>
+          {config.message}
+        </p>
       </div>
     </div>
   );
