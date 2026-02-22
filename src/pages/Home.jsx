@@ -12,6 +12,7 @@ import PresentationHero from "@/components/refinery/PresentationHero";
 import ProcessMap from "@/components/refinery/ProcessMap";
 import PreheatIndicator from "@/components/refinery/PreheatIndicator";
 import CoolingCapacityIndicator from "@/components/refinery/CoolingCapacityIndicator";
+import H2AvailabilityIndicator from "@/components/refinery/H2AvailabilityIndicator";
 import {
   computeRateOfRise,
   computeAllConstraints,
@@ -294,6 +295,12 @@ export default function Home() {
             />
 
             <CoolingCapacityIndicator capacity={coolingCapacity} />
+
+            <H2AvailabilityIndicator 
+              equipment={activeData.equipment} 
+              coolingCapacity={coolingCapacity}
+              slope={slope}
+            />
 
             <ProcessMap
               escalationLevel={escalationLevel}
