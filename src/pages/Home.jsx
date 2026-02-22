@@ -9,6 +9,7 @@ import ExecutiveRibbon from "@/components/refinery/ExecutiveRibbon";
 import AlarmsOnlyView from "@/components/refinery/AlarmsOnlyView";
 import ScenarioSelector from "@/components/refinery/ScenarioSelector";
 import PresentationHero from "@/components/refinery/PresentationHero";
+import DecisionWindowBar from "@/components/refinery/DecisionWindowBar";
 import ProcessMap from "@/components/refinery/ProcessMap";
 import PreheatIndicator from "@/components/refinery/PreheatIndicator";
 import CoolingCapacityIndicator from "@/components/refinery/CoolingCapacityIndicator";
@@ -286,6 +287,18 @@ export default function Home() {
               slope={slope}
               consequence={consequence}
             />
+            
+            <div className="max-w-3xl mx-auto">
+              <DecisionWindowBar 
+                timeToNearest={timeToNearest}
+                escalationLevel={escalationLevel}
+                coolingCapacity={coolingCapacity}
+                equipment={activeData.equipment}
+                hotSpotRisk={hotSpotRisk}
+                slope={slope}
+                currentTemp={currentValue}
+              />
+            </div>
 
             <PreheatIndicator
               preheatActive={preheatActive}

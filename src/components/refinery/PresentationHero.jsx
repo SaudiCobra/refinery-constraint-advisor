@@ -89,7 +89,15 @@ export default function PresentationHero({
 
       {/* Decision Window Bar */}
       <div className="w-full max-w-3xl">
-        <DecisionWindowBar timeToNearest={timeToNearest} />
+        <DecisionWindowBar 
+          timeToNearest={timeToNearest}
+          escalationLevel={escalationLevel}
+          coolingCapacity={coolingCapacity}
+          equipment={equipment}
+          hotSpotRisk={hotSpotRisk}
+          slope={slope}
+          currentTemp={0}
+        />
       </div>
 
       {/* Nearest Constraint Badge - Only if not stable */}
