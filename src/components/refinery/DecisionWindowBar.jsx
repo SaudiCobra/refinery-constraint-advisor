@@ -1,7 +1,15 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-export default function DecisionWindowBar({ timeToNearest }) {
+export default function DecisionWindowBar({ 
+  timeToNearest, 
+  escalationLevel,
+  coolingCapacity,
+  equipment,
+  hotSpotRisk,
+  slope,
+  currentTemp,
+}) {
   // Compute bar fill percentage (cap at 30 minutes for visual scale)
   const maxTime = 30;
   const fillPercent = timeToNearest === Infinity || timeToNearest == null 
@@ -23,6 +31,31 @@ export default function DecisionWindowBar({ timeToNearest }) {
     ? "—" 
     : `${Math.round(timeToNearest)} min`;
   
+  // Determine primary constraint
+  const getPrimaryConstraint = () => {
+    if (hotSpotRisk === "HIGH") {
+      return "Primary constraint: Reactor bed temperature imbalance approaching runaway threshold";
+    }
+    if (coolingCapacity === "CONSTRAINED" && escalationLevel >= 2) {
+      return "Primary constraint: Effluent cooler heat removal capacity insufficient";
+    }
+    if (!equipment?.h2Compressor && escalationLevel >= 1) {
+      return "Primary constraint: Hydrogen quench system unavailable for moderation";
+    }
+    if (currentTemp >= 375) {
+      return "Primary constraint: Reactor outlet temperature approaching high limit";
+    }
+    if (slope > 2.0) {
+      return "Primary constraint: Temperature rise rate exceeding normal operating envelope";
+    }
+    if (escalationLevel >= 1) {
+      return "Primary constraint: Reactor outlet temperature approaching high limit";
+    }
+    return null;
+  };
+  
+  const primaryConstraint = getPrimaryConstraint();
+  
   return (
     <div className="flex flex-col gap-2 bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3">
       <div className="flex items-center justify-between">
@@ -38,6 +71,11 @@ export default function DecisionWindowBar({ timeToNearest }) {
           }}
         />
       </div>
+      {primaryConstraint && (
+        <div className="pt-1 border-t border-[#2a2a2a]">
+          <p className="text-[#999] text-sm leading-relaxed">{primaryConstraint}</p>
+        </div>
+      )}
     </div>
   );
 }
