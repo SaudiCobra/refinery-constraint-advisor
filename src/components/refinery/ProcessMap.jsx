@@ -109,7 +109,7 @@ export default function ProcessMap({
   const shellThermalColor = getThermalColor(reactorOutletTemp);
   const cooledThermalColor = getThermalColor(coolerOutletTemp);
 
-  // Presentation Mode: Subtle accent colors based on constraint state
+  // Presentation Mode: Scenario-aware visual behavior
   const getConstrainedUnit = () => {
     if (!interactive) {
       if (hotSpotRisk === "HIGH" || escalationLevel >= 2) return "reactor";
@@ -121,7 +121,29 @@ export default function ProcessMap({
   };
   
   const constrainedUnit = getConstrainedUnit();
-  const accentIntensity = escalationLevel >= 2 ? 1.0 : 0.7;
+  const isEscalating = !interactive && escalationLevel >= 1;
+  const isImmediateRisk = !interactive && escalationLevel >= 2;
+  
+  // Muting for non-affected equipment in presentation mode
+  const getNonAffectedOpacity = (unitType) => {
+    if (!isEscalating || !constrainedUnit) return 1;
+    if (unitType === constrainedUnit) return 1;
+    // Mute non-affected equipment by 15% maximum
+    return 0.85;
+  };
+  
+  // Path emphasis for affected flow paths
+  const getPathEmphasis = (pathType) => {
+    if (!isEscalating || !constrainedUnit) return { strokeWidth: "4", opacity: 0.9 };
+    const isAffectedPath = 
+      (constrainedUnit === "reactor" && ["feed", "reactor-in", "reactor-out"].includes(pathType)) ||
+      (constrainedUnit === "cooler" && ["cooler-in", "cooler-out"].includes(pathType)) ||
+      (constrainedUnit === "exchanger" && ["exchanger-tube", "exchanger-shell"].includes(pathType));
+    return {
+      strokeWidth: isAffectedPath ? "5" : "4",
+      opacity: isAffectedPath ? 1 : 0.85
+    };
+  };
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative">
