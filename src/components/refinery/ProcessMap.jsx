@@ -134,25 +134,95 @@ export default function ProcessMap({
   const isEscalating = !interactive && escalationLevel >= 1;
   const isImmediateRisk = !interactive && escalationLevel >= 2;
   
+  // State-based color palettes
+  const getEquipmentColor = (unitType) => {
+    if (interactive) {
+      // Interactive mode uses existing dynamic colors
+      if (unitType === "reactor") return baseColor;
+      if (unitType === "exchanger") return preheatColor;
+      if (unitType === "cooler") return coolerColor;
+      return "#555";
+    }
+    
+    // Presentation mode: scenario-driven colors
+    if (scenarioState === "NORMAL") {
+      return "#555"; // Neutral grey with faint teal
+    }
+    
+    if (scenarioState === "EARLY_DRIFT") {
+      if (unitType === constrainedUnit) return "#B47A1F"; // Soft orange
+      return "#555"; // Others remain neutral
+    }
+    
+    if (scenarioState === "IMMEDIATE_RISK") {
+      if (unitType === constrainedUnit) return "#D4653F"; // Amber/dark orange-red
+      return "#555"; // Others remain neutral
+    }
+    
+    return "#555";
+  };
+  
+  const getEquipmentStrokeWidth = (unitType) => {
+    if (interactive) return "3";
+    
+    if (scenarioState === "NORMAL") return "2.5";
+    
+    if (scenarioState === "EARLY_DRIFT") {
+      return unitType === constrainedUnit ? "3.5" : "2.5";
+    }
+    
+    if (scenarioState === "IMMEDIATE_RISK") {
+      return unitType === constrainedUnit ? "4" : "2.5";
+    }
+    
+    return "3";
+  };
+  
   // Muting for non-affected equipment in presentation mode
   const getNonAffectedOpacity = (unitType) => {
-    if (!isEscalating || !constrainedUnit) return 1;
-    if (unitType === constrainedUnit) return 1;
-    // Mute non-affected equipment by 15% maximum
-    return 0.85;
+    if (scenarioState === "NORMAL") return 1;
+    if (scenarioState === "EARLY_DRIFT") return 1; // All equipment visible
+    if (scenarioState === "IMMEDIATE_RISK") {
+      // Downstream/unaffected may dim slightly
+      if (unitType === constrainedUnit) return 1;
+      return 0.85;
+    }
+    return 1;
   };
   
   // Path emphasis for affected flow paths
   const getPathEmphasis = (pathType) => {
-    if (!isEscalating || !constrainedUnit) return { strokeWidth: "4", opacity: 0.9 };
-    const isAffectedPath = 
-      (constrainedUnit === "reactor" && ["feed", "reactor-in", "reactor-out"].includes(pathType)) ||
-      (constrainedUnit === "cooler" && ["cooler-in", "cooler-out"].includes(pathType)) ||
-      (constrainedUnit === "exchanger" && ["exchanger-tube", "exchanger-shell"].includes(pathType));
-    return {
-      strokeWidth: isAffectedPath ? "5" : "4",
-      opacity: isAffectedPath ? 1 : 0.85
-    };
+    if (scenarioState === "NORMAL") {
+      return { strokeWidth: "3", opacity: 0.8, stroke: "#555" };
+    }
+    
+    if (scenarioState === "EARLY_DRIFT") {
+      const isAffectedPath = 
+        (constrainedUnit === "reactor" && ["feed", "reactor-in", "reactor-out"].includes(pathType)) ||
+        (constrainedUnit === "cooler" && ["cooler-in", "cooler-out"].includes(pathType)) ||
+        (constrainedUnit === "exchanger" && ["exchanger-tube", "exchanger-shell"].includes(pathType));
+      
+      return {
+        strokeWidth: isAffectedPath ? "4" : "3",
+        opacity: isAffectedPath ? 0.9 : 0.75,
+        stroke: isAffectedPath ? "#B47A1F" : "#555" // Muted orange tint
+      };
+    }
+    
+    if (scenarioState === "IMMEDIATE_RISK") {
+      const isAffectedPath = 
+        (constrainedUnit === "reactor" && ["feed", "reactor-in", "reactor-out"].includes(pathType)) ||
+        (constrainedUnit === "cooler" && ["cooler-in", "cooler-out"].includes(pathType)) ||
+        (constrainedUnit === "exchanger" && ["exchanger-tube", "exchanger-shell"].includes(pathType));
+      
+      return {
+        strokeWidth: isAffectedPath ? "4.5" : "3",
+        opacity: isAffectedPath ? 1 : 0.7,
+        stroke: isAffectedPath ? "#D4653F" : "#555"
+      };
+    }
+    
+    return { strokeWidth: "4", opacity: 0.9, stroke: "#555" };
   };
 
   return (
