@@ -270,7 +270,7 @@ export default function ProcessMap({
         </circle>
         
         {/* Short vertical nozzle penetration into reactor top */}
-        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} stroke="#555" strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
         <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={tubeThermalColor}>
           <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
