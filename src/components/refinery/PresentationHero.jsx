@@ -85,7 +85,7 @@ export default function PresentationHero({
       {/* Compact Metrics */}
       <div className="w-full max-w-4xl space-y-2">
         <p className="text-[#888] text-sm">
-          <span className="text-[#666]">Assessment Confidence:</span> {confidenceLabel}
+          <span className="text-[#666]">Assessment Confidence:</span> {confidenceStatus}
         </p>
         <p className="text-[#888] text-sm">
           <span className="text-[#666]">Mitigation Capacity:</span> {stable ? "Available" : `${correctiveLevers.available} / ${correctiveLevers.total} active`}
