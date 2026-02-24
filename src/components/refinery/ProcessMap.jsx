@@ -184,9 +184,9 @@ export default function ProcessMap({
 
         {/* MAIN EXCHANGER E-1 (Tube = Cold Feed, Shell = Hot Effluent) */}
         <g transform={`translate(${ANCHORS.E1.x}, ${ANCHORS.E1.y})`} onClick={() => handleUnitClick('e1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")}>
-          <ellipse cx={-SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#1a1a1a" stroke={interactive || preheatActive ? preheatColor : "#555"} strokeWidth="2.5" />
-          <rect x={-SIZES.E1.w/2} y={-SIZES.E1.h/2 + 8} width={SIZES.E1.w} height={SIZES.E1.h - 16} fill="#2a2a2a" stroke={interactive || preheatActive ? preheatColor : "#555"} strokeWidth="3" filter="url(#equipmentShadow)" />
-          <ellipse cx={SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#2a2a2a" stroke={interactive || preheatActive ? preheatColor : "#555"} strokeWidth="2.5" />
+          <ellipse cx={-SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#1a1a1a" stroke={interactive ? preheatColor : constrainedUnit === "exchanger" ? "#B47A1F" : "#555"} strokeWidth="2.5" className="transition-colors duration-700" />
+          <rect x={-SIZES.E1.w/2} y={-SIZES.E1.h/2 + 8} width={SIZES.E1.w} height={SIZES.E1.h - 16} fill="#2a2a2a" stroke={interactive ? preheatColor : constrainedUnit === "exchanger" ? "#B47A1F" : "#555"} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-colors duration-700" />
+          <ellipse cx={SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#2a2a2a" stroke={interactive ? preheatColor : constrainedUnit === "exchanger" ? "#B47A1F" : "#555"} strokeWidth="2.5" className="transition-colors duration-700" />
           
           {[-50, -35, -20, -5, 10, 25, 40, 55].map(yOffset => (
             <line key={yOffset} x1={-SIZES.E1.w/2 + 12} y1={yOffset} x2={SIZES.E1.w/2 - 12} y2={yOffset} stroke="#444" strokeWidth="1.5" opacity="0.9" />
@@ -302,7 +302,7 @@ export default function ProcessMap({
                       cy={py}
                       r="2"
                       fill={bedColor}
-                      opacity={0.6 + glowIntensity}
+                      opacity={interactive ? (0.6 + glowIntensity) : (0.35 + glowIntensity * 0.5)}
                       className="transition-all duration-500"
                     />
                   );
@@ -317,7 +317,7 @@ export default function ProcessMap({
                     {/* H₂ Quench — From right-side header */}
                     <line x1={SIZES.R1.w/2} y1={yStart + bedHeight + 3} x2={SIZES.R1.w/2 + 40} y2={yStart + bedHeight + 3} stroke={equipment.h2Compressor ? "#4A90E2" : "#888"} strokeWidth="1.5" strokeDasharray="3,3" opacity="0.5" />
                     <circle cx={SIZES.R1.w/2 + 20} cy={yStart + bedHeight + 3} r="2.5" fill={equipment.h2Compressor ? "#4A90E2" : "#888"} opacity="0.6">
-                      {equipment.h2Compressor && (
+                      {equipment.h2Compressor && interactive && (
                         <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.5s" repeatCount="indefinite" />
                       )}
                     </circle>
@@ -465,7 +465,7 @@ export default function ProcessMap({
 
         {/* EFFLUENT COOLER E-2 */}
         <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={() => handleUnitClick('e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")}>
-          <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={interactive || coolingCapacity !== "NORMAL" ? coolerColor : "#555"} strokeWidth={interactive || coolingCapacity !== "NORMAL" ? "3" : "2"} filter="url(#equipmentShadow)" className="transition-all duration-400" />
+          <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={interactive ? coolerColor : constrainedUnit === "cooler" ? (escalationLevel >= 2 ? "#A13A1F" : "#B47A1F") : "#555"} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-colors duration-700" />
           {[-60, -40, -20, 0, 20, 40, 60].map(y => (
             <line key={y} x1={-SIZES.E2.w/2 + 16} y1={y} x2={SIZES.E2.w/2 - 16} y2={y} stroke="#2F5D80" strokeWidth="2.5" opacity="0.54" />
           ))}
