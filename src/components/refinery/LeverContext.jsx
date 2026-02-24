@@ -3,25 +3,27 @@ import { cn } from "@/lib/utils";
 import { CheckCircle2, AlertTriangle } from "lucide-react";
 
 export default function LeverContext({ equipment, coolingCapacity, escalationLevel }) {
+  const [expanded, setExpanded] = React.useState(false);
+  
   const levers = [
     {
       available: coolingCapacity !== "CONSTRAINED",
-      label: "Cooling headroom available",
+      label: "Cooling headroom",
       description: "E-2 not saturated",
     },
     {
       available: equipment.h2Compressor,
-      label: "Hydrogen moderation possible",
+      label: "Hydrogen moderation",
       description: "H₂ availability not constrained",
     },
     {
       available: equipment.bypassValve,
-      label: "Bypass routing flexibility intact",
+      label: "Bypass routing",
       description: "Control valves operational",
     },
     {
       available: escalationLevel < 3,
-      label: "No hard equipment or safety limits reached",
+      label: "Equipment limits",
       description: "Operating margin remains",
     },
   ];
@@ -29,9 +31,9 @@ export default function LeverContext({ equipment, coolingCapacity, escalationLev
   const availableCount = levers.filter(l => l.available).length;
 
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-[#aaa] text-sm font-semibold uppercase tracking-wider">
+    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-3">
+      <div className="flex items-center justify-between">
+        <h4 className="text-[#888] text-xs font-semibold uppercase tracking-wider">
           Operational Flexibility
         </h4>
         <span className={cn(
@@ -40,39 +42,46 @@ export default function LeverContext({ equipment, coolingCapacity, escalationLev
           availableCount === 2 && "bg-[#B47A1F]/50 text-[#D4A547]",
           availableCount <= 1 && "bg-[#A13A1F]/50 text-[#D4653F]"
         )}>
-          {availableCount}/4 Available
+          {availableCount} / 4
         </span>
       </div>
 
-      <div className="space-y-2">
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
         {levers.map((lever, idx) => (
-          <div key={idx} className="flex items-start gap-2">
+          <div key={idx} className="flex items-center gap-1.5">
             {lever.available ? (
-              <CheckCircle2 className="w-4 h-4 text-[#0F9F9F] flex-shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-3 h-3 text-[#0F9F9F] flex-shrink-0" />
             ) : (
-              <AlertTriangle className="w-4 h-4 text-[#A13A1F] flex-shrink-0 mt-0.5" />
+              <span className="w-3 h-3 rounded-full border border-[#555] flex-shrink-0" />
             )}
-            <div className="flex-1">
-              <p className={cn(
-                "text-sm leading-tight",
-                lever.available ? "text-[#ccc]" : "text-[#888] line-through"
-              )}>
-                {lever.label}
-              </p>
-              <p className="text-xs text-[#666] mt-0.5">{lever.description}</p>
-            </div>
+            <span className={cn(
+              "text-xs",
+              lever.available ? "text-[#aaa]" : "text-[#666] line-through"
+            )}>
+              {lever.label}
+            </span>
           </div>
         ))}
       </div>
 
-      <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
-        <p className="text-[#666] text-xs italic">
-          Advisory system — no control actions executed
-        </p>
-        <p className="text-[#555] text-xs mt-1">
-          Operator retains full control at all times
-        </p>
-      </div>
+      {expanded && (
+        <div className="mt-3 pt-3 border-t border-[#2a2a2a] space-y-1.5">
+          {levers.map((lever, idx) => (
+            lever.available && (
+              <p key={idx} className="text-[#777] text-xs">
+                • {lever.description}
+              </p>
+            )
+          ))}
+        </div>
+      )}
+
+      <button 
+        onClick={() => setExpanded(!expanded)}
+        className="text-[#666] text-xs mt-2 hover:text-[#888] transition-colors"
+      >
+        {expanded ? "− Hide details" : "+ Show details"}
+      </button>
     </div>
   );
 }

@@ -15,39 +15,22 @@ export default function HeroMetric({ timeToNearest, nearestName, escalationLevel
   const displayTime = stable ? "—" : formatTime(timeToNearest);
 
   return (
-    <div className="flex flex-col items-center justify-center py-8 px-4">
-      {/* Status Badge */}
-      <div className={cn("px-4 py-1.5 rounded border text-xs font-semibold tracking-widest uppercase mb-4", colors.badge)}>
-        {colors.label}
-      </div>
-
-      {/* Subtitle */}
-      <p className="text-[#888] text-sm tracking-wide mb-2">
-        {stable ? "No near constraint projected" : "Time remaining before nearest constraint"}
+    <div className="flex flex-col items-center justify-center py-6 px-4">
+      {/* Subtitle - compact */}
+      <p className="text-[#666] text-xs tracking-wider mb-1 uppercase">
+        {stable ? "No constraint projected" : "Time before nearest constraint"}
       </p>
 
       {/* Hero Time */}
       <div
         className={cn(
-          "text-[96px] md:text-[128px] font-extralight leading-none tracking-tight transition-all duration-700",
+          "text-[72px] md:text-[96px] font-extralight leading-none tracking-tight transition-all duration-700",
           stable ? "text-green-400/80" : colors.text,
           escalationLevel >= 3 && !stable && "animate-[pulse_3s_ease-in-out_infinite]"
         )}
       >
         {displayTime}
       </div>
-
-      {/* Nearest Constraint Name */}
-      {!stable && nearestName && (
-        <p className="mt-4 text-[#aaa] text-base tracking-wide">
-          Nearest constraint: <span className={cn("font-semibold", colors.text)}>{nearestName}</span>
-        </p>
-      )}
-
-      {/* Consequence */}
-      {!stable && consequence && (
-        <p className="mt-2 text-[#777] text-sm">{consequence}</p>
-      )}
     </div>
   );
 }

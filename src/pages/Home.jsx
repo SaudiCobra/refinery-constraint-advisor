@@ -289,7 +289,7 @@ export default function Home() {
               consequence={consequence}
             />
             
-            <div className="max-w-3xl mx-auto space-y-4">
+            <div className="max-w-3xl mx-auto space-y-3">
               <DecisionWindowBar 
                 timeToNearest={timeToNearest}
                 escalationLevel={escalationLevel}
@@ -305,6 +305,12 @@ export default function Home() {
                 coolingCapacity={coolingCapacity}
                 escalationLevel={escalationLevel}
               />
+              
+              <div className="text-center pt-2 border-t border-[#2a2a2a]">
+                <p className="text-[#555] text-xs">
+                  Advisory system — no control actions executed. Operator retains full control at all times.
+                </p>
+              </div>
             </div>
 
             <PreheatIndicator

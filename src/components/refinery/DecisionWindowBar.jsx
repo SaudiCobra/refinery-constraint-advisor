@@ -140,13 +140,15 @@ export default function DecisionWindowBar({
   
   const constraintLeverRelationship = getConstraintLeverRelationship();
   
+  const [expanded, setExpanded] = React.useState(false);
+  
   return (
-    <div className="flex flex-col gap-2 bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3">
+    <div className="flex flex-col gap-2 bg-[#1e1e1e] border border-[#333] rounded-lg px-4 py-2.5">
       <div className="flex items-center justify-between">
         <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">Decision Window</span>
-        <span className="text-[#aaa] text-base font-semibold">{timeDisplay}</span>
+        <span className="text-[#aaa] text-sm font-semibold">{timeDisplay}</span>
       </div>
-      <div className="w-full h-4 bg-[#0d0d0d] rounded-full border border-[#2a2a2a] overflow-hidden">
+      <div className="w-full h-3 bg-[#0d0d0d] rounded-full border border-[#2a2a2a] overflow-hidden">
         <div 
           className="h-full transition-all duration-1500 ease-in-out rounded-full"
           style={{ 
@@ -156,23 +158,30 @@ export default function DecisionWindowBar({
         />
       </div>
       {primaryConstraint && (
-        <div className="pt-1 border-t border-[#2a2a2a] space-y-1">
-          <p className="text-[#999] text-sm leading-relaxed">{primaryConstraint}</p>
-          {trendCredibility && (
-            <p className="text-[#666] text-xs italic">{trendCredibility}</p>
+        <div className="pt-1">
+          <p className="text-[#999] text-xs leading-relaxed">{primaryConstraint}</p>
+          {(trendCredibility || constraintLeverRelationship) && (
+            <button 
+              onClick={() => setExpanded(!expanded)}
+              className="text-[#666] text-xs mt-1 hover:text-[#888] transition-colors"
+            >
+              {expanded ? "− Hide details" : "+ Show details"}
+            </button>
           )}
-          {constraintLeverRelationship && (
-            <p className="text-[#777] text-xs leading-relaxed mt-1">
-              {constraintLeverRelationship}
-            </p>
+          {expanded && (
+            <div className="mt-2 space-y-1 pl-2 border-l-2 border-[#2a2a2a]">
+              {trendCredibility && (
+                <p className="text-[#666] text-xs italic">{trendCredibility}</p>
+              )}
+              {constraintLeverRelationship && (
+                <p className="text-[#777] text-xs leading-relaxed">
+                  {constraintLeverRelationship}
+                </p>
+              )}
+            </div>
           )}
         </div>
       )}
-      <div className="pt-2 border-t border-[#2a2a2a] mt-2">
-        <p className="text-[#555] text-xs text-center">
-          Advisory system — Operator retains full control at all times
-        </p>
-      </div>
     </div>
   );
 }
