@@ -338,19 +338,19 @@ export default function ProcessMap({
 
         {/* E-1 Tube Out → Reactor Inlet (Top Nozzle Entry) */}
         {/* Vertical rise from E-1 outlet to top nozzle elevation */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke="#555" strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke={getPathEmphasis("reactor-in").stroke} strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
         <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
           <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
         
         {/* Horizontal run to reactor centerline at top */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke="#555" strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke={getPathEmphasis("reactor-in").stroke} strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
         <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
         
         {/* Short vertical nozzle penetration into reactor top */}
-        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} stroke="#555" strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
+        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} stroke={getPathEmphasis("reactor-in").stroke} strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
         <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={tubeThermalColor}>
           <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
