@@ -58,7 +58,7 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
         {!stable && nearest && (
           <Line>Nearest constraint: Reactor outlet temperature</Line>
         )}
-        <Line>Required attention: Rate-of-rise & margin</Line>
+        <Line>Attention focus: Rate-of-rise & margin</Line>
       </Block>
     </div>
   );
