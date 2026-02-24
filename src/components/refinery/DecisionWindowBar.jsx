@@ -143,42 +143,47 @@ export default function DecisionWindowBar({
   const [expanded, setExpanded] = React.useState(false);
   
   return (
-    <div className="flex flex-col gap-2 bg-[#1e1e1e] border border-[#333] rounded-lg px-4 py-2.5">
-      <div className="flex items-center justify-between">
-        <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">Decision Window</span>
-        <span className="text-[#aaa] text-sm font-semibold">{timeDisplay}</span>
+    <div className="space-y-2">
+      <div className="flex flex-col gap-1.5 bg-[#1e1e1e] border border-[#333] rounded-lg px-4 py-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">Decision Window</span>
+          <span className="text-[#aaa] text-sm font-semibold">{timeDisplay}</span>
+        </div>
+        <div className="w-full h-3 bg-[#0d0d0d] rounded-full border border-[#2a2a2a] overflow-hidden">
+          <div 
+            className="h-full transition-all duration-1500 ease-in-out rounded-full"
+            style={{ 
+              width: `${fillPercent}%`,
+              backgroundColor: barColor,
+            }}
+          />
+        </div>
       </div>
-      <div className="w-full h-3 bg-[#0d0d0d] rounded-full border border-[#2a2a2a] overflow-hidden">
-        <div 
-          className="h-full transition-all duration-1500 ease-in-out rounded-full"
-          style={{ 
-            width: `${fillPercent}%`,
-            backgroundColor: barColor,
-          }}
-        />
-      </div>
+      
       {primaryConstraint && (
-        <div className="pt-1">
-          <p className="text-[#999] text-xs leading-relaxed">{primaryConstraint}</p>
+        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-4 py-2">
+          <p className="text-[#aaa] text-xs leading-relaxed">{primaryConstraint}</p>
           {(trendCredibility || constraintLeverRelationship) && (
-            <button 
-              onClick={() => setExpanded(!expanded)}
-              className="text-[#666] text-xs mt-1 hover:text-[#888] transition-colors"
-            >
-              {expanded ? "− Hide details" : "+ Show details"}
-            </button>
-          )}
-          {expanded && (
-            <div className="mt-2 space-y-1 pl-2 border-l-2 border-[#2a2a2a]">
-              {trendCredibility && (
-                <p className="text-[#666] text-xs italic">{trendCredibility}</p>
+            <>
+              <button 
+                onClick={() => setExpanded(!expanded)}
+                className="text-[#666] text-xs mt-1.5 hover:text-[#888] transition-colors"
+              >
+                {expanded ? "− Hide details" : "+ Show details"}
+              </button>
+              {expanded && (
+                <div className="mt-2 space-y-1 pl-2 border-l-2 border-[#2a2a2a]">
+                  {trendCredibility && (
+                    <p className="text-[#666] text-xs italic">{trendCredibility}</p>
+                  )}
+                  {constraintLeverRelationship && (
+                    <p className="text-[#777] text-xs leading-relaxed">
+                      {constraintLeverRelationship}
+                    </p>
+                  )}
+                </div>
               )}
-              {constraintLeverRelationship && (
-                <p className="text-[#777] text-xs leading-relaxed">
-                  {constraintLeverRelationship}
-                </p>
-              )}
-            </div>
+            </>
           )}
         </div>
       )}

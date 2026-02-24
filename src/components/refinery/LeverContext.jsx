@@ -8,17 +8,17 @@ export default function LeverContext({ equipment, coolingCapacity, escalationLev
   const levers = [
     {
       available: coolingCapacity !== "CONSTRAINED",
-      label: "Cooling headroom",
+      label: "Cooling",
       description: "E-2 not saturated",
     },
     {
       available: equipment.h2Compressor,
-      label: "Hydrogen moderation",
+      label: "Hydrogen",
       description: "H₂ availability not constrained",
     },
     {
       available: equipment.bypassValve,
-      label: "Bypass routing",
+      label: "Bypass",
       description: "Control valves operational",
     },
     {
@@ -42,7 +42,7 @@ export default function LeverContext({ equipment, coolingCapacity, escalationLev
           availableCount === 2 && "bg-[#B47A1F]/50 text-[#D4A547]",
           availableCount <= 1 && "bg-[#A13A1F]/50 text-[#D4653F]"
         )}>
-          {availableCount} / 4
+          {availableCount} / 4 available
         </span>
       </div>
 
