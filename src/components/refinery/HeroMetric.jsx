@@ -16,6 +16,12 @@ export default function HeroMetric({ timeToNearest, nearestName, escalationLevel
 
   return (
     <div className="flex flex-col items-center justify-center py-6 px-4">
+      {!stable && (
+        <div className={cn("px-3 py-1 text-[10px] font-bold tracking-[0.15em] uppercase mb-3", colors.badge)}>
+          {colors.label}
+        </div>
+      )}
+      
       {/* Subtitle - compact */}
       <p className="text-[#666] text-xs tracking-wider mb-1 uppercase">
         {stable ? "No constraint projected" : "Time before nearest constraint"}

@@ -27,16 +27,16 @@ const BANNER_CONFIG = {
     message: "System State: Moderation Limited — Hydrogen authority reduced",
   },
   IMMEDIATE: {
-    bg: "bg-[#1a0f0f]",
-    border: "border-[#7A0F0F]",
-    text: "text-[#C97A7A]",
-    message: "System State: Immediate Risk — Escalation projected within minutes",
+    bg: "bg-[#140a0a]",
+    border: "border-[#6A0C0C]",
+    text: "text-[#B86B6B]",
+    message: "IMMEDIATE RISK — Escalation projected",
   },
   HOTSPOT: {
-    bg: "bg-[#1a0f0f]",
-    border: "border-[#7A0F0F]",
-    text: "text-[#C97A7A]",
-    message: "System State: Immediate Risk — Hot spot developing in reactor bed",
+    bg: "bg-[#140a0a]",
+    border: "border-[#6A0C0C]",
+    text: "text-[#B86B6B]",
+    message: "IMMEDIATE RISK — Hot spot developing in reactor bed",
   },
 };
 
