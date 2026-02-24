@@ -567,7 +567,7 @@ export default function ProcessMap({
 
         {/* EFFLUENT COOLER E-2 */}
         <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={() => handleUnitClick('e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")} opacity={getNonAffectedOpacity("cooler")}>
-          <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={interactive ? coolerColor : constrainedUnit === "cooler" ? (isImmediateRisk ? "#D4653F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "3" : constrainedUnit === "cooler" ? (isImmediateRisk ? "4" : "3.5") : "3"} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+          <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={getEquipmentColor("cooler")} strokeWidth={getEquipmentStrokeWidth("cooler")} filter="url(#equipmentShadow)" className="transition-all duration-700" />
           {[-60, -40, -20, 0, 20, 40, 60].map(y => (
             <line key={y} x1={-SIZES.E2.w/2 + 16} y1={y} x2={SIZES.E2.w/2 - 16} y2={y} stroke="#2F5D80" strokeWidth="2.5" opacity="0.54" />
           ))}
