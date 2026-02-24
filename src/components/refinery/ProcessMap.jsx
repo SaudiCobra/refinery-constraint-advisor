@@ -109,10 +109,10 @@ export default function ProcessMap({
   const shellThermalColor = getThermalColor(reactorOutletTemp);
   const cooledThermalColor = getThermalColor(coolerOutletTemp);
 
-  // Presentation Mode: Reduce visual emphasis
+  // Presentation Mode: Visible but secondary
   const presentationStyle = !interactive ? {
-    opacity: 0.5,
-    filter: 'saturate(0.4) contrast(0.85)'
+    opacity: 0.75,
+    filter: 'saturate(0.6) contrast(0.92)'
   } : {};
 
   return (
