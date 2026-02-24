@@ -267,6 +267,14 @@ export default function Home() {
         preheatStatus={preheatStatus}
       />
 
+      {!alarmsOnly && displayMode === "presentation" && (
+        <div className="max-w-[2200px] mx-auto px-20 pt-4">
+          <p className="text-[#999] text-sm">
+            Escalation driven by sustained temperature rise; intervention window remains available.
+          </p>
+        </div>
+      )}
+
       <div className="max-w-[2200px] mx-auto px-20 py-10 space-y-10">
         {/* ALARMS-ONLY VIEW */}
         {alarmsOnly && (
