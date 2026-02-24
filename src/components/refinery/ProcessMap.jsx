@@ -110,6 +110,16 @@ export default function ProcessMap({
   const cooledThermalColor = getThermalColor(coolerOutletTemp);
 
   // Presentation Mode: Scenario-aware visual behavior
+  // Define three distinct states
+  const getScenarioState = () => {
+    if (interactive) return "INTERACTIVE";
+    if (escalationLevel === 0) return "NORMAL";
+    if (escalationLevel === 1) return "EARLY_DRIFT";
+    return "IMMEDIATE_RISK"; // escalationLevel >= 2
+  };
+  
+  const scenarioState = getScenarioState();
+  
   const getConstrainedUnit = () => {
     if (!interactive) {
       if (hotSpotRisk === "HIGH" || escalationLevel >= 2) return "reactor";
