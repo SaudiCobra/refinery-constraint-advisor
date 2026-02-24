@@ -247,9 +247,9 @@ export default function ProcessMap({
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
         <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")}>
-          <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#1a1a1a" stroke={baseColor} strokeWidth="3" />
-          <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill="#2a2a2a" stroke={baseColor} strokeWidth="4" filter="url(#equipmentShadow)" />
-          <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#2a2a2a" stroke={baseColor} strokeWidth="3" />
+          <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#1a1a1a" stroke={interactive || escalationLevel >= 1 ? baseColor : "#555"} strokeWidth={interactive || escalationLevel >= 1 ? "3" : "2"} />
+          <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill="#2a2a2a" stroke={interactive || escalationLevel >= 1 ? baseColor : "#555"} strokeWidth={interactive || escalationLevel >= 1 ? "4" : "2"} filter="url(#equipmentShadow)" />
+          <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#2a2a2a" stroke={interactive || escalationLevel >= 1 ? baseColor : "#555"} strokeWidth={interactive || escalationLevel >= 1 ? "3" : "2"} />
           
           {bedImbalance && bedImbalance.beds.map((bed, idx) => {
             const bedHeight = 70;
