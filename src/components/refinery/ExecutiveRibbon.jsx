@@ -10,10 +10,6 @@ export default function ExecutiveRibbon({ timeToNearest, equipment, sensorQualit
 
   return (
     <div className="flex flex-wrap items-center gap-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-5 py-3">
-      <Metric label="Decision Time Gained" value={decisionTime} />
-      <div className="w-px h-6 bg-[#333]" />
-      <Metric label="Corrective Levers Available" value={`${leversAvailable} / 4`} />
-      <div className="w-px h-6 bg-[#333]" />
       <Metric
         label="Prediction confidence"
         value={confidenceLabel}
