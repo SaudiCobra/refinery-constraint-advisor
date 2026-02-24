@@ -67,7 +67,10 @@ export default function LeverContext({ equipment, coolingCapacity, escalationLev
 
       <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
         <p className="text-[#666] text-xs italic">
-          Advisory indicators only — no action implied
+          Advisory system — no control actions executed
+        </p>
+        <p className="text-[#555] text-xs mt-1">
+          Operator retains full control at all times
         </p>
       </div>
     </div>

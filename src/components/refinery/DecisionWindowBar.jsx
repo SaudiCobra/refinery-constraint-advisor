@@ -168,6 +168,11 @@ export default function DecisionWindowBar({
           )}
         </div>
       )}
+      <div className="pt-2 border-t border-[#2a2a2a] mt-2">
+        <p className="text-[#555] text-xs text-center">
+          Advisory system — Operator retains full control at all times
+        </p>
+      </div>
     </div>
   );
 }
