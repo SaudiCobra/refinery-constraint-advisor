@@ -19,12 +19,12 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
       {/* System Reasoning */}
       <Block title="System Reasoning" color="blue">
         {stable ? (
-          <Line>Rate-of-rise stable or cooling</Line>
+          <Line>Rate-of-rise: 0.0 {units}/min (stable)</Line>
         ) : (
           <>
-            <Line>Rate-of-rise: {slope.toFixed(2)} {units}/min</Line>
-            {nearest && <Line>Margin to {nearest.name}: {nearest.margin.toFixed(1)} {units}</Line>}
-            <Line>Escalation window narrowing</Line>
+            <Line>Rate-of-rise: +{slope.toFixed(1)} {units}/min (confirmed)</Line>
+            {nearest && <Line>Margin to {nearest.name.toLowerCase()}: {nearest.margin.toFixed(1)} {units}</Line>}
+            <Line>Escalation window: narrowing</Line>
           </>
         )}
       </Block>
