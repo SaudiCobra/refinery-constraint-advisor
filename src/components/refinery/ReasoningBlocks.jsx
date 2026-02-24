@@ -51,10 +51,10 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
         ) : (
           <>
             {hiConstraint && hiConstraint.time < Infinity && (
-              <Line>High alarm likely within {formatTime(hiConstraint.time)}</Line>
+              <Line>High limit projected in {formatTime(hiConstraint.time)}</Line>
             )}
             {hihiConstraint && hihiConstraint.time < Infinity && (
-              <Line>High-High likely within {formatTime(hihiConstraint.time)}</Line>
+              <Line>High-High escalation projected in {formatTime(hihiConstraint.time)}</Line>
             )}
             {!hiConstraint && !hihiConstraint && <Line>Constraints not configured</Line>}
           </>
@@ -63,11 +63,11 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
 
       {/* Shift Summary */}
       <Block title="Shift Summary" color="green">
-        <Line>Status: {stable ? "Stable" : "Trending"}</Line>
+        <Line>Status: {stable ? "Stable" : "Escalation forming"}</Line>
         {!stable && nearest && (
-          <Line>Nearest constraint in {formatTime(nearest.time)}</Line>
+          <Line>Nearest constraint: Reactor outlet temperature</Line>
         )}
-        <Line>Watch: rate-of-rise + equipment margin</Line>
+        <Line>Required attention: Rate-of-rise & margin</Line>
       </Block>
     </div>
   );

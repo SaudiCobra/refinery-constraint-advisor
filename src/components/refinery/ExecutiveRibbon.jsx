@@ -4,7 +4,8 @@ import { formatTime } from "./calcEngine";
 
 export default function ExecutiveRibbon({ timeToNearest, equipment, sensorQuality }) {
   const leversAvailable = Object.values(equipment).filter(Boolean).length;
-  const confidence = sensorQuality === "good" ? "High" : sensorQuality === "suspect" ? "Reduced" : "Low";
+  const confidenceValue = sensorQuality === "good" ? "High" : sensorQuality === "suspect" ? "Reduced" : "Low";
+  const confidenceLabel = sensorQuality === "good" ? "High — trend confirmed" : sensorQuality === "suspect" ? "Reduced — sensor quality" : "Low — data quality";
   const decisionTime = timeToNearest === Infinity || timeToNearest == null ? "—" : formatTime(timeToNearest);
 
   return (
@@ -14,12 +15,12 @@ export default function ExecutiveRibbon({ timeToNearest, equipment, sensorQualit
       <Metric label="Corrective Levers Available" value={`${leversAvailable} / 4`} />
       <div className="w-px h-6 bg-[#333]" />
       <Metric
-        label="Confidence"
-        value={confidence}
+        label="Prediction confidence"
+        value={confidenceLabel}
         valueClass={cn(
-          confidence === "High" && "text-green-400",
-          confidence === "Reduced" && "text-amber-400",
-          confidence === "Low" && "text-red-400"
+          confidenceValue === "High" && "text-green-400",
+          confidenceValue === "Reduced" && "text-amber-400",
+          confidenceValue === "Low" && "text-red-400"
         )}
       />
     </div>
