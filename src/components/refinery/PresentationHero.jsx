@@ -29,13 +29,13 @@ function getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCap
 }
 
 function getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance) {
-  if (hotSpotRisk === "HIGH") return "Bed temperature imbalance. Immediate attention required.";
-  if (timeToNearest < 10 && timeToNearest > 0) return `${Math.round(timeToNearest)} min to ${nearestName}.`;
-  if (coolingCapacity === "CONSTRAINED") return "Cooling saturated. Thermal margin reduced.";
-  if (!equipment.h2Compressor && escalationLevel >= 1) return "H₂ moderation offline. Exotherm sensitivity elevated.";
-  if (slope > 1.5 || preheatStatus?.includes("stress")) return "Rapid rise confirmed. ${Math.round(timeToNearest)} min available.";
-  if (escalationLevel >= 1 && timeToNearest < Infinity) return `Rate-of-rise active. ${Math.round(timeToNearest)} min to ${nearestName}.`;
-  return "No active constraints.";
+  if (hotSpotRisk === "HIGH") return "Bed hot spot developing";
+  if (timeToNearest < 10 && timeToNearest > 0) return `${Math.round(timeToNearest)} minutes to ${nearestName} at current trend`;
+  if (coolingCapacity === "CONSTRAINED") return "Heat removal capability reduced";
+  if (!equipment.h2Compressor && escalationLevel >= 1) return "Exotherm sensitivity increased";
+  if (slope > 1.5 || preheatStatus?.includes("stress")) return "Rate-of-rise above expected range";
+  if (escalationLevel >= 1 && timeToNearest < Infinity) return `${Math.round(timeToNearest)} minutes to ${nearestName} at current rate`;
+  return "No binding constraints detected";
 }
 
 export default function PresentationHero({ 
@@ -120,7 +120,7 @@ export default function PresentationHero({
 
       {/* Footer */}
       <div className="text-center text-[#444] text-xs pt-4">
-        <p>Situation assessed. Operator authority retained.</p>
+        <p>Situation understood and under operator control</p>
       </div>
     </div>
   );
