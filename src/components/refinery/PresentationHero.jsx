@@ -75,75 +75,52 @@ export default function PresentationHero({
   const recommendation = getRecommendationWithConfidence(escalationLevel, confidence, equipment, coolingCapacity, hotSpotRisk);
 
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-8 space-y-5">
-      {/* Enhanced Situation Headline - Two-Line Structure */}
-      <div className="w-full max-w-5xl">
-        <div className={cn("px-8 py-6 rounded-lg border-2 text-center transition-all duration-400", `border-[${config.text.replace('text-', '')}]`)}>
-          <p className={cn("text-4xl font-bold tracking-tight leading-tight", config.text)}>
+    <div className="flex flex-col items-center justify-center px-6 py-12 space-y-8">
+      {/* System State - Single Dominant Element */}
+      <div className="w-full max-w-6xl">
+        <div className={cn("px-12 py-10 rounded-lg border-4 text-center transition-all duration-400", `border-[${config.text.replace('text-', '')}]`)}>
+          <p className={cn("text-6xl font-bold tracking-tight leading-tight mb-4", config.text)}>
             {getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus)}
           </p>
-          <p className="text-[#999] text-lg mt-3 font-medium">
+          <p className="text-[#aaa] text-xl font-medium">
             {getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance)}
           </p>
         </div>
       </div>
 
-      {/* Decision Window Bar */}
-      <div className="w-full max-w-3xl">
-        <DecisionWindowBar 
-          timeToNearest={timeToNearest}
-          escalationLevel={escalationLevel}
-          coolingCapacity={coolingCapacity}
-          equipment={equipment}
-          hotSpotRisk={hotSpotRisk}
-          slope={slope}
-          currentTemp={0}
-        />
-      </div>
+      {/* Collapsed Secondary Information */}
+      <div className="w-full max-w-4xl space-y-2 opacity-60">
+        {/* Decision Window - Collapsed */}
+        {!stable && (
+          <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded px-4 py-2 flex items-center justify-between text-xs">
+            <span className="text-[#666] uppercase tracking-wider">Intervention Window</span>
+            <span className="text-[#888]">{Math.round(timeToNearest)} min available</span>
+          </div>
+        )}
 
-      {/* Nearest Constraint Badge - Only if not stable */}
-      {!stable && nearestName && (
-        <div className="bg-[#1e1e1e] border-2 border-[#444] rounded-lg px-6 py-3 text-center">
-          <p className="text-[#888] text-xs uppercase tracking-wider mb-1">Nearest Constraint</p>
-          <p className={cn("text-2xl font-bold", config.text)}>{nearestName}</p>
+        {/* Operational Flexibility - Collapsed */}
+        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded px-4 py-2 flex items-center justify-between text-xs">
+          <span className="text-[#666] uppercase tracking-wider">Mitigation Capacity</span>
+          <span className="text-[#888]">{correctiveLevers.available} / {correctiveLevers.total} active</span>
         </div>
-      )}
 
-      {/* Micro-Cause Line */}
-      {cause && (
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-6 py-3 text-center max-w-2xl">
-          <p className="text-[#999] text-sm font-medium">
-            Cause: {cause}
-          </p>
+        {/* Confidence - Collapsed */}
+        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded px-4 py-2 flex items-center justify-between text-xs">
+          <span className="text-[#666] uppercase tracking-wider">Assessment Confidence</span>
+          <span className={cn(
+            "font-medium",
+            confidenceLabel.includes("HIGH") && "text-[#0F9F9F]",
+            confidenceLabel.includes("MODERATE") && "text-[#B47A1F]",
+            confidenceLabel.includes("REDUCED") && "text-[#A13A1F]"
+          )}>
+            {confidenceLabel}
+          </span>
         </div>
-      )}
-
-      {/* Operational Flexibility */}
-      <div className="w-full max-w-2xl">
-        <LeverContext 
-          equipment={equipment}
-          coolingCapacity={coolingCapacity}
-          escalationLevel={escalationLevel}
-        />
       </div>
 
-      {/* Confidence - Always show */}
-      <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-6 py-3 text-center min-w-[200px]">
-        <p className="text-[#888] text-xs uppercase tracking-wider mb-1 font-semibold">Confidence</p>
-        <p className={cn(
-          "text-base font-bold",
-          confidenceLabel.includes("HIGH") && "text-[#0F9F9F]",
-          confidenceLabel.includes("MODERATE") && "text-[#B47A1F]",
-          confidenceLabel.includes("REDUCED") && "text-[#A13A1F]",
-          confidenceLabel.includes("CRITICAL") && "text-[#7A0F0F]"
-        )}>
-          {confidenceLabel}
-        </p>
-      </div>
-
-      {/* Footer Disclaimers */}
-      <div className="text-center text-[#555] text-xs space-y-1 pt-2">
-        <p className="tracking-wide">Advisory system — Operator judgment remains primary authority</p>
+      {/* Footer */}
+      <div className="text-center text-[#444] text-xs pt-4">
+        <p>Situation understood and under operator control</p>
       </div>
     </div>
   );
