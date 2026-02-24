@@ -355,8 +355,8 @@ export default function ProcessMap({
           {interactive && escalationLevel >= 2 && (
             <rect x={-SIZES.R1.w/2 + 5} y={-SIZES.R1.h/2 + 5} width={SIZES.R1.w - 10} height={SIZES.R1.h - 10} fill="url(#reactorGlow)" opacity="1.08" className={escalationLevel >= 3 ? "animate-[pulse_1.2s_ease-in-out_infinite]" : "transition-opacity duration-500"} />
           )}
-          {!interactive && escalationLevel >= 2 && (
-            <rect x={-SIZES.R1.w/2 + 5} y={-SIZES.R1.h/2 + 5} width={SIZES.R1.w - 10} height={SIZES.R1.h - 10} fill="url(#reactorGlow)" opacity="0.5" className="transition-opacity duration-500" />
+          {!interactive && isImmediateRisk && constrainedUnit === "reactor" && (
+            <rect x={-SIZES.R1.w/2 + 5} y={-SIZES.R1.h/2 + 5} width={SIZES.R1.w - 10} height={SIZES.R1.h - 10} fill="url(#reactorGlow)" opacity="0.35" className="transition-opacity duration-700" />
           )}
           
           <text x={-SIZES.R1.w/2 - 40} y={SIZES.R1.h/2 + 12} fill="#aaa" fontSize="22" textAnchor="end" fontWeight="bold">R-1</text>
