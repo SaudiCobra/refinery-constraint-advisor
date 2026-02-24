@@ -78,6 +78,68 @@ export default function DecisionWindowBar({
   
   const trendCredibility = getTrendCredibility();
   
+  // Constraint-lever relationship (explanatory only)
+  const getConstraintLeverRelationship = () => {
+    if (!primaryConstraint) return null;
+    
+    // Check available flexibility
+    const hasCoolingHeadroom = coolingCapacity !== "CONSTRAINED";
+    const hasH2Availability = equipment?.h2Compressor;
+    const hasBypassFlexibility = equipment?.bypassValve;
+    
+    // Build contextual explanation based on constraint and available levers
+    if (hotSpotRisk === "HIGH") {
+      if (hasH2Availability && hasCoolingHeadroom) {
+        return "Mitigation flexibility exists due to hydrogen moderation headroom and available cooling capacity";
+      }
+      if (hasH2Availability) {
+        return "Limited mitigation flexibility exists due to hydrogen moderation capability, though cooling capacity constrained";
+      }
+      return "Mitigation flexibility severely restricted due to hydrogen system unavailability and cooling constraints";
+    }
+    
+    if (coolingCapacity === "CONSTRAINED") {
+      if (hasH2Availability && hasBypassFlexibility) {
+        return "Alternative response flexibility exists through hydrogen moderation and bypass routing adjustment";
+      }
+      if (hasH2Availability) {
+        return "Response flexibility exists primarily through hydrogen moderation authority";
+      }
+      return "Response flexibility severely restricted with cooling and hydrogen systems constrained";
+    }
+    
+    if (!equipment?.h2Compressor) {
+      if (hasCoolingHeadroom && hasBypassFlexibility) {
+        return "Response flexibility exists through cooling capacity and bypass routing, though hydrogen moderation unavailable";
+      }
+      if (hasCoolingHeadroom) {
+        return "Response flexibility limited primarily to cooling capacity adjustment";
+      }
+      return "Response flexibility severely restricted with hydrogen and cooling systems constrained";
+    }
+    
+    // Temperature-based constraints
+    if (currentTemp >= 375 || escalationLevel >= 1) {
+      if (hasCoolingHeadroom && hasH2Availability && hasBypassFlexibility) {
+        return "Available mitigation flexibility exists due to remaining cooling capacity and hydrogen moderation headroom";
+      }
+      if (hasCoolingHeadroom && hasH2Availability) {
+        return "Mitigation flexibility exists through cooling and hydrogen moderation, bypass routing limited";
+      }
+      if (hasCoolingHeadroom) {
+        return "Mitigation flexibility exists primarily through remaining cooling capacity";
+      }
+      if (hasH2Availability) {
+        return "Mitigation flexibility exists primarily through hydrogen moderation capability";
+      }
+      return "Mitigation flexibility severely restricted due to equipment and capacity constraints";
+    }
+    
+    return null;
+  };
+  
+  const constraintLeverRelationship = getConstraintLeverRelationship();
+  
   return (
     <div className="flex flex-col gap-2 bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3">
       <div className="flex items-center justify-between">
@@ -98,6 +160,11 @@ export default function DecisionWindowBar({
           <p className="text-[#999] text-sm leading-relaxed">{primaryConstraint}</p>
           {trendCredibility && (
             <p className="text-[#666] text-xs italic">{trendCredibility}</p>
+          )}
+          {constraintLeverRelationship && (
+            <p className="text-[#777] text-xs leading-relaxed mt-1">
+              {constraintLeverRelationship}
+            </p>
           )}
         </div>
       )}
