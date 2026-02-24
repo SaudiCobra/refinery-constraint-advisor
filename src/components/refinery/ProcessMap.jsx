@@ -70,8 +70,10 @@ export default function ProcessMap({
   const baseColor = LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0];
   const coolerColor = COOLING_COLORS[coolingCapacity] || COOLING_COLORS.NORMAL;
   
+  // Adjust animation speed based on mode
   const flowSpeedMultiplier = escalationLevel === 0 ? 1.0 : escalationLevel === 1 ? 1.2 : escalationLevel === 2 ? 1.5 : 1.8;
-  const animationSpeed = `${8 / flowSpeedMultiplier}s`;
+  const baseAnimationSpeed = 8 / flowSpeedMultiplier;
+  const animationSpeed = interactive ? `${baseAnimationSpeed}s` : `${baseAnimationSpeed * 1.8}s`;
   
   const valveStates = {
     tcv01a: equipment.bypassValve ? "CLOSED" : "OOS",
