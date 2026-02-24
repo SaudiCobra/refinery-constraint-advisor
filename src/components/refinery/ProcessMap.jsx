@@ -109,14 +109,22 @@ export default function ProcessMap({
   const shellThermalColor = getThermalColor(reactorOutletTemp);
   const cooledThermalColor = getThermalColor(coolerOutletTemp);
 
-  // Presentation Mode: Visible but secondary
-  const presentationStyle = !interactive ? {
-    opacity: 0.75,
-    filter: 'saturate(0.6) contrast(0.92)'
-  } : {};
+  // Presentation Mode: Subtle accent colors based on constraint state
+  const getConstrainedUnit = () => {
+    if (!interactive) {
+      if (hotSpotRisk === "HIGH" || escalationLevel >= 2) return "reactor";
+      if (coolingCapacity === "CONSTRAINED") return "cooler";
+      if (preheatStatus?.includes("stress")) return "exchanger";
+      if (escalationLevel >= 1) return "reactor";
+    }
+    return null;
+  };
+  
+  const constrainedUnit = getConstrainedUnit();
+  const accentIntensity = escalationLevel >= 2 ? 1.0 : 0.7;
 
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative" style={presentationStyle}>
+    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative">
       <svg viewBox="0 0 2560 1200" className="w-full h-auto">
         <defs>
           <filter id="equipmentShadow" x="-50%" y="-50%" width="200%" height="200%">
