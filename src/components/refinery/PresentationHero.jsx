@@ -1,6 +1,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import DecisionWindowBar from "./DecisionWindowBar";
+import LeverContext from "./LeverContext";
 import {
   computeConfidence,
   computeCorrectiveLevers,
@@ -117,36 +118,27 @@ export default function PresentationHero({
         </div>
       )}
 
-      {/* Corrective Levers & Confidence Row */}
-      <div className="flex gap-6 justify-center">
-        {/* Corrective Levers - Only highlight if <=2 */}
-        {correctiveLevers <= 2 && (
-          <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-6 py-3 text-center min-w-[160px]">
-            <p className="text-[#888] text-xs uppercase tracking-wider mb-1 font-semibold">Corrective Levers</p>
-            <p className={cn(
-              "text-2xl font-bold",
-              correctiveLevers === 0 && "text-[#A13A1F]",
-              correctiveLevers === 1 && "text-[#B47A1F]",
-              correctiveLevers === 2 && "text-[#D4A547]"
-            )}>
-              {correctiveLevers}
-            </p>
-          </div>
-        )}
+      {/* Operational Flexibility */}
+      <div className="w-full max-w-2xl">
+        <LeverContext 
+          equipment={equipment}
+          coolingCapacity={coolingCapacity}
+          escalationLevel={escalationLevel}
+        />
+      </div>
 
-        {/* Confidence - Always show */}
-        <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-6 py-3 text-center min-w-[200px]">
-          <p className="text-[#888] text-xs uppercase tracking-wider mb-1 font-semibold">Confidence</p>
-          <p className={cn(
-            "text-base font-bold",
-            confidenceLabel.includes("HIGH") && "text-[#0F9F9F]",
-            confidenceLabel.includes("MODERATE") && "text-[#B47A1F]",
-            confidenceLabel.includes("REDUCED") && "text-[#A13A1F]",
-            confidenceLabel.includes("CRITICAL") && "text-[#7A0F0F]"
-          )}>
-            {confidenceLabel}
-          </p>
-        </div>
+      {/* Confidence - Always show */}
+      <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-6 py-3 text-center min-w-[200px]">
+        <p className="text-[#888] text-xs uppercase tracking-wider mb-1 font-semibold">Confidence</p>
+        <p className={cn(
+          "text-base font-bold",
+          confidenceLabel.includes("HIGH") && "text-[#0F9F9F]",
+          confidenceLabel.includes("MODERATE") && "text-[#B47A1F]",
+          confidenceLabel.includes("REDUCED") && "text-[#A13A1F]",
+          confidenceLabel.includes("CRITICAL") && "text-[#7A0F0F]"
+        )}>
+          {confidenceLabel}
+        </p>
       </div>
 
       {/* Footer Disclaimers */}

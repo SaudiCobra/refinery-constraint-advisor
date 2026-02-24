@@ -10,6 +10,7 @@ import AlarmsOnlyView from "@/components/refinery/AlarmsOnlyView";
 import ScenarioSelector from "@/components/refinery/ScenarioSelector";
 import PresentationHero from "@/components/refinery/PresentationHero";
 import DecisionWindowBar from "@/components/refinery/DecisionWindowBar";
+import LeverContext from "@/components/refinery/LeverContext";
 import ProcessMap from "@/components/refinery/ProcessMap";
 import PreheatIndicator from "@/components/refinery/PreheatIndicator";
 import CoolingCapacityIndicator from "@/components/refinery/CoolingCapacityIndicator";
@@ -288,7 +289,7 @@ export default function Home() {
               consequence={consequence}
             />
             
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-3xl mx-auto space-y-4">
               <DecisionWindowBar 
                 timeToNearest={timeToNearest}
                 escalationLevel={escalationLevel}
@@ -297,6 +298,12 @@ export default function Home() {
                 hotSpotRisk={hotSpotRisk}
                 slope={slope}
                 currentTemp={currentValue}
+              />
+              
+              <LeverContext 
+                equipment={activeData.equipment}
+                coolingCapacity={coolingCapacity}
+                escalationLevel={escalationLevel}
               />
             </div>
 
