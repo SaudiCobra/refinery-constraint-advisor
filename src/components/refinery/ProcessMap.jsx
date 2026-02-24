@@ -109,8 +109,14 @@ export default function ProcessMap({
   const shellThermalColor = getThermalColor(reactorOutletTemp);
   const cooledThermalColor = getThermalColor(coolerOutletTemp);
 
+  // Presentation Mode: Reduce visual emphasis
+  const presentationStyle = !interactive ? {
+    opacity: 0.5,
+    filter: 'saturate(0.4) contrast(0.85)'
+  } : {};
+
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative">
+    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative" style={presentationStyle}>
       <svg viewBox="0 0 2560 1200" className="w-full h-auto">
         <defs>
           <filter id="equipmentShadow" x="-50%" y="-50%" width="200%" height="200%">
