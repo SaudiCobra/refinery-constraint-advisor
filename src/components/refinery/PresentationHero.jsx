@@ -55,24 +55,13 @@ export default function PresentationHero({
   const stable = slope <= 0 || timeToNearest === Infinity;
   const config = LEVEL_CONFIG[escalationLevel] || LEVEL_CONFIG[0];
   
-  // Simulate multi-transmitter consistency (85% chance of consistency)
-  const simulateMismatch = Math.random() > 0.85;
-  const transmitterMismatchCount = simulateMismatch ? (Math.random() > 0.5 ? 1 : 2) : 0;
-  const valveReliability = (Math.random() > 0.9 && escalationLevel >= 2) ? "lag" : "normal";
-  
-  // Compute confidence
-  const confidence = computeConfidence(sensorQuality, opMode, valveReliability, transmitterMismatchCount, 3);
-  const confidenceLabel = getConfidenceLabel(confidence, transmitterMismatchCount, 3, sensorQuality);
-  
   // Compute corrective levers
   const correctiveLevers = computeCorrectiveLevers(equipment);
   
-  // Get dynamic headline and cause (single dominant cause)
-  const headline = getSituationHeadline(escalationLevel, timeToNearest, nearestName, coolingCapacity, preheatStatus, slope, hotSpotRisk, equipment);
-  const cause = getEscalationCause(escalationLevel, coolingCapacity, preheatStatus, slope, timeToNearest, equipment, hotSpotRisk, bedImbalance);
-  
-  // Get recommendation adjusted for confidence and hot spot risk
-  const recommendation = getRecommendationWithConfidence(escalationLevel, confidence, equipment, coolingCapacity, hotSpotRisk);
+  // Determine confidence status (simplified for Presentation Mode)
+  const confidenceStatus = (sensorQuality === "degraded" || sensorQuality === "poor") 
+    ? "Under Review" 
+    : "Normal";
 
   return (
     <div className="flex flex-col items-center justify-center px-6 py-12 space-y-8">
