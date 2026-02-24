@@ -79,48 +79,28 @@ export default function PresentationHero({
       {/* System State - Single Dominant Element */}
       <div className="w-full max-w-6xl">
         <div className={cn("px-12 py-10 rounded-lg border-4 text-center transition-all duration-400", `border-[${config.text.replace('text-', '')}]`)}>
-          <p className={cn("text-6xl font-bold tracking-tight leading-tight mb-4", config.text)}>
+          <p className={cn("text-6xl font-bold tracking-tight leading-tight mb-6", config.text)}>
             {getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus)}
           </p>
-          <p className="text-[#aaa] text-xl font-medium">
-            {getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance)}
-          </p>
-        </div>
-      </div>
-
-      {/* Collapsed Secondary Information */}
-      <div className="w-full max-w-4xl space-y-2 opacity-60">
-        {/* Decision Window - Collapsed */}
-        {!stable && (
-          <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded px-4 py-2 flex items-center justify-between text-xs">
-            <span className="text-[#666] uppercase tracking-wider">Intervention Window</span>
-            <span className="text-[#888]">{Math.round(timeToNearest)} min available</span>
+          <div className="space-y-1">
+            <p className="text-[#999] text-base">
+              {stable ? "No active constraints." : `${Math.round(timeToNearest)} minutes to ${nearestName}.`}
+            </p>
+            <p className="text-[#999] text-base">
+              {stable ? "All parameters within operating limits." : getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance)}
+            </p>
           </div>
-        )}
-
-        {/* Operational Flexibility - Collapsed */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded px-4 py-2 flex items-center justify-between text-xs">
-          <span className="text-[#666] uppercase tracking-wider">Mitigation Capacity</span>
-          <span className="text-[#888]">{correctiveLevers.available} / {correctiveLevers.total} active</span>
-        </div>
-
-        {/* Confidence - Collapsed */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded px-4 py-2 flex items-center justify-between text-xs">
-          <span className="text-[#666] uppercase tracking-wider">Assessment Confidence</span>
-          <span className={cn(
-            "font-medium",
-            confidenceLabel.includes("HIGH") && "text-[#0F9F9F]",
-            confidenceLabel.includes("MODERATE") && "text-[#B47A1F]",
-            confidenceLabel.includes("REDUCED") && "text-[#A13A1F]"
-          )}>
-            {confidenceLabel}
-          </span>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="text-center text-[#444] text-xs pt-4">
-        <p>Situation understood and under operator control</p>
+      {/* Compact Metrics */}
+      <div className="w-full max-w-4xl space-y-2">
+        <p className="text-[#888] text-sm">
+          <span className="text-[#666]">Assessment Confidence:</span> {confidenceLabel}
+        </p>
+        <p className="text-[#888] text-sm">
+          <span className="text-[#666]">Mitigation Capacity:</span> {stable ? "Available" : `${correctiveLevers.available} / ${correctiveLevers.total} active`}
+        </p>
       </div>
     </div>
   );
