@@ -55,19 +55,18 @@ export default function H2AvailabilityIndicator({ equipment, coolingCapacity, sl
   const h2State = deriveH2Availability(equipment, coolingCapacity, slope);
   const stateColor = getStateColor(h2State);
   
+  const getMessage = () => {
+    if (h2State === "Unavailable") return "Hydrogen moderation unavailable — system offline";
+    if (h2State === "Restricted") return "Hydrogen moderation restricted — limited authority";
+    if (h2State === "Limited") return "Hydrogen moderation limited — reduced capacity";
+    return "Hydrogen moderation available — no supply constraint";
+  };
+  
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="text-[#888] text-sm font-medium">H₂ Availability:</div>
-          <div className={`text-lg font-semibold transition-colors duration-500 ${stateColor}`}>
-            {h2State}
-          </div>
-        </div>
-        <div className="text-xs text-[#666]">
-          Hydrogen moderation capability
-        </div>
-      </div>
+    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-4 py-2">
+      <p className={`text-xs leading-relaxed transition-colors duration-500 ${stateColor}`}>
+        {getMessage()}
+      </p>
     </div>
   );
 }
