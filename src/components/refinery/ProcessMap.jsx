@@ -276,10 +276,10 @@ export default function ProcessMap({
         </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
-        <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")}>
-          <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#1a1a1a" stroke={interactive ? baseColor : constrainedUnit === "reactor" ? (escalationLevel >= 2 ? "#B47A1F" : "#7A6A3F") : "#555"} strokeWidth="3" className="transition-colors duration-700" />
-          <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill="#2a2a2a" stroke={interactive ? baseColor : constrainedUnit === "reactor" ? (escalationLevel >= 2 ? "#B47A1F" : "#7A6A3F") : "#555"} strokeWidth="4" filter="url(#equipmentShadow)" className="transition-colors duration-700" />
-          <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#2a2a2a" stroke={interactive ? baseColor : constrainedUnit === "reactor" ? (escalationLevel >= 2 ? "#B47A1F" : "#7A6A3F") : "#555"} strokeWidth="3" className="transition-colors duration-700" />
+        <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("reactor")}>
+          <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#1a1a1a" stroke={interactive ? baseColor : constrainedUnit === "reactor" ? (isImmediateRisk ? "#D4653F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "3" : constrainedUnit === "reactor" ? (isImmediateRisk ? "5" : "4") : "3"} className="transition-all duration-700" />
+          <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill="#2a2a2a" stroke={interactive ? baseColor : constrainedUnit === "reactor" ? (isImmediateRisk ? "#D4653F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "4" : constrainedUnit === "reactor" ? (isImmediateRisk ? "6" : "5") : "4"} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+          <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#2a2a2a" stroke={interactive ? baseColor : constrainedUnit === "reactor" ? (isImmediateRisk ? "#D4653F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "3" : constrainedUnit === "reactor" ? (isImmediateRisk ? "5" : "4") : "3"} className="transition-all duration-700" />
           
           {bedImbalance && bedImbalance.beds.map((bed, idx) => {
             const bedHeight = 70;
