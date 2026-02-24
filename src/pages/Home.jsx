@@ -267,10 +267,10 @@ export default function Home() {
         preheatStatus={preheatStatus}
       />
 
-      {!alarmsOnly && displayMode === "presentation" && (
+      {!alarmsOnly && displayMode === "presentation" && slope > 0 && timeToNearest < Infinity && (
         <div className="max-w-[2200px] mx-auto px-20 pt-4">
           <p className="text-[#999] text-sm">
-            Escalation driven by sustained temperature rise; intervention window remains available.
+            Sustained temperature rise. {Math.round(timeToNearest)} min to constraint.
           </p>
         </div>
       )}
