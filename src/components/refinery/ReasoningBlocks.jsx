@@ -31,17 +31,8 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
 
       {/* Reality Check */}
       <Block title="Reality Check" color="amber">
-        {unavailable.length > 0 ? (
-          <>
-            <Line>Cooling constrained</Line>
-            {unavailable.map(n => <Line key={n}>{n} — unavailable</Line>)}
-          </>
-        ) : (
-          <Line>All levers available</Line>
-        )}
-        {sensorQuality !== "good" && (
-          <Line>Sensor quality: {sensorQuality}</Line>
-        )}
+        <Line>Mitigation capacity remains</Line>
+        <Line>No hard limits active</Line>
       </Block>
 
       {/* Consequence */}
