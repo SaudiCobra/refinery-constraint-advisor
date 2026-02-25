@@ -76,25 +76,25 @@ export default function ProcessMap({
     if (!interactive) {
       if (systemState === "IMMEDIATE_RISK") {
         return {
-          base: "#777", // More visible base
+          base: "#56616B", // Visible neutral grey
           affected: "#A13A1F", // Amber/dark red
-          affectedStroke: "4.5",
-          pipes: "#666"
+          affectedStroke: "5",
+          pipes: "#56616B"
         };
       } else if (systemState === "EARLY_DRIFT") {
         return {
-          base: "#777",
+          base: "#56616B",
           affected: "#B47A1F", // Muted orange
-          affectedStroke: "4",
-          pipes: "#666"
+          affectedStroke: "4.5",
+          pipes: "#56616B"
         };
       }
       // NORMAL
       return {
-        base: "#777", // Increased from #555 for visibility
-        affected: "#777",
-        affectedStroke: "3",
-        pipes: "#666"
+        base: "#56616B", // Visible neutral grey
+        affected: "#56616B",
+        affectedStroke: "3.5",
+        pipes: "#56616B"
       };
     }
     return null;
@@ -341,6 +341,17 @@ export default function ProcessMap({
             const isDominant = bed.id === bedImbalance.dominantBed;
             
             const getBedColor = () => {
+              // Use state colors in presentation mode
+              if (!interactive && stateColors) {
+                if (systemState === "IMMEDIATE_RISK" && (isDominant || escalationLevel >= 2)) {
+                  return stateColors.affected; // #A13A1F
+                }
+                if (systemState === "EARLY_DRIFT" && (isDominant || escalationLevel >= 1)) {
+                  return stateColors.affected; // #B47A1F
+                }
+                return "#56616B"; // Neutral
+              }
+              // Interactive mode logic
               if (hotSpotRisk === "HIGH" && isDominant) return "#A13A1F";
               if (hotSpotRisk === "MEDIUM" && isDominant) return "#B47A1F";
               if (isDominant && bedImbalance.severity === "SEVERE") return "#A13A1F";
@@ -351,8 +362,8 @@ export default function ProcessMap({
             };
             
             const bedColor = getBedColor();
-            const glowIntensity = isDominant && hotSpotRisk === "HIGH" ? 0.5 : isDominant && hotSpotRisk === "MEDIUM" ? 0.3 : 0;
-            const bedOpacity = 0.15 + glowIntensity;
+            const glowIntensity = interactive && isDominant && hotSpotRisk === "HIGH" ? 0.5 : interactive && isDominant && hotSpotRisk === "MEDIUM" ? 0.3 : 0;
+            const bedOpacity = !interactive ? 0.12 : (0.15 + glowIntensity);
             
             return (
               <g key={bed.id}>
@@ -378,7 +389,7 @@ export default function ProcessMap({
                       cy={py}
                       r="2"
                       fill={bedColor}
-                      opacity={interactive ? (0.6 + glowIntensity) : (0.35 + glowIntensity * 0.5)}
+                      opacity={interactive ? (0.6 + glowIntensity) : 0.25}
                       className="transition-all duration-500"
                     />
                   );
