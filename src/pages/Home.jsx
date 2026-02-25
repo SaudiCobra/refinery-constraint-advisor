@@ -427,6 +427,11 @@ export default function Home() {
               )}
             </div>
 
+            <MitigationCapacity 
+              escalationLevel={escalationLevel}
+              timeToNearest={timeToNearest}
+            />
+
             <ProcessMap
               escalationLevel={escalationLevel}
               slope={slope}
