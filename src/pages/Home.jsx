@@ -438,6 +438,7 @@ export default function Home() {
               hotSpotRisk={hotSpotRisk}
               interactive={false}
               units={activeData.units}
+              systemState={escalationLevel >= 2 ? "IMMEDIATE_RISK" : escalationLevel >= 1 ? "EARLY_DRIFT" : "NORMAL"}
             />
 
             <PresentationHero
