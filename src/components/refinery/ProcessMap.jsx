@@ -71,30 +71,45 @@ export default function ProcessMap({
   const baseColor = LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0];
   const coolerColor = COOLING_COLORS[coolingCapacity] || COOLING_COLORS.NORMAL;
   
+  // Normalize systemState (handle spacing, casing variations)
+  const normalizedState = (systemState || "NORMAL")
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, "_");
+  
+  // Presentation mode state override (based on escalation severity)
+  const effectiveState = !interactive
+    ? (escalationLevel >= 2 || hotSpotRisk === "HIGH"
+        ? "IMMEDIATE_RISK"
+        : escalationLevel >= 1
+        ? "EARLY_DRIFT"
+        : normalizedState)
+    : normalizedState;
+  
   // State-driven color palettes (Presentation Mode)
   const getStateColors = () => {
     if (!interactive) {
-      if (systemState === "IMMEDIATE_RISK") {
+      if (effectiveState === "IMMEDIATE_RISK") {
         return {
-          base: "#56616B", // Visible neutral grey
-          affected: "#A13A1F", // Amber/dark red
+          base: "#7A7A7A", // Visible neutral grey
+          affected: "#C0392B", // Amber/dark red (NOT orange)
           affectedStroke: "5",
-          pipes: "#56616B"
+          pipes: "#7A7A7A"
         };
-      } else if (systemState === "EARLY_DRIFT") {
+      } else if (effectiveState === "EARLY_DRIFT") {
         return {
-          base: "#56616B",
-          affected: "#B47A1F", // Muted orange
+          base: "#7A7A7A",
+          affected: "#E67E22", // Muted orange
           affectedStroke: "4.5",
-          pipes: "#56616B"
+          pipes: "#7A7A7A"
         };
       }
       // NORMAL
       return {
-        base: "#56616B", // Visible neutral grey
-        affected: "#56616B",
+        base: "#7A7A7A", // Visible neutral grey
+        affected: "#7A7A7A",
         affectedStroke: "3.5",
-        pipes: "#56616B"
+        pipes: "#7A7A7A"
       };
     }
     return null;
@@ -343,13 +358,13 @@ export default function ProcessMap({
             const getBedColor = () => {
               // Use state colors in presentation mode
               if (!interactive && stateColors) {
-                if (systemState === "IMMEDIATE_RISK" && (isDominant || escalationLevel >= 2)) {
-                  return stateColors.affected; // #A13A1F
+                if (effectiveState === "IMMEDIATE_RISK" && (isDominant || escalationLevel >= 2)) {
+                  return stateColors.affected; // Red/amber
                 }
-                if (systemState === "EARLY_DRIFT" && (isDominant || escalationLevel >= 1)) {
-                  return stateColors.affected; // #B47A1F
+                if (effectiveState === "EARLY_DRIFT" && (isDominant || escalationLevel >= 1)) {
+                  return stateColors.affected; // Orange
                 }
-                return "#56616B"; // Neutral
+                return "#3A3A3A"; // Neutral fill
               }
               // Interactive mode logic
               if (hotSpotRisk === "HIGH" && isDominant) return "#A13A1F";
