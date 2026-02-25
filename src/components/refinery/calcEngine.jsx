@@ -64,7 +64,7 @@ export function getEscalationLevel(timeMinutes, preheatActive, slope, coolingCap
     baseLevel = Math.max(baseLevel, 2);
   }
 
-  if (coolingCapacity === "CONSTRAINED" && timeMinutes < 15) {
+  if (coolingCapacity === "SEVERELY_LIMITED" && timeMinutes < 15) {
     baseLevel = Math.min(baseLevel + 1, 3);
   }
 
@@ -81,7 +81,7 @@ export function computeCoolingCapacity(equipment, slope, timeToNearest) {
   }
 
   if (!coolerAvailable && (slope > 1.5 || timeToNearest < 15 || !bypassAvailable)) {
-    return "CONSTRAINED";
+    return "SEVERELY_LIMITED";
   }
 
   if (!coolerAvailable || !h2Available) {
@@ -95,7 +95,7 @@ export function adjustTimeToConstraint(baseTime, coolingCapacity) {
   if (coolingCapacity === "REDUCED") {
     return baseTime * 0.85;
   }
-  if (coolingCapacity === "CONSTRAINED") {
+  if (coolingCapacity === "SEVERELY_LIMITED") {
     return baseTime * 0.70;
   }
   return baseTime;
@@ -124,7 +124,7 @@ export function getRecommendation(level, nearest, equipment, coolingCapacity, pr
     return "Moderate heat-up rate to remain within catalyst envelope.";
   }
   
-  if (coolingCapacity === "CONSTRAINED") {
+  if (coolingCapacity === "SEVERELY_LIMITED") {
     return "Prepare escalation; limited heat removal available.";
   }
   

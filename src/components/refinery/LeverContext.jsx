@@ -7,7 +7,7 @@ export default function LeverContext({ equipment, coolingCapacity, escalationLev
   
   const levers = [
     {
-      available: coolingCapacity !== "CONSTRAINED",
+      available: coolingCapacity !== "SEVERELY_LIMITED",
       label: "Cooling",
       description: "E-2 not saturated",
     },

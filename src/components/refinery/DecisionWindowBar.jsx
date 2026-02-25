@@ -36,7 +36,7 @@ export default function DecisionWindowBar({
     if (hotSpotRisk === "HIGH") {
       return "Primary constraint: Reactor bed temperature imbalance approaching runaway threshold";
     }
-    if (coolingCapacity === "CONSTRAINED" && escalationLevel >= 2) {
+    if (coolingCapacity === "SEVERELY_LIMITED" && escalationLevel >= 2) {
       return "Primary constraint: Effluent cooler heat removal capacity insufficient";
     }
     if (!equipment?.h2Compressor && escalationLevel >= 1) {
@@ -83,7 +83,7 @@ export default function DecisionWindowBar({
     if (!primaryConstraint) return null;
     
     // Check available flexibility
-    const hasCoolingHeadroom = coolingCapacity !== "CONSTRAINED";
+    const hasCoolingHeadroom = coolingCapacity !== "SEVERELY_LIMITED";
     const hasH2Availability = equipment?.h2Compressor;
     const hasBypassFlexibility = equipment?.bypassValve;
     
@@ -93,12 +93,12 @@ export default function DecisionWindowBar({
         return "Mitigation flexibility exists due to hydrogen moderation headroom and available cooling capacity";
       }
       if (hasH2Availability) {
-        return "Limited mitigation flexibility exists due to hydrogen moderation capability, though cooling capacity constrained";
+        return "Limited mitigation flexibility exists due to hydrogen moderation capability, though cooling capacity severely limited";
       }
       return "Mitigation flexibility severely restricted due to hydrogen system unavailability and cooling constraints";
     }
     
-    if (coolingCapacity === "CONSTRAINED") {
+    if (coolingCapacity === "SEVERELY_LIMITED") {
       if (hasH2Availability && hasBypassFlexibility) {
         return "Alternative response flexibility exists through hydrogen moderation and bypass routing adjustment";
       }

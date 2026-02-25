@@ -13,10 +13,10 @@ export default function CoolingCapacityIndicator({ capacity }) {
       label: "REDUCED",
       advisory: "Cooling authority limited — response window compressed",
     },
-    CONSTRAINED: { 
+    SEVERELY_LIMITED: { 
       color: "#A13A1F", 
-      label: "CONSTRAINED",
-      advisory: "Heat removal constrained — escalation sensitivity increased",
+      label: "SEVERELY LIMITED",
+      advisory: "Heat removal severely limited — escalation sensitivity increased",
     },
   };
 

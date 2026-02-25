@@ -15,6 +15,7 @@ import ProcessMap from "@/components/refinery/ProcessMap";
 import PreheatIndicator from "@/components/refinery/PreheatIndicator";
 import CoolingCapacityIndicator from "@/components/refinery/CoolingCapacityIndicator";
 import H2AvailabilityIndicator from "@/components/refinery/H2AvailabilityIndicator";
+import MitigationCapacity from "@/components/refinery/MitigationCapacity";
 import {
   computeRateOfRise,
   computeAllConstraints,
@@ -326,6 +327,11 @@ export default function Home() {
               onToggle={setPreheatActive}
               currentTemp={currentValue}
               slope={slope}
+            />
+
+            <MitigationCapacity 
+              escalationLevel={escalationLevel}
+              timeToNearest={timeToNearest}
             />
 
             <CoolingCapacityIndicator capacity={coolingCapacity} />
