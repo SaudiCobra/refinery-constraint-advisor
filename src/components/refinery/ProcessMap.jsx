@@ -65,10 +65,42 @@ export default function ProcessMap({
   hotSpotRisk,
   interactive = true,
   units = "°C",
+  systemState = "NORMAL", // "NORMAL" | "EARLY_DRIFT" | "IMMEDIATE_RISK"
 }) {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const baseColor = LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0];
   const coolerColor = COOLING_COLORS[coolingCapacity] || COOLING_COLORS.NORMAL;
+  
+  // State-driven color palettes (Presentation Mode)
+  const getStateColors = () => {
+    if (!interactive) {
+      if (systemState === "IMMEDIATE_RISK") {
+        return {
+          base: "#777", // More visible base
+          affected: "#A13A1F", // Amber/dark red
+          affectedStroke: "4.5",
+          pipes: "#666"
+        };
+      } else if (systemState === "EARLY_DRIFT") {
+        return {
+          base: "#777",
+          affected: "#B47A1F", // Muted orange
+          affectedStroke: "4",
+          pipes: "#666"
+        };
+      }
+      // NORMAL
+      return {
+        base: "#777", // Increased from #555 for visibility
+        affected: "#777",
+        affectedStroke: "3",
+        pipes: "#666"
+      };
+    }
+    return null;
+  };
+  
+  const stateColors = getStateColors();
   
   // Adjust animation speed based on mode
   const flowSpeedMultiplier = escalationLevel === 0 ? 1.0 : escalationLevel === 1 ? 1.2 : escalationLevel === 2 ? 1.5 : 1.8;
@@ -109,7 +141,7 @@ export default function ProcessMap({
   const shellThermalColor = getThermalColor(reactorOutletTemp);
   const cooledThermalColor = getThermalColor(coolerOutletTemp);
 
-  // Presentation Mode: Scenario-aware visual behavior
+  // Presentation Mode: Determine which unit is constrained
   const getConstrainedUnit = () => {
     if (!interactive) {
       if (hotSpotRisk === "HIGH" || escalationLevel >= 2) return "reactor";
@@ -121,28 +153,36 @@ export default function ProcessMap({
   };
   
   const constrainedUnit = getConstrainedUnit();
-  const isEscalating = !interactive && escalationLevel >= 1;
-  const isImmediateRisk = !interactive && escalationLevel >= 2;
   
-  // Muting for non-affected equipment in presentation mode
-  const getNonAffectedOpacity = (unitType) => {
-    if (!isEscalating || !constrainedUnit) return 1;
-    if (unitType === constrainedUnit) return 1;
-    // Mute non-affected equipment by 15% maximum
-    return 0.85;
+  // Get equipment stroke based on state
+  const getEquipmentStroke = (unitType) => {
+    if (!interactive && stateColors) {
+      if (unitType === constrainedUnit && systemState !== "NORMAL") {
+        return { color: stateColors.affected, width: stateColors.affectedStroke };
+      }
+      return { color: stateColors.base, width: "3" };
+    }
+    // Interactive mode
+    if (unitType === "reactor") return { color: baseColor, width: "4" };
+    if (unitType === "cooler") return { color: coolerColor, width: "3" };
+    if (unitType === "exchanger") return { color: preheatColor, width: "3" };
+    return { color: "#777", width: "3" };
   };
   
-  // Path emphasis for affected flow paths
-  const getPathEmphasis = (pathType) => {
-    if (!isEscalating || !constrainedUnit) return { strokeWidth: "4", opacity: 0.9 };
-    const isAffectedPath = 
-      (constrainedUnit === "reactor" && ["feed", "reactor-in", "reactor-out"].includes(pathType)) ||
-      (constrainedUnit === "cooler" && ["cooler-in", "cooler-out"].includes(pathType)) ||
-      (constrainedUnit === "exchanger" && ["exchanger-tube", "exchanger-shell"].includes(pathType));
-    return {
-      strokeWidth: isAffectedPath ? "5" : "4",
-      opacity: isAffectedPath ? 1 : 0.85
-    };
+  // Subtle muting for non-affected equipment
+  const getNonAffectedOpacity = (unitType) => {
+    if (!interactive && constrainedUnit && systemState !== "NORMAL") {
+      return unitType === constrainedUnit ? 1 : 0.92;
+    }
+    return 1;
+  };
+  
+  // Path styling based on state
+  const getPathStyle = () => {
+    if (!interactive && stateColors) {
+      return { stroke: stateColors.pipes, strokeWidth: "4", opacity: 0.9 };
+    }
+    return { stroke: "#555", strokeWidth: "4", opacity: 0.9 };
   };
 
   return (
@@ -171,9 +211,9 @@ export default function ProcessMap({
         
         {/* FEED FILTER F-1 */}
         <g transform={`translate(${ANCHORS.F1.x}, ${ANCHORS.F1.y})`} onClick={() => handleUnitClick('f1')} className={cn(interactive && "cursor-pointer")}>
-          <ellipse cx="0" cy={-SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#1a1a1a" stroke="#555" strokeWidth="2.5" />
-          <rect x={-SIZES.F1.w/2} y={-SIZES.F1.h/2} width={SIZES.F1.w} height={SIZES.F1.h} fill="#2a2a2a" stroke="#555" strokeWidth="3" filter="url(#equipmentShadow)" />
-          <ellipse cx="0" cy={SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#2a2a2a" stroke="#555" strokeWidth="2.5" />
+          <ellipse cx="0" cy={-SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#1a1a1a" stroke={stateColors?.base || "#555"} strokeWidth="2.5" />
+          <rect x={-SIZES.F1.w/2} y={-SIZES.F1.h/2} width={SIZES.F1.w} height={SIZES.F1.h} fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="3" filter="url(#equipmentShadow)" />
+          <ellipse cx="0" cy={SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="2.5" />
           {[-30, -10, 10, 30].map(y => (
             <line key={y} x1={-SIZES.F1.w/3} y1={y} x2={SIZES.F1.w/3} y2={y} stroke="#444" strokeWidth="1.8" opacity="0.9" />
           ))}
@@ -187,7 +227,7 @@ export default function ProcessMap({
         </g>
 
         {/* SPINE: F-1 → TCV-01B */}
-        <line x1={ANCHORS.F1.x + SIZES.F1.w/2} y1={Y_SPINE} x2={VALVES.TCV01B.x - 20} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1={ANCHORS.F1.x + SIZES.F1.w/2} y1={Y_SPINE} x2={VALVES.TCV01B.x - 20} y2={Y_SPINE} {...getPathStyle()} />
         <circle cx={(ANCHORS.F1.x + VALVES.TCV01B.x)/2} cy={Y_SPINE} r="4" fill="#2F5D80">
           <animate attributeName="cx" values={`${ANCHORS.F1.x + SIZES.F1.w/2};${VALVES.TCV01B.x - 20}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
@@ -199,16 +239,23 @@ export default function ProcessMap({
         </g>
         
         {/* SPINE: TCV-01B → E-1 Tube Inlet */}
-        <line x1={VALVES.TCV01B.x + 20} y1={Y_SPINE} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1={VALVES.TCV01B.x + 20} y1={Y_SPINE} x2={ANCHORS.E1.x - SIZES.E1.w/2} y2={Y_SPINE} {...getPathStyle()} />
         <circle cx={(VALVES.TCV01B.x + ANCHORS.E1.x)/2} cy={Y_SPINE} r="4" fill="#2F5D80">
           <animate attributeName="cx" values={`${VALVES.TCV01B.x + 20};${ANCHORS.E1.x - SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* MAIN EXCHANGER E-1 (Tube = Cold Feed, Shell = Hot Effluent) */}
         <g transform={`translate(${ANCHORS.E1.x}, ${ANCHORS.E1.y})`} onClick={() => handleUnitClick('e1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("exchanger")}>
-          <ellipse cx={-SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#1a1a1a" stroke={interactive ? preheatColor : constrainedUnit === "exchanger" ? (isImmediateRisk ? "#A13A1F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "2.5" : constrainedUnit === "exchanger" ? (isImmediateRisk ? "3.5" : "3") : "2.5"} className="transition-all duration-700" />
-          <rect x={-SIZES.E1.w/2} y={-SIZES.E1.h/2 + 8} width={SIZES.E1.w} height={SIZES.E1.h - 16} fill="#2a2a2a" stroke={interactive ? preheatColor : constrainedUnit === "exchanger" ? (isImmediateRisk ? "#A13A1F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "3" : constrainedUnit === "exchanger" ? (isImmediateRisk ? "4" : "3.5") : "3"} filter="url(#equipmentShadow)" className="transition-all duration-700" />
-          <ellipse cx={SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#2a2a2a" stroke={interactive ? preheatColor : constrainedUnit === "exchanger" ? (isImmediateRisk ? "#A13A1F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "2.5" : constrainedUnit === "exchanger" ? (isImmediateRisk ? "3.5" : "3") : "2.5"} className="transition-all duration-700" />
+          {(() => {
+            const stroke = getEquipmentStroke("exchanger");
+            return (
+              <>
+                <ellipse cx={-SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#1a1a1a" stroke={stroke.color} strokeWidth="2.5" className="transition-all duration-700" />
+                <rect x={-SIZES.E1.w/2} y={-SIZES.E1.h/2 + 8} width={SIZES.E1.w} height={SIZES.E1.h - 16} fill="#2a2a2a" stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+                <ellipse cx={SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#2a2a2a" stroke={stroke.color} strokeWidth="2.5" className="transition-all duration-700" />
+              </>
+            );
+          })()}
           
           {[-50, -35, -20, -5, 10, 25, 40, 55].map(yOffset => (
             <line key={yOffset} x1={-SIZES.E1.w/2 + 12} y1={yOffset} x2={SIZES.E1.w/2 - 12} y2={yOffset} stroke="#444" strokeWidth="1.5" opacity="0.9" />
@@ -258,28 +305,35 @@ export default function ProcessMap({
 
         {/* E-1 Tube Out → Reactor Inlet (Top Nozzle Entry) */}
         {/* Vertical rise from E-1 outlet to top nozzle elevation */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke="#555" strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
         <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
           <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
         
         {/* Horizontal run to reactor centerline at top */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} stroke="#555" strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
         <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
         
         {/* Short vertical nozzle penetration into reactor top */}
-        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} stroke="#555" strokeWidth={getPathEmphasis("reactor-in").strokeWidth} opacity={getPathEmphasis("reactor-in").opacity} className="transition-all duration-700" />
+        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} {...getPathStyle()} className="transition-all duration-700" />
         <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={tubeThermalColor}>
           <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
         <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("reactor")}>
-          <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#1a1a1a" stroke={interactive ? baseColor : constrainedUnit === "reactor" ? (isImmediateRisk ? "#A13A1F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "3" : constrainedUnit === "reactor" ? (isImmediateRisk ? "5" : "4") : "3"} className="transition-all duration-700" />
-          <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill="#2a2a2a" stroke={interactive ? baseColor : constrainedUnit === "reactor" ? (isImmediateRisk ? "#A13A1F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "4" : constrainedUnit === "reactor" ? (isImmediateRisk ? "6" : "5") : "4"} filter="url(#equipmentShadow)" className="transition-all duration-700" />
-          <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#2a2a2a" stroke={interactive ? baseColor : constrainedUnit === "reactor" ? (isImmediateRisk ? "#A13A1F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "3" : constrainedUnit === "reactor" ? (isImmediateRisk ? "5" : "4") : "3"} className="transition-all duration-700" />
+          {(() => {
+            const stroke = getEquipmentStroke("reactor");
+            return (
+              <>
+                <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#1a1a1a" stroke={stroke.color} strokeWidth="3" className="transition-all duration-700" />
+                <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill="#2a2a2a" stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+                <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#2a2a2a" stroke={stroke.color} strokeWidth="3" className="transition-all duration-700" />
+              </>
+            );
+          })()}
           
           {bedImbalance && bedImbalance.beds.map((bed, idx) => {
             const bedHeight = 70;
@@ -352,8 +406,9 @@ export default function ProcessMap({
             );
           })}
           
+          {/* Glow effect only in interactive mode */}
           {interactive && escalationLevel >= 2 && (
-            <rect x={-SIZES.R1.w/2 + 5} y={-SIZES.R1.h/2 + 5} width={SIZES.R1.w - 10} height={SIZES.R1.h - 10} fill="url(#reactorGlow)" opacity="1.08" className={escalationLevel >= 3 ? "animate-[pulse_1.2s_ease-in-out_infinite]" : "transition-opacity duration-500"} />
+            <rect x={-SIZES.R1.w/2 + 5} y={-SIZES.R1.h/2 + 5} width={SIZES.R1.w - 10} height={SIZES.R1.h - 10} fill="url(#reactorGlow)" opacity="0.15" className="transition-opacity duration-500" />
           )}
           
           <text x={-SIZES.R1.w/2 - 40} y={SIZES.R1.h/2 + 12} fill="#aaa" fontSize="22" textAnchor="end" fontWeight="bold">R-1</text>
@@ -378,7 +433,7 @@ export default function ProcessMap({
         {/* === SHELL-SIDE OUTLET: REACTOR → LOWER ZONE === */}
         
         {/* Reactor outlet — Vertical drop to split point */}
-        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y + SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={Y_LOWER_ZONE - 20} stroke="#555" strokeWidth={getPathEmphasis("reactor-out").strokeWidth} opacity={getPathEmphasis("reactor-out").opacity} className="transition-all duration-700" />
+        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y + SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={Y_LOWER_ZONE - 20} {...getPathStyle()} className="transition-all duration-700" />
         <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y + SIZES.R1.h/2 + 30} r="4" fill={shellThermalColor}>
           <animate attributeName="cy" values={`${ANCHORS.R1.y + SIZES.R1.h/2};${Y_LOWER_ZONE - 20}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
@@ -484,7 +539,12 @@ export default function ProcessMap({
 
         {/* EFFLUENT COOLER E-2 */}
         <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={() => handleUnitClick('e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")} opacity={getNonAffectedOpacity("cooler")}>
-          <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={interactive ? coolerColor : constrainedUnit === "cooler" ? (isImmediateRisk ? "#A13A1F" : "#B47A1F") : "#555"} strokeWidth={interactive ? "3" : constrainedUnit === "cooler" ? (isImmediateRisk ? "4" : "3.5") : "3"} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+          {(() => {
+            const stroke = getEquipmentStroke("cooler");
+            return (
+              <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+            );
+          })()}
           {[-60, -40, -20, 0, 20, 40, 60].map(y => (
             <line key={y} x1={-SIZES.E2.w/2 + 16} y1={y} x2={SIZES.E2.w/2 - 16} y2={y} stroke="#2F5D80" strokeWidth="2.5" opacity="0.54" />
           ))}
@@ -525,16 +585,16 @@ export default function ProcessMap({
         </g>
 
         {/* SPINE: E-2 → D-1 */}
-        <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_SPINE} x2={ANCHORS.D1.x - SIZES.D1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_SPINE} x2={ANCHORS.D1.x - SIZES.D1.w/2} y2={Y_SPINE} {...getPathStyle()} />
         <circle cx={(ANCHORS.E2.x + ANCHORS.D1.x)/2} cy={Y_SPINE} r="4" fill={cooledThermalColor}>
           <animate attributeName="cx" values={`${ANCHORS.E2.x + SIZES.E2.w/2};${ANCHORS.D1.x - SIZES.D1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* THREE-PHASE SEPARATOR D-1 — Terminal Unit */}
         <g transform={`translate(${ANCHORS.D1.x}, ${ANCHORS.D1.y})`} onClick={() => handleUnitClick('d1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("separator")}>
-          <ellipse cx={-SIZES.D1.w/2} cy="0" rx="10" ry={SIZES.D1.h/2 - 4} fill="#1a1a1a" stroke="#555" strokeWidth="3" className="transition-all duration-700" />
-          <rect x={-SIZES.D1.w/2} y={-SIZES.D1.h/2 + 4} width={SIZES.D1.w} height={SIZES.D1.h - 8} fill="#2a2a2a" stroke="#555" strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-700" />
-          <ellipse cx={SIZES.D1.w/2} cy="0" rx="10" ry={SIZES.D1.h/2 - 4} fill="#2a2a2a" stroke="#555" strokeWidth="3" className="transition-all duration-700" />
+          <ellipse cx={-SIZES.D1.w/2} cy="0" rx="10" ry={SIZES.D1.h/2 - 4} fill="#1a1a1a" stroke={stateColors?.base || "#555"} strokeWidth="3" className="transition-all duration-700" />
+          <rect x={-SIZES.D1.w/2} y={-SIZES.D1.h/2 + 4} width={SIZES.D1.w} height={SIZES.D1.h - 8} fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-700" />
+          <ellipse cx={SIZES.D1.w/2} cy="0" rx="10" ry={SIZES.D1.h/2 - 4} fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="3" className="transition-all duration-700" />
           
           <rect x={-SIZES.D1.w/2 + 10} y={-SIZES.D1.h/2 + 10} width={SIZES.D1.w - 20} height={28} fill="#333" opacity="0.3" />
           <text x="0" y={-SIZES.D1.h/2 + 30} fill="#888" fontSize="16" textAnchor="middle">Gas</text>
