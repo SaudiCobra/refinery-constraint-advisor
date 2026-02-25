@@ -761,9 +761,9 @@ export default function ProcessMap({
           {selectedUnit === 'e2' && (
             <>
               <h4 className="text-[#aaa] text-sm font-bold mb-2">E-2 Effluent Cooler</h4>
-              <p className="text-[#ccc] text-xs">Capacity: {coolingCapacity}</p>
+              <p className="text-[#ccc] text-xs">Capacity: {coolingCapacity === "SEVERELY_LIMITED" ? "Severely Limited" : coolingCapacity === "REDUCED" ? "Reduced" : "Normal"}</p>
               <p className="text-[#ccc] text-xs mt-1">Status: {equipment.effluentCooler ? "Online" : "OFFLINE"}</p>
-              {coolingCapacity === "SEVERELY_LIMITED" && <p className="text-[#A13A1F] text-xs mt-2 font-semibold">Heat removal limited</p>}
+              {coolingCapacity === "SEVERELY_LIMITED" && <p className="text-[#A13A1F] text-xs mt-2 font-semibold">Heat removal severely limited</p>}
             </>
           )}
           
