@@ -70,6 +70,15 @@ export default function Home() {
   const [simRunning, setSimRunning] = useState(true);
   const [mitigationMsg, setMitigationMsg] = useState("");
 
+  // ── Mitigation toggle state ───────────────────────────────────────────────
+  const [feedReductionActive, setFeedReductionActive] = useState(false);
+  const [quenchBoostActive,   setQuenchBoostActive]   = useState(false);
+  const [coolingBoostActive,  setCoolingBoostActive]  = useState(false);
+  // Mirror to refs so the tick can read them without stale closure
+  const feedReductionRef = useRef(false);
+  const quenchBoostRef   = useRef(false);
+  const coolingBoostRef  = useRef(false);
+
   // Smoothed TTL for display (prevents jumps > 3 min per tick)
   const [smoothedTTL, setSmoothedTTL] = useState(null);
   const simTempRef = useRef(358.0);
