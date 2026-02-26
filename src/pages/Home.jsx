@@ -433,8 +433,8 @@ export default function Home() {
               timeToNearest={displayTTL}
               escalationLevel={escalationLevel}
               slope={displaySlope}
-              uiState={explicitUiState}
-              demoTimeMin={demoTimeMin}
+              uiState={systemState}
+              demoTimeMin={displayTTL}
               demoState={demoState}
             />
             
