@@ -286,11 +286,15 @@ export default function Home() {
     }
   }
   
-  let escalationLevel = getEscalationLevel(timeToNearest, activePreheatMode, effectiveSlope, coolingCapacity);
-  
-  // Adjust escalation for hot spot risk
-  escalationLevel = adjustEscalationForHotSpot(escalationLevel, hotSpotRisk, timeToNearest);
-  const alarmState = getAlarmState(currentValue, activeData.limits);
+  const escalationLevel = adjustEscalationForHotSpot(
+    getEscalationLevel(timeToNearest, activePreheatMode, effectiveSlope, coolingCapacity),
+    hotSpotRisk,
+    timeToNearest
+  );
+  // Derive systemState and uiState directly from timeToNearest (4-band model)
+  const computedState = getSystemState(timeToNearest);
+  const systemState   = explicitUiState || computedState;
+  const alarmState    = getAlarmState(currentValue, activeData.limits);
   
   // Apply smoothing to prevent instant jumps (2-3 second interpolation)
   useEffect(() => {
