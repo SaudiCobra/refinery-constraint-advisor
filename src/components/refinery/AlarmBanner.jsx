@@ -18,7 +18,7 @@ const BANNER_CONFIG = {
     bg: "bg-[#1a1210]",
     border: "border-[#A13A1F]",
     text: "text-[#D4653F]",
-    message: "System State: Severe Drift — Cooling capacity limited",
+    message: "System State: Severe Drift — Operating limit approaching rapidly",
   },
   IMMEDIATE_RISK: {
     bg: "bg-[#140a0a]",
@@ -76,28 +76,21 @@ export default function AlarmBanner({
   slope,
   preheatStatus,
   uiState,
+  demoState,
 }) {
-  // Use explicit uiState if provided (scenario-driven), else determine from conditions
-  let bannerKey = uiState || "NORMAL";
+  // Demo state takes priority, then explicit uiState, then inference
+  const activeState = demoState || uiState;
+  let bannerKey = activeState || "NORMAL";
   
-  if (!uiState) {
-    // Legacy inference logic when uiState is not provided
+  if (!activeState) {
     if (!alarmsOnly) {
-      if (hotSpotRisk === "HIGH") {
-        bannerKey = "HOTSPOT";
-      } else if (timeToNearest < 10 && timeToNearest > 0) {
-        bannerKey = "IMMEDIATE_RISK";
-      } else if (coolingCapacity === "CONSTRAINED") {
-        bannerKey = "CONSTRAINED";
-      } else if (!equipment?.h2Compressor && escalationLevel >= 1) {
-        bannerKey = "MODERATION";
-      } else if (slope > 1.5 || preheatStatus?.includes("stress")) {
-        bannerKey = "EARLY_DRIFT";
-      } else if (escalationLevel >= 1) {
-        bannerKey = "EARLY_DRIFT";
-      }
+      if (hotSpotRisk === "HIGH") bannerKey = "HOTSPOT";
+      else if (timeToNearest < 1 && timeToNearest > 0) bannerKey = "IMMEDIATE_RISK";
+      else if (timeToNearest < 10 && timeToNearest > 0) bannerKey = "SEVERE_DRIFT";
+      else if (!equipment?.h2Compressor && escalationLevel >= 1) bannerKey = "MODERATION";
+      else if (slope > 1.5 || preheatStatus?.includes("stress")) bannerKey = "EARLY_DRIFT";
+      else if (escalationLevel >= 1) bannerKey = "EARLY_DRIFT";
     } else {
-      // Alarms-only mode uses traditional alarm states
       bannerKey = alarmState === "NORMAL" ? "NORMAL" : alarmState === "HIGH" ? "EARLY_DRIFT" : "IMMEDIATE_RISK";
     }
   }

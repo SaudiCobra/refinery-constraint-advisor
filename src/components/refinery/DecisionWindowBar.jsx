@@ -1,6 +1,8 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
+import { formatDemoTime } from "./HeroMetric";
+
 export default function DecisionWindowBar({ 
   timeToNearest, 
   escalationLevel,
@@ -9,52 +11,56 @@ export default function DecisionWindowBar({
   hotSpotRisk,
   slope,
   currentTemp,
+  demoTimeMin,
+  demoState,
 }) {
-  // Compute bar fill percentage (cap at 30 minutes for visual scale)
-  const maxTime = 30;
-  const fillPercent = timeToNearest === Infinity || timeToNearest == null 
+  const activeTime = (demoTimeMin !== null && demoTimeMin !== undefined) ? demoTimeMin : timeToNearest;
+
+  // Bar scale = 35 min so EARLY_DRIFT fills nicely
+  const maxTime = 35;
+  const fillPercent = activeTime === Infinity || activeTime == null 
     ? 100 
-    : Math.min(100, (timeToNearest / maxTime) * 100);
+    : Math.min(100, (activeTime / maxTime) * 100);
   
-  // Gradient color based on time with smooth transitions
+  // Color aligned to 4 states
   const getBarColor = (time) => {
     if (time === Infinity || time == null) return "#3a3a3a";
-    if (time < 5) return "#7A0F0F"; // Deep crimson
-    if (time < 10) return "#A13A1F"; // Burnt orange
-    if (time < 20) return "#B47A1F"; // Amber
-    return "#3a3a3a"; // Neutral grey
+    if (time < 1)  return "#7A0F0F"; // IMMEDIATE_RISK — deep red
+    if (time < 5)  return "#A13A1F"; // SEVERE_DRIFT — burnt orange
+    if (time <= 35) return "#D35400"; // EARLY_DRIFT — orange
+    return "#3a3a3a"; // NORMAL — neutral grey
   };
   
-  const barColor = getBarColor(timeToNearest);
+  const barColor = getBarColor(activeTime);
   
-  const timeDisplay = timeToNearest === Infinity || timeToNearest == null 
-    ? "—" 
-    : `${Math.round(timeToNearest)} min`;
+  const timeDisplay = activeTime === Infinity || activeTime == null
+    ? "—"
+    : formatDemoTime(activeTime);
   
-  // Determine primary constraint
+  // Determine primary operating limit
   const getPrimaryConstraint = () => {
+    if (demoState === "IMMEDIATE_RISK") return "Primary operating limit: Immediate escalation — reactor approaching trip threshold";
+    if (demoState === "SEVERE_DRIFT")   return "Primary operating limit: Effluent temperature approaching Hi-Hi alarm";
+    if (demoState === "EARLY_DRIFT")    return "Primary operating limit: Reactor outlet temperature drifting toward High alarm";
     if (hotSpotRisk === "HIGH") {
-      return "Primary constraint: Reactor bed temperature imbalance approaching runaway threshold";
+      return "Primary operating limit: Reactor bed temperature imbalance approaching runaway threshold";
     }
     if (coolingCapacity === "SEVERELY_LIMITED" && escalationLevel >= 2) {
-      return "Primary constraint: Effluent cooler heat removal capacity insufficient";
+      return "Primary operating limit: Effluent cooler heat removal capacity insufficient";
     }
     if (!equipment?.h2Compressor && escalationLevel >= 1) {
-      return "Primary constraint: Hydrogen quench system unavailable for moderation";
+      return "Primary operating limit: Hydrogen quench system unavailable for moderation";
     }
-    if (currentTemp >= 375) {
-      return "Primary constraint: Reactor outlet temperature approaching high limit";
-    }
-    if (slope > 2.0) {
-      return "Primary constraint: Temperature rise rate exceeding normal operating envelope";
-    }
-    if (escalationLevel >= 1) {
-      return "Primary constraint: Reactor outlet temperature approaching high limit";
+    if (currentTemp >= 375 || escalationLevel >= 1) {
+      return "Primary operating limit: Reactor outlet temperature approaching High alarm";
     }
     return null;
   };
   
   const primaryConstraint = getPrimaryConstraint();
+  
+  // Resolve actual escalationLevel from demoState for lever relationship logic
+  const activeEscalation = demoState === "IMMEDIATE_RISK" ? 3 : demoState === "SEVERE_DRIFT" ? 2 : demoState === "EARLY_DRIFT" ? 1 : escalationLevel;
   
   // Trend credibility statement
   const getTrendCredibility = () => {
@@ -78,64 +84,26 @@ export default function DecisionWindowBar({
   
   const trendCredibility = getTrendCredibility();
   
-  // Constraint-lever relationship (explanatory only)
+  // Operating-limit lever relationship (explanatory only)
   const getConstraintLeverRelationship = () => {
     if (!primaryConstraint) return null;
-    
-    // Check available flexibility
-    const hasCoolingHeadroom = coolingCapacity !== "SEVERELY_LIMITED";
-    const hasH2Availability = equipment?.h2Compressor;
+    const hasCoolingHeadroom  = coolingCapacity !== "SEVERELY_LIMITED";
+    const hasH2Availability   = equipment?.h2Compressor;
     const hasBypassFlexibility = equipment?.bypassValve;
-    
-    // Build contextual explanation based on constraint and available levers
-    if (hotSpotRisk === "HIGH") {
-      if (hasH2Availability && hasCoolingHeadroom) {
-        return "Mitigation flexibility exists due to hydrogen moderation headroom and available cooling capacity";
-      }
-      if (hasH2Availability) {
-        return "Limited mitigation flexibility exists due to hydrogen moderation capability, though cooling capacity severely limited";
-      }
-      return "Mitigation flexibility severely restricted due to hydrogen system unavailability and cooling constraints";
+
+    if (hasCoolingHeadroom && hasH2Availability && hasBypassFlexibility) {
+      return "Mitigation flexibility available via cooling, hydrogen moderation, and bypass routing";
     }
-    
-    if (coolingCapacity === "SEVERELY_LIMITED") {
-      if (hasH2Availability && hasBypassFlexibility) {
-        return "Alternative response flexibility exists through hydrogen moderation and bypass routing adjustment";
-      }
-      if (hasH2Availability) {
-        return "Response flexibility exists primarily through hydrogen moderation authority";
-      }
-      return "Response flexibility severely restricted with cooling and hydrogen systems constrained";
+    if (hasCoolingHeadroom && hasH2Availability) {
+      return "Mitigation flexibility through cooling capacity and hydrogen moderation";
     }
-    
-    if (!equipment?.h2Compressor) {
-      if (hasCoolingHeadroom && hasBypassFlexibility) {
-        return "Response flexibility exists through cooling capacity and bypass routing, though hydrogen moderation unavailable";
-      }
-      if (hasCoolingHeadroom) {
-        return "Response flexibility limited primarily to cooling capacity adjustment";
-      }
-      return "Response flexibility severely restricted with hydrogen and cooling systems constrained";
+    if (hasCoolingHeadroom) {
+      return "Mitigation flexibility limited to remaining cooling capacity";
     }
-    
-    // Temperature-based constraints
-    if (currentTemp >= 375 || escalationLevel >= 1) {
-      if (hasCoolingHeadroom && hasH2Availability && hasBypassFlexibility) {
-        return "Available mitigation flexibility exists due to remaining cooling capacity and hydrogen moderation headroom";
-      }
-      if (hasCoolingHeadroom && hasH2Availability) {
-        return "Mitigation flexibility exists through cooling and hydrogen moderation, bypass routing limited";
-      }
-      if (hasCoolingHeadroom) {
-        return "Mitigation flexibility exists primarily through remaining cooling capacity";
-      }
-      if (hasH2Availability) {
-        return "Mitigation flexibility exists primarily through hydrogen moderation capability";
-      }
-      return "Mitigation flexibility severely restricted due to equipment and capacity constraints";
+    if (hasH2Availability) {
+      return "Mitigation flexibility limited to hydrogen moderation authority";
     }
-    
-    return null;
+    return "Mitigation flexibility severely restricted — all primary levers constrained";
   };
   
   const constraintLeverRelationship = getConstraintLeverRelationship();
