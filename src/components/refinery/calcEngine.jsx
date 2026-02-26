@@ -166,11 +166,17 @@ export function getRecommendation(level, nearest, equipment, coolingCapacity, pr
 }
 
 // Interactive Mode Demo Scenarios (4 only - scenario-driven with explicit uiState)
+// baseRoR per scenario: (highLimit=370 - currentTemp) / targetTTL
+// NORMAL:        margin=18, TTL≈60min → baseRoR=0.30°C/min  (step=0.60°C per 2-min interval)
+// EARLY_DRIFT:   margin=10, TTL≈29min → baseRoR=0.35°C/min  (step=0.70°C per 2-min interval)
+// SEVERE_DRIFT:  margin=8,  TTL≈10min → baseRoR=0.80°C/min  (step=1.60°C per 2-min interval)
+// IMMEDIATE_RISK: margin=4, TTL≈3min  → baseRoR=1.35°C/min  (step=2.70°C per 2-min interval)
 export const DEMO_SCENARIOS = {
   NORMAL: {
     name: "NORMAL",
     uiState: "NORMAL",
-    samples: [348, 349, 350, 351, 352],
+    // currentTemp=352, margin=18, baseRoR=0.30°C/min, TTL=60 min
+    samples: [349.6, 350.2, 350.8, 351.4, 352.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
     feedFlow: 84000,
@@ -180,7 +186,8 @@ export const DEMO_SCENARIOS = {
   EARLY_DRIFT: {
     name: "EARLY_DRIFT",
     uiState: "EARLY_DRIFT",
-    samples: [352, 354, 356, 358, 360],
+    // currentTemp=360, margin=10, baseRoR=0.35°C/min, TTL≈28.6 min
+    samples: [357.2, 357.9, 358.6, 359.3, 360.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
     feedFlow: 87000,
@@ -190,7 +197,8 @@ export const DEMO_SCENARIOS = {
   SEVERE_DRIFT: {
     name: "SEVERE_DRIFT",
     uiState: "SEVERE_DRIFT",
-    samples: [360, 362, 364, 366, 368],
+    // currentTemp=362, margin=8, baseRoR=0.80°C/min, TTL=10 min
+    samples: [355.6, 357.2, 358.8, 360.4, 362.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: true },
     feedFlow: 91000,
@@ -200,7 +208,8 @@ export const DEMO_SCENARIOS = {
   IMMEDIATE_RISK: {
     name: "IMMEDIATE_RISK",
     uiState: "IMMEDIATE_RISK",
-    samples: [368, 370, 372, 374, 376],
+    // currentTemp=366, margin=4, baseRoR=1.35°C/min, TTL≈2.96 min
+    samples: [355.2, 357.9, 360.6, 363.3, 366.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: false },
     feedFlow: 95000,
