@@ -234,11 +234,8 @@ export default function Home() {
   const currentValue = activeData.samples[activeData.samples.length - 1];
   const baseSlope = computeRateOfRise(activeData.samples, activeData.interval);
   
-  // Apply mitigation engine — inject feedReduction lever (interactive mode only)
-  const mitigationEquipment = (displayMode === "interactive" && feedReductionActive)
-    ? { ...activeData.equipment, bypassValve: true, _feedReductionOverride: true }
-    : activeData.equipment;
-  const mitigationResult = computeMitigatedRoR(baseSlope, mitigationEquipment, systemState, feedReductionActive && displayMode === "interactive");
+  // Apply mitigation engine
+  const mitigationResult = computeMitigatedRoR(baseSlope, activeData.equipment, systemState, false);
   const effectiveSlope = mitigationResult.effectiveRoR;
   
   const constraints = computeAllConstraints(currentValue, activeData.limits, effectiveSlope);
