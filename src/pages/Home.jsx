@@ -75,12 +75,13 @@ export default function Home() {
   const simTempRef = useRef(352);
   const simRoRRef  = useRef(0.30);
 
-  // Scenario-band RoR clamps
-  const ROR_CLAMPS = {
-    NORMAL:         { min: 0.10, max: 0.55, noise: 0.04 },
-    EARLY_DRIFT:    { min: 0.25, max: 0.70, noise: 0.05 },
-    SEVERE_DRIFT:   { min: 0.55, max: 1.20, noise: 0.06 },
-    IMMEDIATE_RISK: { min: 0.90, max: 2.00, noise: 0.07 },
+  // ── Band definitions: TTL [lo, hi] in minutes, RoR clamps, and noise ───────
+  // These drive both seeding and continuous soft-steering.
+  const BAND_CONFIG = {
+    NORMAL:         { ttlLo: 36, ttlHi: 60, rorMin: 0.10, rorMax: 0.40, noise: 0.025, steerK: 0.012 },
+    EARLY_DRIFT:    { ttlLo: 10, ttlHi: 35, rorMin: 0.28, rorMax: 0.75, noise: 0.035, steerK: 0.018 },
+    SEVERE_DRIFT:   { ttlLo:  5, ttlHi: 10, rorMin: 0.60, rorMax: 1.30, noise: 0.045, steerK: 0.030 },
+    IMMEDIATE_RISK: { ttlLo:  0.3, ttlHi: 5, rorMin: 1.00, rorMax: 2.20, noise: 0.055, steerK: 0.060 },
   };
 
   // Derive computed TTL + state from sim vars (pure function, no state)
