@@ -337,8 +337,7 @@ export default function Home() {
             />
 
             <MitigationCapacity 
-              escalationLevel={escalationLevel}
-              timeToNearest={timeToNearest}
+              systemState={systemState}
             />
 
             <CoolingCapacityIndicator capacity={coolingCapacity} />
