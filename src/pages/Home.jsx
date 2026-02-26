@@ -278,44 +278,34 @@ export default function Home() {
       })()
     : state;
 
-  // Get explicit uiState from scenario (if in demo mode)
-  const explicitUiState = activeData.demoScenario || null;
-  
-  // Calculations
-  const currentValue = activeData.samples[activeData.samples.length - 1];
-  const baseSlope = computeRateOfRise(activeData.samples, activeData.interval);
-  
-  // Apply mitigation engine
-  const mitigationResult = computeMitigatedRoR(baseSlope, activeData.equipment, systemState, false);
-  const effectiveSlope = mitigationResult.effectiveRoR;
-  
-  const constraints = computeAllConstraints(currentValue, activeData.limits, effectiveSlope);
-  const nearest = getNearestConstraint(constraints);
-  const baseTimeToNearest = nearest ? nearest.time : Infinity;
-  
-  // Bed imbalance and hot spot risk
-  const beds = simulateBedTemperatures(currentValue, effectiveSlope, activeData.equipment, 0);
-  const bedImbalance = computeBedImbalance(beds);
-  
-  // Cooling capacity assessment
-  const coolingCapacity = computeCoolingCapacity(activeData.equipment, effectiveSlope, baseTimeToNearest);
-  
-  // Hot spot risk
-  const hotSpotRisk = computeHotSpotRisk(bedImbalance, activeData.equipment, coolingCapacity, effectiveSlope);
-  
-  // Compute mitigated time-to-limit
-  const highLimit = activeData.limits.hi || activeData.limits.hihi || 370;
-  let calculatedTTL = computeMitigatedTimeToLimit(currentValue, highLimit, effectiveSlope);
-  
-  // Clamp to baseline (prevent over-extension)
-  calculatedTTL = clampTimeToBaseline(calculatedTTL, systemState);
-  
-  // Adjust time based on cooling capacity
-  let timeToNearest = adjustTimeToConstraint(calculatedTTL, coolingCapacity);
-  if (hotSpotRisk === "HIGH") timeToNearest = timeToNearest * 0.9;
+  // ── Determine active temperature and RoR depending on mode ──────────────────
+  // Interactive: use live physics sim; Presentation: use scenario sample data.
+  const isInteractive = displayMode === "interactive";
 
-  // --- SINGLE SOURCE OF TRUTH: derive all state from timeToNearest ---
-  
+  const currentValue  = isInteractive ? simTemp   : activeData.samples[activeData.samples.length - 1];
+  const effectiveSlope = isInteractive ? simRoR   : computeRateOfRise(activeData.samples, activeData.interval);
+
+  // ── Compute TTL (single source of truth) ────────────────────────────────────
+  // Interactive: use smoothed physics TTL | Presentation: derive from samples
+  const highLimit = Number(activeData.limits?.hi || 370);
+  const rawPhysicsTTL = getSimTTL(currentValue, effectiveSlope, activeData.limits);
+  const physicsTTL   = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
+
+  const constraints = computeAllConstraints(currentValue, activeData.limits, effectiveSlope);
+  const nearest     = getNearestConstraint(constraints);
+
+  // timeToNearest is THE single source for all state derivation
+  const timeToNearest = isInteractive ? physicsTTL : (nearest ? nearest.time : Infinity);
+
+  // ── Ancillary calculations (all derived, never override timeToNearest) ───────
+  const beds = simulateBedTemperatures(currentValue, effectiveSlope, activeData.equipment, 0);
+  const bedImbalance    = computeBedImbalance(beds);
+  const coolingCapacity = computeCoolingCapacity(activeData.equipment, effectiveSlope, timeToNearest);
+  const hotSpotRisk     = computeHotSpotRisk(bedImbalance, activeData.equipment, coolingCapacity, effectiveSlope);
+
+  // Get explicit uiState from scenario (if set)
+  const explicitUiState = activeData.demoScenario || null;
+
   // Preheat status - use demonstration stage preheat mode if active
   const ACTIVATION_LOWER = 280;
   const ACTIVATION_UPPER = 330;
