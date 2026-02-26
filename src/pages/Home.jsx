@@ -376,9 +376,9 @@ export default function Home() {
     if (currentValue < ACTIVATION_LOWER) {
       preheatStatus = "Below activation window";
     } else if (currentValue >= ACTIVATION_LOWER && currentValue <= ACTIVATION_UPPER) {
-      if (slope > 1.5) {
+      if (effectiveSlope > 1.5) {
         preheatStatus = "Thermal stress risk";
-      } else if (slope > 1.0) {
+      } else if (effectiveSlope > 1.0) {
         preheatStatus = "Above recommended ramp";
       } else {
         preheatStatus = "Within envelope";
