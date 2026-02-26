@@ -148,34 +148,40 @@ export default function Home() {
     return () => clearInterval(tick);
   }, [simRunning, displayMode, state.limits]);
 
-  // Corrective action handler
+  // Corrective action: reduce RoR to extend window
   const handleMitigate = (action) => {
-    const adds = {
-      feedReduction: { NORMAL: 2, EARLY_DRIFT: 10, SEVERE_DRIFT: 2, IMMEDIATE_RISK: 0.7 },
-      quench:        { NORMAL: 1, EARLY_DRIFT: 5,  SEVERE_DRIFT: 1, IMMEDIATE_RISK: 0.4 },
-      cooling:       { NORMAL: 1, EARLY_DRIFT: 6,  SEVERE_DRIFT: 1.5, IMMEDIATE_RISK: 0.5 },
-    };
-    const caps = { NORMAL: 90, EARLY_DRIFT: 60, SEVERE_DRIFT: 10, IMMEDIATE_RISK: 5 };
-    const delta = adds[action]?.[demoState] || 0;
-    const cap = caps[demoState] || 90;
+    const rorReductions = { feedReduction: 0.15, quench: 0.08, cooling: 0.10 };
     const labels = { feedReduction: "Feed reduced", quench: "Quench increased", cooling: "Cooling boosted" };
-    setDemoTimeMin(prev => Math.min(cap, prev + delta));
-    setMitigationMsg(`${labels[action]} — window extended by ${delta < 1 ? (delta*60|0)+"s" : delta+"min"}.`);
+    const reduction = rorReductions[action] || 0;
+    const newRoR = Math.max(0.05, simRoRRef.current - reduction);
+    simRoRRef.current = newRoR;
+    setSimRoR(newRoR);
+    const extMin = (reduction / Math.max(newRoR, 0.05)).toFixed(1);
+    setMitigationMsg(`${labels[action]} — RoR reduced, window extended ~${extMin} min.`);
     setTimeout(() => setMitigationMsg(""), 4000);
   };
 
-  // Quick scenario selector handler
+  // Quick scenario selector: seed physics sim to correct starting conditions
+  const SCENARIO_SEEDS = {
+    NORMAL:         { temp: 352, ror: 0.30, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    EARLY_DRIFT:    { temp: 360, ror: 0.35, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    SEVERE_DRIFT:   { temp: 362, ror: 0.80, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    IMMEDIATE_RISK: { temp: 366, ror: 1.35, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+  };
   const handleSelectScenario = (scenario) => {
-    const defaults = { NORMAL: 75, EARLY_DRIFT: 33, SEVERE_DRIFT: 4, IMMEDIATE_RISK: 0.7 };
+    const seed = SCENARIO_SEEDS[scenario] || SCENARIO_SEEDS.NORMAL;
+    simTempRef.current = seed.temp;
+    simRoRRef.current  = seed.ror;
+    setSimTemp(seed.temp);
+    setSimRoR(seed.ror);
+    setSmoothedTTL(null); // reset smoother
     import("@/components/refinery/calcEngine").then(({ DEMO_SCENARIOS }) => {
       const s = DEMO_SCENARIOS[scenario];
       if (s) {
-        setState({ ...state, samples: s.samples, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario });
+        setState(prev => ({ ...prev, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario, limits: seed.limits }));
       }
     });
-    setDemoTimeMin(defaults[scenario] ?? 75);
-    setDemoState(scenario);
-    setDemoRunning(true);
+    setSimRunning(true);
     setMitigationMsg("");
   };
 
