@@ -227,9 +227,6 @@ export default function Home() {
   // Get explicit uiState from scenario (if in demo mode)
   const explicitUiState = activeData.demoScenario || null;
   
-  // Derive system state from escalation level (temporary scenario-driven mapping)
-  const systemState = explicitUiState || getSystemState(getEscalationLevel(Infinity, false, 0, "NORMAL"));
-  
   // Calculations
   const currentValue = activeData.samples[activeData.samples.length - 1];
   const baseSlope = computeRateOfRise(activeData.samples, activeData.interval);
