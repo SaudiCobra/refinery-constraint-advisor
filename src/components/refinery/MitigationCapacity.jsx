@@ -4,13 +4,22 @@ import { cn } from "@/lib/utils";
 export default function MitigationCapacity({ escalationLevel, timeToNearest }) {
   // Derive mitigation capacity from escalation severity and time-to-constraint
   const getMitigationCapacity = () => {
-    if (escalationLevel >= 3 || timeToNearest <= 5) {
+    // Time override rules (highest priority)
+    if (timeToNearest <= 5) {
       return "CRITICAL";
     }
-    if (escalationLevel >= 2 || timeToNearest <= 15) {
+    if (timeToNearest <= 10 && escalationLevel >= 2) {
+      return "CRITICAL";
+    }
+
+    // Escalation level mapping
+    if (escalationLevel >= 3) {
+      return "CRITICAL";
+    }
+    if (escalationLevel === 2) {
       return "SEVERELY_LIMITED";
     }
-    if (escalationLevel >= 1 || timeToNearest <= 30) {
+    if (escalationLevel === 1) {
       return "LIMITED";
     }
     return "AVAILABLE";
@@ -22,22 +31,22 @@ export default function MitigationCapacity({ escalationLevel, timeToNearest }) {
     AVAILABLE: {
       color: "#2F5D80",
       label: "AVAILABLE",
-      message: "Multiple levers effective.",
+      message: "Multiple corrective levers effective.",
     },
     LIMITED: {
       color: "#B47A1F",
       label: "LIMITED",
-      message: "Some levers remain.",
+      message: "Some corrective flexibility remains.",
     },
     SEVERELY_LIMITED: {
       color: "#A13A1F",
       label: "SEVERELY LIMITED",
-      message: "Only high-impact levers remain.",
+      message: "Only high-impact interventions remain.",
     },
     CRITICAL: {
       color: "#7A0F0F",
       label: "CRITICAL",
-      message: "Mitigation nearly exhausted.",
+      message: "Mitigation capacity nearly exhausted.",
     },
   };
 
