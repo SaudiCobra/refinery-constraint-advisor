@@ -63,15 +63,33 @@ export default function Home() {
   const [state, setState] = useState({ ...DEFAULTS });
   const [preheatActive, setPreheatActive] = useState(false);
 
-  // Demo clock — single source of truth for timer + state
-  const [demoTimeMin, setDemoTimeMin] = useState(75);
-  const [demoState,   setDemoState]   = useState("NORMAL");
-  const [demoRunning, setDemoRunning]  = useState(true);
+  // ── Physics simulation state (interactive mode only) ────────────────────────
+  // These are the raw physics variables; all display values derive from them.
+  const [simTemp,   setSimTemp]   = useState(352);   // currentOutletTempC
+  const [simRoR,    setSimRoR]    = useState(0.30);  // rateOfRiseC_per_min
+  const [simRunning, setSimRunning] = useState(true);
   const [mitigationMsg, setMitigationMsg] = useState("");
-  
-  // Smoothed mitigation state
+
+  // Smoothed TTL for display (prevents jumps > 3 min per tick)
   const [smoothedTTL, setSmoothedTTL] = useState(null);
-  const [smoothedRoR, setSmoothedRoR] = useState(null);
+  const simTempRef = useRef(352);
+  const simRoRRef  = useRef(0.30);
+
+  // Scenario-band RoR clamps
+  const ROR_CLAMPS = {
+    NORMAL:         { min: 0.10, max: 0.55, noise: 0.04 },
+    EARLY_DRIFT:    { min: 0.25, max: 0.70, noise: 0.05 },
+    SEVERE_DRIFT:   { min: 0.55, max: 1.20, noise: 0.06 },
+    IMMEDIATE_RISK: { min: 0.90, max: 2.00, noise: 0.07 },
+  };
+
+  // Derive computed TTL + state from sim vars (pure function, no state)
+  const getSimTTL = (temp, ror, limits) => {
+    const limitVal = Number(limits?.hi || 370);
+    const margin   = limitVal - temp;
+    if (margin <= 0) return 0;
+    return margin / Math.max(ror, 0.05);
+  };
 
   // Presentation mode state
   const [presScenario, setPresScenario] = useState(0);
