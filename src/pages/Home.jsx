@@ -62,7 +62,12 @@ export default function Home() {
   const [alarmsOnly, setAlarmsOnly] = useState(false);
   const [state, setState] = useState({ ...DEFAULTS });
   const [preheatActive, setPreheatActive] = useState(false);
-  const [feedReductionActive, setFeedReductionActive] = useState(false);
+
+  // Demo clock — single source of truth for timer + state
+  const [demoTimeMin, setDemoTimeMin] = useState(75);
+  const [demoState,   setDemoState]   = useState("NORMAL");
+  const [demoRunning, setDemoRunning]  = useState(true);
+  const [mitigationMsg, setMitigationMsg] = useState("");
   
   // Smoothed mitigation state
   const [smoothedTTL, setSmoothedTTL] = useState(null);
@@ -77,6 +82,54 @@ export default function Home() {
   const cycleRef = useRef(null);
   const sequenceRef = useRef(null);
   const demoRef = useRef(null);
+
+  // Demo clock tick: 1 real second = 1 demo minute
+  useEffect(() => {
+    if (!demoRunning) return;
+    const tick = setInterval(() => {
+      setDemoTimeMin(prev => {
+        const next = Math.max(0, prev - 1);
+        // Auto-derive state from time
+        if (next > 35) setDemoState("NORMAL");
+        else if (next > 5) setDemoState("EARLY_DRIFT");
+        else if (next >= 1) setDemoState("SEVERE_DRIFT");
+        else setDemoState("IMMEDIATE_RISK");
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [demoRunning]);
+
+  // Corrective action handler
+  const handleMitigate = (action) => {
+    const adds = {
+      feedReduction: { NORMAL: 2, EARLY_DRIFT: 10, SEVERE_DRIFT: 2, IMMEDIATE_RISK: 0.7 },
+      quench:        { NORMAL: 1, EARLY_DRIFT: 5,  SEVERE_DRIFT: 1, IMMEDIATE_RISK: 0.4 },
+      cooling:       { NORMAL: 1, EARLY_DRIFT: 6,  SEVERE_DRIFT: 1.5, IMMEDIATE_RISK: 0.5 },
+    };
+    const caps = { NORMAL: 90, EARLY_DRIFT: 60, SEVERE_DRIFT: 10, IMMEDIATE_RISK: 5 };
+    const delta = adds[action]?.[demoState] || 0;
+    const cap = caps[demoState] || 90;
+    const labels = { feedReduction: "Feed reduced", quench: "Quench increased", cooling: "Cooling boosted" };
+    setDemoTimeMin(prev => Math.min(cap, prev + delta));
+    setMitigationMsg(`${labels[action]} — window extended by ${delta < 1 ? (delta*60|0)+"s" : delta+"min"}.`);
+    setTimeout(() => setMitigationMsg(""), 4000);
+  };
+
+  // Quick scenario selector handler
+  const handleSelectScenario = (scenario) => {
+    const defaults = { NORMAL: 75, EARLY_DRIFT: 33, SEVERE_DRIFT: 4, IMMEDIATE_RISK: 0.7 };
+    import("@/components/refinery/calcEngine").then(({ DEMO_SCENARIOS }) => {
+      const s = DEMO_SCENARIOS[scenario];
+      if (s) {
+        setState({ ...state, samples: s.samples, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario });
+      }
+    });
+    setDemoTimeMin(defaults[scenario] ?? 75);
+    setDemoState(scenario);
+    setDemoRunning(true);
+    setMitigationMsg("");
+  };
 
   // Auto-cycle logic
   useEffect(() => {
@@ -321,6 +374,7 @@ export default function Home() {
         slope={displaySlope}
         preheatStatus={preheatStatus}
         uiState={explicitUiState}
+        demoState={displayMode === "interactive" ? demoState : undefined}
       />
 
       {!alarmsOnly && displayMode === "presentation" && (
@@ -346,32 +400,17 @@ export default function Home() {
         {!alarmsOnly && displayMode === "interactive" && (
           <>
             <QuickScenarioSelector
-              activeScenario={state.demoScenario || "NORMAL"}
-              onSelect={(scenario) => {
-                import("@/components/refinery/calcEngine").then(({ DEMO_SCENARIOS }) => {
-                  const s = DEMO_SCENARIOS[scenario];
-                  if (s) {
-                    setState({
-                      ...state,
-                      samples: s.samples,
-                      equipment: s.equipment,
-                      feedFlow: s.feedFlow,
-                      sensorQuality: s.sensorQuality,
-                      opMode: s.opMode,
-                      demoScenario: scenario,
-                    });
-                  }
-                });
-              }}
+              activeScenario={demoState}
+              onSelect={handleSelectScenario}
             />
             
             <HeroMetric
               timeToNearest={displayTTL}
-              nearestName={nearest?.name}
               escalationLevel={escalationLevel}
               slope={displaySlope}
-              consequence={consequence}
               uiState={explicitUiState}
+              demoTimeMin={demoTimeMin}
+              demoState={demoState}
             />
             
             <div className="max-w-3xl mx-auto space-y-3">
@@ -383,14 +422,16 @@ export default function Home() {
                 hotSpotRisk={hotSpotRisk}
                 slope={displaySlope}
                 currentTemp={currentValue}
+                demoTimeMin={demoTimeMin}
+                demoState={demoState}
               />
               
               <LeverContext 
                 equipment={activeData.equipment}
                 coolingCapacity={coolingCapacity}
                 escalationLevel={escalationLevel}
-                feedReductionActive={feedReductionActive}
-                onFeedReductionToggle={() => setFeedReductionActive(prev => !prev)}
+                onMitigate={handleMitigate}
+                mitigationMsg={mitigationMsg}
               />
               
               <div className="text-center pt-2 border-t border-[#2a2a2a]">
