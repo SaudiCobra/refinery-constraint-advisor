@@ -48,43 +48,28 @@ export function getNearestConstraint(constraints) {
   return positive.length > 0 ? positive[0] : null;
 }
 
-export function getSystemState(escalationLevel) {
-  // Map escalation level to system state (temporary scenario-driven mapping)
-  if (escalationLevel >= 3) {
-    return "IMMEDIATE_RISK";
-  }
-  if (escalationLevel === 2) {
-    return "SEVERE_DRIFT";
-  }
-  if (escalationLevel === 1) {
-    return "EARLY_DRIFT";
-  }
-  return "NORMAL";
+// NEW 4-band model — single source of truth for all state derivation
+// NORMAL: > 35 min | EARLY_DRIFT: 10–35 | SEVERE_DRIFT: 5–10 | IMMEDIATE_RISK: ≤ 5
+export function getSystemState(timeMinutes) {
+  if (timeMinutes === Infinity || timeMinutes == null || timeMinutes > 35) return "NORMAL";
+  if (timeMinutes > 10) return "EARLY_DRIFT";
+  if (timeMinutes > 5)  return "SEVERE_DRIFT";
+  return "IMMEDIATE_RISK";
 }
 
 export function getEscalationLevel(timeMinutes, preheatActive, slope, coolingCapacity) {
-  let baseLevel = 0;
-  
-  if (timeMinutes === Infinity || timeMinutes === null) {
-    baseLevel = 0;
-  } else if (timeMinutes > 30) {
-    baseLevel = 0;
-  } else if (timeMinutes > 15) {
-    baseLevel = 1;
-  } else if (timeMinutes > 10) {
-    baseLevel = 2;
-  } else {
-    baseLevel = 3;
-  }
+  const state = getSystemState(timeMinutes);
+  let baseLevel =
+    state === "IMMEDIATE_RISK" ? 3 :
+    state === "SEVERE_DRIFT"   ? 2 :
+    state === "EARLY_DRIFT"    ? 1 : 0;
 
   if (preheatActive && slope > 1.5) {
     baseLevel = Math.max(baseLevel, 2);
   }
-
-  if (coolingCapacity === "SEVERELY_LIMITED" && timeMinutes < 15) {
+  if (coolingCapacity === "SEVERELY_LIMITED" && timeMinutes < 10) {
     baseLevel = Math.min(baseLevel + 1, 3);
   }
-
   return baseLevel;
 }
 
