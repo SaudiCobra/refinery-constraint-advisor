@@ -33,6 +33,12 @@ import {
   HOT_SPOT_SCENARIO,
 } from "@/components/refinery/calcEngine";
 import {
+  computeMitigatedRoR,
+  computeMitigatedTimeToLimit,
+  smoothTransition,
+  clampTimeToBaseline,
+} from "@/components/refinery/mitigationEngine";
+import {
   simulateBedTemperatures,
   computeBedImbalance,
   computeHotSpotRisk,
@@ -56,6 +62,10 @@ export default function Home() {
   const [alarmsOnly, setAlarmsOnly] = useState(false);
   const [state, setState] = useState({ ...DEFAULTS });
   const [preheatActive, setPreheatActive] = useState(false);
+  
+  // Smoothed mitigation state
+  const [smoothedTTL, setSmoothedTTL] = useState(null);
+  const [smoothedRoR, setSmoothedRoR] = useState(null);
 
   // Presentation mode state
   const [presScenario, setPresScenario] = useState(0);
@@ -160,25 +170,43 @@ export default function Home() {
       })()
     : state;
 
+  // Get explicit uiState from scenario (if in demo mode)
+  const explicitUiState = activeData.demoScenario || null;
+  
+  // Derive system state from escalation level (temporary scenario-driven mapping)
+  const systemState = explicitUiState || getSystemState(getEscalationLevel(Infinity, false, 0, "NORMAL"));
+  
   // Calculations
   const currentValue = activeData.samples[activeData.samples.length - 1];
-  const slope = computeRateOfRise(activeData.samples, activeData.interval);
-  const constraints = computeAllConstraints(currentValue, activeData.limits, slope);
+  const baseSlope = computeRateOfRise(activeData.samples, activeData.interval);
+  
+  // Apply mitigation engine
+  const mitigationResult = computeMitigatedRoR(baseSlope, activeData.equipment, systemState);
+  const effectiveSlope = mitigationResult.effectiveRoR;
+  
+  const constraints = computeAllConstraints(currentValue, activeData.limits, effectiveSlope);
   const nearest = getNearestConstraint(constraints);
   const baseTimeToNearest = nearest ? nearest.time : Infinity;
   
   // Bed imbalance and hot spot risk
-  const beds = simulateBedTemperatures(currentValue, slope, activeData.equipment, 0);
+  const beds = simulateBedTemperatures(currentValue, effectiveSlope, activeData.equipment, 0);
   const bedImbalance = computeBedImbalance(beds);
   
   // Cooling capacity assessment
-  const coolingCapacity = computeCoolingCapacity(activeData.equipment, slope, baseTimeToNearest);
+  const coolingCapacity = computeCoolingCapacity(activeData.equipment, effectiveSlope, baseTimeToNearest);
   
   // Hot spot risk
-  const hotSpotRisk = computeHotSpotRisk(bedImbalance, activeData.equipment, coolingCapacity, slope);
+  const hotSpotRisk = computeHotSpotRisk(bedImbalance, activeData.equipment, coolingCapacity, effectiveSlope);
   
-  // Adjust time based on cooling capacity
-  let timeToNearest = adjustTimeToConstraint(baseTimeToNearest, coolingCapacity);
+  // Compute mitigated time-to-limit
+  const highLimit = activeData.limits.hi || activeData.limits.hihi || 370;
+  let calculatedTTL = computeMitigatedTimeToLimit(currentValue, highLimit, effectiveSlope);
+  
+  // Clamp to baseline (prevent over-extension)
+  calculatedTTL = clampTimeToBaseline(calculatedTTL, systemState);
+  
+  // Adjust time based on cooling capacity (legacy adjustment)
+  let timeToNearest = adjustTimeToConstraint(calculatedTTL, coolingCapacity);
   
   // Further compress time if hot spot risk is HIGH
   if (hotSpotRisk === "HIGH") {
@@ -209,20 +237,34 @@ export default function Home() {
     }
   }
   
-  let escalationLevel = getEscalationLevel(timeToNearest, activePreheatMode, slope, coolingCapacity);
+  let escalationLevel = getEscalationLevel(timeToNearest, activePreheatMode, effectiveSlope, coolingCapacity);
   
   // Adjust escalation for hot spot risk
   escalationLevel = adjustEscalationForHotSpot(escalationLevel, hotSpotRisk, timeToNearest);
   const alarmState = getAlarmState(currentValue, activeData.limits);
-
-  // Get explicit uiState from scenario (if in demo mode)
-  const explicitUiState = activeData.demoScenario || null;
   
-  // Derive system state from escalation level (temporary scenario-driven mapping)
-  const systemState = explicitUiState || getSystemState(escalationLevel);
+  // Apply smoothing to prevent instant jumps (2-3 second interpolation)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSmoothedTTL(prev => {
+        if (prev === null) return timeToNearest;
+        return smoothTransition(prev, timeToNearest, 0.12); // ~2.5s smoothing
+      });
+      setSmoothedRoR(prev => {
+        if (prev === null) return effectiveSlope;
+        return smoothTransition(prev, effectiveSlope, 0.12);
+      });
+    }, 100); // Update every 100ms
+    
+    return () => clearInterval(interval);
+  }, [timeToNearest, effectiveSlope]);
+  
+  // Use smoothed values for display
+  const displayTTL = smoothedTTL !== null ? smoothedTTL : timeToNearest;
+  const displaySlope = smoothedRoR !== null ? smoothedRoR : effectiveSlope;
 
   const consequence = nearest && nearest.time < Infinity
-    ? `If unchanged: ${nearest.name} in ${formatTime(timeToNearest)}`
+    ? `If unchanged: ${nearest.name} in ${formatTime(displayTTL)}`
     : null;
 
   const handleRunDemo = useCallback((scenarioIndex) => {
@@ -269,10 +311,10 @@ export default function Home() {
         escalationLevel={escalationLevel}
         alarmsOnly={alarmsOnly}
         hotSpotRisk={hotSpotRisk}
-        timeToNearest={timeToNearest}
+        timeToNearest={displayTTL}
         coolingCapacity={coolingCapacity}
         equipment={activeData.equipment}
-        slope={slope}
+        slope={displaySlope}
         preheatStatus={preheatStatus}
         uiState={explicitUiState}
       />
@@ -320,22 +362,22 @@ export default function Home() {
             />
             
             <HeroMetric
-              timeToNearest={timeToNearest}
+              timeToNearest={displayTTL}
               nearestName={nearest?.name}
               escalationLevel={escalationLevel}
-              slope={slope}
+              slope={displaySlope}
               consequence={consequence}
               uiState={explicitUiState}
             />
             
             <div className="max-w-3xl mx-auto space-y-3">
               <DecisionWindowBar 
-                timeToNearest={timeToNearest}
+                timeToNearest={displayTTL}
                 escalationLevel={escalationLevel}
                 coolingCapacity={coolingCapacity}
                 equipment={activeData.equipment}
                 hotSpotRisk={hotSpotRisk}
-                slope={slope}
+                slope={displaySlope}
                 currentTemp={currentValue}
               />
               
@@ -356,7 +398,7 @@ export default function Home() {
               preheatActive={preheatActive}
               onToggle={setPreheatActive}
               currentTemp={currentValue}
-              slope={slope}
+              slope={displaySlope}
             />
 
             <MitigationCapacity 
@@ -368,12 +410,12 @@ export default function Home() {
             <H2AvailabilityIndicator 
               equipment={activeData.equipment} 
               coolingCapacity={coolingCapacity}
-              slope={slope}
+              slope={displaySlope}
             />
 
             <ProcessMap
               escalationLevel={escalationLevel}
-              slope={slope}
+              slope={displaySlope}
               currentTemp={currentValue}
               feedFlow={activeData.feedFlow}
               equipment={activeData.equipment}
@@ -381,13 +423,14 @@ export default function Home() {
               preheatStatus={preheatStatus}
               coolingCapacity={coolingCapacity}
               nearest={nearest}
-              timeToNearest={timeToNearest}
+              timeToNearest={displayTTL}
               sensorQuality={activeData.sensorQuality}
               opMode={activeData.opMode}
               bedImbalance={bedImbalance}
               hotSpotRisk={hotSpotRisk}
               interactive={true}
               units={activeData.units}
+              systemState={systemState}
             />
 
             <InputPanel
@@ -397,7 +440,7 @@ export default function Home() {
             />
 
             <ReasoningBlocks
-              slope={slope}
+              slope={displaySlope}
               nearest={nearest}
               constraints={constraints}
               equipment={activeData.equipment}
@@ -408,7 +451,7 @@ export default function Home() {
             <AcknowledgeSystem />
 
             <ExecutiveRibbon
-              timeToNearest={timeToNearest}
+              timeToNearest={displayTTL}
               equipment={activeData.equipment}
               sensorQuality={activeData.sensorQuality}
             />
@@ -462,7 +505,7 @@ export default function Home() {
 
             <ProcessMap
               escalationLevel={escalationLevel}
-              slope={slope}
+              slope={displaySlope}
               currentTemp={currentValue}
               feedFlow={activeData.feedFlow}
               equipment={activeData.equipment}
@@ -470,21 +513,21 @@ export default function Home() {
               preheatStatus={preheatStatus}
               coolingCapacity={coolingCapacity}
               nearest={nearest}
-              timeToNearest={timeToNearest}
+              timeToNearest={displayTTL}
               sensorQuality={activeData.sensorQuality}
               opMode={activeData.opMode}
               bedImbalance={bedImbalance}
               hotSpotRisk={hotSpotRisk}
               interactive={false}
               units={activeData.units}
-              systemState={escalationLevel >= 2 ? "IMMEDIATE_RISK" : escalationLevel >= 1 ? "EARLY_DRIFT" : "NORMAL"}
+              systemState={systemState}
             />
 
             <PresentationHero
-              timeToNearest={timeToNearest}
+              timeToNearest={displayTTL}
               nearestName={nearest?.name}
               escalationLevel={escalationLevel}
-              slope={slope}
+              slope={displaySlope}
               equipment={activeData.equipment}
               preheatActive={activePreheatMode}
               preheatStatus={preheatStatus}
