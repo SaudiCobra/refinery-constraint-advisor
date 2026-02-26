@@ -335,30 +335,15 @@ export default function Home() {
     hotSpotRisk,
     timeToNearest
   );
-  // Derive systemState and uiState directly from timeToNearest (4-band model)
+  // All state derived from timeToNearest — single source of truth
   const computedState = getSystemState(timeToNearest);
   const systemState   = explicitUiState || computedState;
+  const demoState     = computedState; // alias used by child components
   const alarmState    = getAlarmState(currentValue, activeData.limits);
-  
-  // Apply smoothing to prevent instant jumps (2-3 second interpolation)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSmoothedTTL(prev => {
-        if (prev === null) return timeToNearest;
-        return smoothTransition(prev, timeToNearest, 0.12); // ~2.5s smoothing
-      });
-      setSmoothedRoR(prev => {
-        if (prev === null) return effectiveSlope;
-        return smoothTransition(prev, effectiveSlope, 0.12);
-      });
-    }, 100); // Update every 100ms
-    
-    return () => clearInterval(interval);
-  }, [timeToNearest, effectiveSlope]);
-  
-  // Use smoothed values for display
-  const displayTTL = smoothedTTL !== null ? smoothedTTL : timeToNearest;
-  const displaySlope = smoothedRoR !== null ? smoothedRoR : effectiveSlope;
+
+  // displayTTL and displaySlope feed every consumer
+  const displayTTL   = timeToNearest;
+  const displaySlope = effectiveSlope;
 
   const consequence = nearest && nearest.time < Infinity
     ? `If unchanged: ${nearest.name} in ${formatTime(displayTTL)}`
