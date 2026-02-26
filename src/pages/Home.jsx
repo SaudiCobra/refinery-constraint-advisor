@@ -20,6 +20,7 @@ import {
   computeRateOfRise,
   computeAllConstraints,
   getNearestConstraint,
+  getSystemState,
   getEscalationLevel,
   getAlarmState,
   getRecommendation,
@@ -212,6 +213,12 @@ export default function Home() {
   // Adjust escalation for hot spot risk
   escalationLevel = adjustEscalationForHotSpot(escalationLevel, hotSpotRisk, timeToNearest);
   const alarmState = getAlarmState(currentValue, activeData.limits);
+
+  // Calculate systemState based on RoR, Margin, and TTC
+  const hiLimit = activeData.limits.hi != null && activeData.limits.hi !== "" ? Number(activeData.limits.hi) : Infinity;
+  const margin = hiLimit - currentValue;
+  const ttc = slope > 0.2 ? margin / slope : Infinity;
+  const systemState = getSystemState(slope, margin, ttc);
 
   const consequence = nearest && nearest.time < Infinity
     ? `If unchanged: ${nearest.name} in ${formatTime(timeToNearest)}`
@@ -428,8 +435,7 @@ export default function Home() {
             </div>
 
             <MitigationCapacity 
-              escalationLevel={escalationLevel}
-              timeToNearest={timeToNearest}
+              systemState={systemState}
             />
 
             <ProcessMap
