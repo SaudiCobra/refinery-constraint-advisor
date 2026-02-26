@@ -175,33 +175,55 @@ export default function InputPanel({ state, onChange, onRunDemo }) {
           {/* Demo Scenario Selector */}
           <div className="border-t border-[#333] pt-4 mt-2">
             <Label className="text-[#888] text-xs uppercase tracking-wider mb-2 block">Demo Scenario</Label>
-            <Select 
-              value={state.demoScenario || "NORMAL"} 
-              onValueChange={v => {
-                update("demoScenario", v);
-                // Map scenario to sample data
-                const scenarios = {
-                  NORMAL: { samples: [348, 349, 350, 351, 352] },
-                  EARLY_DRIFT: { samples: [356, 358, 360, 362, 364] },
-                  SEVERE_DRIFT: { samples: [362, 364, 366, 368, 370] },
-                  IMMEDIATE_RISK: { samples: [368, 370, 372, 374, 376] },
-                };
-                const scenario = scenarios[v];
-                if (scenario) {
-                  onChange({ ...state, samples: scenario.samples, demoScenario: v });
-                }
-              }}
-            >
-              <SelectTrigger className="bg-[#2a2a2a] border-[#444] text-white w-64">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="NORMAL">NORMAL</SelectItem>
-                <SelectItem value="EARLY_DRIFT">EARLY_DRIFT</SelectItem>
-                <SelectItem value="SEVERE_DRIFT">SEVERE_DRIFT</SelectItem>
-                <SelectItem value="IMMEDIATE_RISK">IMMEDIATE_RISK</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex gap-3 items-center">
+              <Select 
+                value={state.demoScenario || "NORMAL"} 
+                onValueChange={v => {
+                  update("demoScenario", v);
+                  // Map scenario to sample data
+                  const scenarios = {
+                    NORMAL: { samples: [348, 349, 350, 351, 352] },
+                    EARLY_DRIFT: { samples: [356, 358, 360, 362, 364] },
+                    SEVERE_DRIFT: { samples: [362, 364, 366, 368, 370] },
+                    IMMEDIATE_RISK: { samples: [368, 370, 372, 374, 376] },
+                  };
+                  const scenario = scenarios[v];
+                  if (scenario) {
+                    onChange({ ...state, samples: scenario.samples, demoScenario: v });
+                  }
+                }}
+              >
+                <SelectTrigger className="bg-[#2a2a2a] border-[#444] text-white w-64">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NORMAL">NORMAL</SelectItem>
+                  <SelectItem value="EARLY_DRIFT">EARLY_DRIFT</SelectItem>
+                  <SelectItem value="SEVERE_DRIFT">SEVERE_DRIFT</SelectItem>
+                  <SelectItem value="IMMEDIATE_RISK">IMMEDIATE_RISK</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={() => {
+                  const cycle = ["NORMAL", "EARLY_DRIFT", "SEVERE_DRIFT", "IMMEDIATE_RISK"];
+                  const current = state.demoScenario || "NORMAL";
+                  const nextIndex = (cycle.indexOf(current) + 1) % cycle.length;
+                  const next = cycle[nextIndex];
+                  const scenarios = {
+                    NORMAL: { samples: [348, 349, 350, 351, 352] },
+                    EARLY_DRIFT: { samples: [356, 358, 360, 362, 364] },
+                    SEVERE_DRIFT: { samples: [362, 364, 366, 368, 370] },
+                    IMMEDIATE_RISK: { samples: [368, 370, 372, 374, 376] },
+                  };
+                  onChange({ ...state, samples: scenarios[next].samples, demoScenario: next });
+                }}
+                variant="outline"
+                size="sm"
+                className="border-[#444] text-[#aaa] hover:text-white bg-transparent"
+              >
+                Next Scenario
+              </Button>
+            </div>
           </div>
 
           {/* Action Buttons */}
