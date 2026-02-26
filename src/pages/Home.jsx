@@ -256,13 +256,11 @@ export default function Home() {
   // Clamp to baseline (prevent over-extension)
   calculatedTTL = clampTimeToBaseline(calculatedTTL, systemState);
   
-  // Adjust time based on cooling capacity (legacy adjustment)
+  // Adjust time based on cooling capacity
   let timeToNearest = adjustTimeToConstraint(calculatedTTL, coolingCapacity);
-  
-  // Further compress time if hot spot risk is HIGH
-  if (hotSpotRisk === "HIGH") {
-    timeToNearest = timeToNearest * 0.9;
-  }
+  if (hotSpotRisk === "HIGH") timeToNearest = timeToNearest * 0.9;
+
+  // --- SINGLE SOURCE OF TRUTH: derive all state from timeToNearest ---
   
   // Preheat status - use demonstration stage preheat mode if active
   const ACTIVATION_LOWER = 280;
