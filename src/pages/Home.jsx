@@ -176,16 +176,30 @@ export default function Home() {
     return () => clearInterval(tick);
   }, [simRunning, displayMode, state.limits]);
 
-  // Corrective action: reduce RoR to extend window
+  // ── Mitigation toggle handler ────────────────────────────────────────────
+  // Each mitigation is a persistent toggle. When active, the tick applies a
+  // multiplicative RoR reduction factor every second, so the timer grows within
+  // 1–2 ticks. Stacking is multiplicative; minimum RoR floor = 0.05.
+  //   feedReduction: ×0.80 (−20%)
+  //   quenchBoost:   ×0.75 (−25%)
+  //   coolingBoost:  ×0.85 (−15%)
   const handleMitigate = (action) => {
-    const rorReductions = { feedReduction: 0.15, quench: 0.08, cooling: 0.10 };
-    const labels = { feedReduction: "Feed reduced", quench: "Quench increased", cooling: "Cooling boosted" };
-    const reduction = rorReductions[action] || 0;
-    const newRoR = Math.max(0.05, simRoRRef.current - reduction);
-    simRoRRef.current = newRoR;
-    setSimRoR(newRoR);
-    const extMin = (reduction / Math.max(newRoR, 0.05)).toFixed(1);
-    setMitigationMsg(`${labels[action]} — RoR reduced, window extended ~${extMin} min.`);
+    if (action === "feedReduction") {
+      const next = !feedReductionRef.current;
+      feedReductionRef.current = next;
+      setFeedReductionActive(next);
+      setMitigationMsg(next ? "Feed reduction active — RoR reduced 20%" : "Feed reduction deactivated");
+    } else if (action === "quench") {
+      const next = !quenchBoostRef.current;
+      quenchBoostRef.current = next;
+      setQuenchBoostActive(next);
+      setMitigationMsg(next ? "Quench boost active — RoR reduced 25%" : "Quench boost deactivated");
+    } else if (action === "cooling") {
+      const next = !coolingBoostRef.current;
+      coolingBoostRef.current = next;
+      setCoolingBoostActive(next);
+      setMitigationMsg(next ? "Cooling boost active — RoR reduced 15%" : "Cooling boost deactivated");
+    }
     setTimeout(() => setMitigationMsg(""), 4000);
   };
 
