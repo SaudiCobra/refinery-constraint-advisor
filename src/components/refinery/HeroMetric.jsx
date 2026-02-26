@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { formatTime } from "./calcEngine";
 
@@ -19,23 +19,53 @@ const LEVEL_COLORS = {
 
 export default function HeroMetric({ timeToNearest, nearestName, escalationLevel, slope, consequence, uiState }) {
   const stable = slope <= 0 || timeToNearest === Infinity;
-  
+
+  // Live TTL: continuously decrement in real-time (1/60 min per second)
+  const [liveTTL, setLiveTTL] = useState(timeToNearest);
+  const liveTTLRef = useRef(timeToNearest);
+
+  // Reset live TTL when scenario changes significantly
+  useEffect(() => {
+    if (Math.abs(timeToNearest - liveTTLRef.current) > 2) {
+      liveTTLRef.current = timeToNearest;
+      setLiveTTL(timeToNearest);
+    }
+  }, [timeToNearest]);
+
+  // Real-time continuous countdown tick
+  useEffect(() => {
+    if (stable) return;
+    const tick = setInterval(() => {
+      liveTTLRef.current = Math.max(0, liveTTLRef.current - 1 / 60);
+      setLiveTTL(liveTTLRef.current);
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [stable]);
+
   // Use explicit uiState if provided (scenario-driven), else fallback to escalation level
-  const colors = uiState 
+  const colors = uiState
     ? (UI_STATE_COLORS[uiState] || UI_STATE_COLORS.NORMAL)
     : (LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0]);
-  
-  const displayTime = stable ? "—" : formatTime(timeToNearest);
+
+  const displayTime = stable ? "—" : formatTime(liveTTL);
+
+  // Per-state animation class
+  const animationClass = (() => {
+    if (stable) return "";
+    if (uiState === "IMMEDIATE_RISK") return "animate-hero-pulse";
+    if (uiState === "SEVERE_DRIFT") return "animate-hero-breathe";
+    return "";
+  })();
 
   return (
     <div className="flex flex-col items-center justify-center py-6 px-4">
       {!stable && (
-        <div className={cn("px-3 py-1 text-[10px] font-bold tracking-[0.15em] uppercase mb-3", colors.badge)}>
+        <div className={cn("px-3 py-1 text-[10px] font-bold tracking-[0.15em] uppercase mb-3 transition-colors duration-700", colors.badge)}>
           {colors.label}
         </div>
       )}
-      
-      {/* Subtitle - compact */}
+
+      {/* Subtitle */}
       <p className="text-[#666] text-xs tracking-wider mb-1 uppercase">
         {stable ? "No operating limit projected" : "Time before nearest operating limit"}
       </p>
@@ -43,9 +73,9 @@ export default function HeroMetric({ timeToNearest, nearestName, escalationLevel
       {/* Hero Time */}
       <div
         className={cn(
-          "text-[72px] md:text-[96px] font-extralight leading-none tracking-tight transition-all duration-700",
+          "text-[72px] md:text-[96px] font-extralight leading-none tracking-tight transition-colors duration-700",
           stable ? "text-green-400/80" : colors.text,
-          uiState === "IMMEDIATE_RISK" && !stable && "animate-[pulse_3s_ease-in-out_infinite]"
+          animationClass
         )}
       >
         {displayTime}

@@ -79,3 +79,35 @@
     transform: translateX(1px);
   }
 }
+
+/* IMMEDIATE_RISK: very subtle scale pulse (1.0 → 1.02), no opacity change */
+@keyframes hero-pulse {
+  0%, 100% {
+    transform: scale(1.00);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.92;
+  }
+}
+
+/* SEVERE_DRIFT: gentle breathe — slight scale + opacity, slower */
+@keyframes hero-breathe {
+  0%, 100% {
+    transform: scale(1.00);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.01);
+    opacity: 0.88;
+  }
+}
+
+.animate-hero-pulse {
+  animation: hero-pulse 3.5s ease-in-out infinite;
+}
+
+.animate-hero-breathe {
+  animation: hero-breathe 5s ease-in-out infinite;
+}
