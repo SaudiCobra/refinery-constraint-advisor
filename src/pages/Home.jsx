@@ -104,26 +104,44 @@ export default function Home() {
 
   // ── Real-time physics tick (1 000 ms = 1/60 of a demo-minute) ───────────────
   // dt = 1/60 min  →  temp changes by RoR * dt each real second.
+  // Band steering: if TTL drifts outside scenario band, gently push RoR back.
+  //   • TTL too HIGH (> ttlHi): nudge RoR up   → time shrinks back into band
+  //   • TTL too LOW  (< ttlLo): nudge RoR down → time grows  back into band
+  //   steerK controls how fast the nudge is (dimensionless gain per tick).
   useEffect(() => {
     if (!simRunning || displayMode !== "interactive") return;
     const DT = 1 / 60; // real seconds → demo minutes
 
     const tick = setInterval(() => {
-      // Read current sim vars from refs (avoids stale closure)
       let temp = simTempRef.current;
       let ror  = simRoRRef.current;
       const limits = state.limits;
 
-      const currentTTL = getSimTTL(temp, ror, limits);
-      const band = getSystemState(currentTTL);
-      const clamp = ROR_CLAMPS[band] || ROR_CLAMPS.NORMAL;
+      // Current TTL and which named scenario band was selected
+      const currentTTL  = getSimTTL(temp, ror, limits);
+      const scenarioBand = simRoRRef._scenarioBand || "NORMAL";
+      const cfg = BAND_CONFIG[scenarioBand] || BAND_CONFIG.NORMAL;
 
-      // Wander RoR with bounded noise, clamped to band
-      const rorNoise = (Math.random() - 0.5) * 2 * clamp.noise;
-      ror = Math.max(clamp.min, Math.min(clamp.max, ror + rorNoise));
+      // 1. Random RoR wander (within band clamps)
+      const rorNoise = (Math.random() - 0.5) * 2 * cfg.noise;
+      ror = ror + rorNoise;
 
-      // Advance temperature
-      const tempNoise = (Math.random() - 0.5) * 0.05;
+      // 2. Soft band-steering: proportional nudge if TTL out of [ttlLo, ttlHi]
+      if (currentTTL > cfg.ttlHi) {
+        // Too much time left → accelerate slightly to drift back into band
+        const excess = currentTTL - cfg.ttlHi;
+        ror += cfg.steerK * excess;
+      } else if (currentTTL < cfg.ttlLo) {
+        // Too little time → decelerate slightly to recover band
+        const deficit = cfg.ttlLo - currentTTL;
+        ror -= cfg.steerK * deficit;
+      }
+
+      // 3. Hard-clamp RoR to band min/max (prevents runaway)
+      ror = Math.max(cfg.rorMin, Math.min(cfg.rorMax, ror));
+
+      // 4. Advance temperature
+      const tempNoise = (Math.random() - 0.5) * 0.04;
       temp = temp + ror * DT + tempNoise * DT;
 
       // Write back to refs
@@ -133,15 +151,14 @@ export default function Home() {
       // Compute new raw TTL
       const rawTTL = getSimTTL(temp, ror, limits);
 
-      // Smooth: cap jump to 3 min per tick
+      // Smooth: cap jump to 2 min per tick to prevent display lurching
       setSmoothedTTL(prev => {
         if (prev === null) return rawTTL;
         const delta = rawTTL - prev;
-        const capped = prev + Math.max(-3, Math.min(3, delta));
+        const capped = prev + Math.max(-2, Math.min(2, delta));
         return Math.max(0, capped);
       });
 
-      // Keep React state in sync for display (batched)
       setSimTemp(temp);
       setSimRoR(ror);
     }, 1000);
