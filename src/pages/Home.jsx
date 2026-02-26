@@ -159,7 +159,7 @@ export default function Home() {
       const rorFloor = (mitigFactor < 1.0) ? 0.05 : cfg.rorMin;
       ror = Math.max(rorFloor, Math.min(cfg.rorMax, ror));
 
-      // 4. Advance temperature
+      // 5. Advance temperature
       const tempNoise = (Math.random() - 0.5) * 0.04;
       temp = temp + ror * DT + tempNoise * DT;
 
