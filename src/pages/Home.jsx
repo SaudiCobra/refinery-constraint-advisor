@@ -42,7 +42,7 @@ const DEFAULTS = {
   varName: "NHT Reactor Inlet Temperature",
   units: "°C",
   interval: 2,
-  samples: [358, 360, 362, 364, 366],
+  samples: [348, 349, 350, 351, 352],
   limits: { hi: 370, hihi: 380, spec: 375, trip: 390, rampRate: "" },
   opMode: "steady",
   sensorQuality: "good",
