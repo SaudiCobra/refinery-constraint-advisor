@@ -447,7 +447,7 @@ export default function Home() {
                 hotSpotRisk={hotSpotRisk}
                 slope={displaySlope}
                 currentTemp={currentValue}
-                demoTimeMin={demoTimeMin}
+                demoTimeMin={displayTTL}
                 demoState={demoState}
               />
               
