@@ -179,20 +179,27 @@ export default function Home() {
     setTimeout(() => setMitigationMsg(""), 4000);
   };
 
-  // Quick scenario selector: seed physics sim to correct starting conditions
+  // ── Scenario seeds: initial (temp, ror) chosen so TTL starts mid-band ───────
+  // limit = 370; TTL_target = mid-band; temp = limit - ror * TTL_target
+  // NORMAL:         ror=0.25, TTL≈48 → temp = 370 - 0.25*48 = 358.0
+  // EARLY_DRIFT:    ror=0.45, TTL≈22 → temp = 370 - 0.45*22 = 360.1
+  // SEVERE_DRIFT:   ror=0.85, TTL≈7.5→ temp = 370 - 0.85*7.5 = 363.6
+  // IMMEDIATE_RISK: ror=1.50, TTL≈2.6→ temp = 370 - 1.50*2.6 = 366.1
   const SCENARIO_SEEDS = {
-    NORMAL:         { temp: 352, ror: 0.30, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    EARLY_DRIFT:    { temp: 360, ror: 0.35, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    SEVERE_DRIFT:   { temp: 362, ror: 0.80, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    IMMEDIATE_RISK: { temp: 366, ror: 1.35, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    NORMAL:         { temp: 358.0, ror: 0.25, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    EARLY_DRIFT:    { temp: 360.1, ror: 0.45, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    SEVERE_DRIFT:   { temp: 363.6, ror: 0.85, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    IMMEDIATE_RISK: { temp: 366.1, ror: 1.50, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
   };
   const handleSelectScenario = (scenario) => {
     const seed = SCENARIO_SEEDS[scenario] || SCENARIO_SEEDS.NORMAL;
     simTempRef.current = seed.temp;
     simRoRRef.current  = seed.ror;
+    // Tag the ref so the tick knows which band config to use for steering
+    simRoRRef._scenarioBand = scenario;
     setSimTemp(seed.temp);
     setSimRoR(seed.ror);
-    setSmoothedTTL(null); // reset smoother
+    setSmoothedTTL(null); // reset smoother — snap to new value immediately
     import("@/components/refinery/calcEngine").then(({ DEMO_SCENARIOS }) => {
       const s = DEMO_SCENARIOS[scenario];
       if (s) {
