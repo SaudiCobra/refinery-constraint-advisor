@@ -101,22 +101,52 @@ export default function Home() {
   const sequenceRef = useRef(null);
   const demoRef = useRef(null);
 
-  // Demo clock tick: 1 real second = 1 demo minute
+  // ── Real-time physics tick (1 000 ms = 1/60 of a demo-minute) ───────────────
+  // dt = 1/60 min  →  temp changes by RoR * dt each real second.
   useEffect(() => {
-    if (!demoRunning) return;
+    if (!simRunning || displayMode !== "interactive") return;
+    const DT = 1 / 60; // real seconds → demo minutes
+
     const tick = setInterval(() => {
-      setDemoTimeMin(prev => {
-        const next = Math.max(0, prev - 1);
-        // Auto-derive state from time
-        if (next > 35) setDemoState("NORMAL");
-        else if (next > 5) setDemoState("EARLY_DRIFT");
-        else if (next >= 1) setDemoState("SEVERE_DRIFT");
-        else setDemoState("IMMEDIATE_RISK");
-        return next;
+      // Read current sim vars from refs (avoids stale closure)
+      let temp = simTempRef.current;
+      let ror  = simRoRRef.current;
+      const limits = state.limits;
+
+      const currentTTL = getSimTTL(temp, ror, limits);
+      const band = getSystemState(currentTTL);
+      const clamp = ROR_CLAMPS[band] || ROR_CLAMPS.NORMAL;
+
+      // Wander RoR with bounded noise, clamped to band
+      const rorNoise = (Math.random() - 0.5) * 2 * clamp.noise;
+      ror = Math.max(clamp.min, Math.min(clamp.max, ror + rorNoise));
+
+      // Advance temperature
+      const tempNoise = (Math.random() - 0.5) * 0.05;
+      temp = temp + ror * DT + tempNoise * DT;
+
+      // Write back to refs
+      simTempRef.current = temp;
+      simRoRRef.current  = ror;
+
+      // Compute new raw TTL
+      const rawTTL = getSimTTL(temp, ror, limits);
+
+      // Smooth: cap jump to 3 min per tick
+      setSmoothedTTL(prev => {
+        if (prev === null) return rawTTL;
+        const delta = rawTTL - prev;
+        const capped = prev + Math.max(-3, Math.min(3, delta));
+        return Math.max(0, capped);
       });
+
+      // Keep React state in sync for display (batched)
+      setSimTemp(temp);
+      setSimRoR(ror);
     }, 1000);
+
     return () => clearInterval(tick);
-  }, [demoRunning]);
+  }, [simRunning, displayMode, state.limits]);
 
   // Corrective action handler
   const handleMitigate = (action) => {
