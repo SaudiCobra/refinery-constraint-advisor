@@ -72,8 +72,9 @@ export default function Home() {
 
   // Smoothed TTL for display (prevents jumps > 3 min per tick)
   const [smoothedTTL, setSmoothedTTL] = useState(null);
-  const simTempRef = useRef(352);
-  const simRoRRef  = useRef(0.30);
+  const simTempRef = useRef(358.0);
+  const simRoRRef  = useRef(0.25);
+  simRoRRef._scenarioBand = simRoRRef._scenarioBand || "NORMAL";
 
   // ── Band definitions: TTL [lo, hi] in minutes, RoR clamps, and noise ───────
   // These drive both seeding and continuous soft-steering.
