@@ -515,6 +515,9 @@ export default function Home() {
                 escalationLevel={escalationLevel}
                 onMitigate={handleMitigate}
                 mitigationMsg={mitigationMsg}
+                feedReductionActive={feedReductionActive}
+                quenchBoostActive={quenchBoostActive}
+                coolingBoostActive={coolingBoostActive}
               />
               
               <div className="text-center pt-2 border-t border-[#2a2a2a]">
