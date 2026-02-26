@@ -1,25 +1,16 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-export default function MitigationCapacity({ escalationLevel, timeToNearest }) {
-  // Derive mitigation capacity from escalation severity and time-to-constraint
+export default function MitigationCapacity({ systemState }) {
+  // Derive mitigation capacity from system state
   const getMitigationCapacity = () => {
-    // Time override rules (highest priority)
-    if (timeToNearest <= 5) {
+    if (systemState === "IMMEDIATE_RISK") {
       return "CRITICAL";
     }
-    if (timeToNearest <= 10 && escalationLevel >= 2) {
-      return "CRITICAL";
-    }
-
-    // Escalation level mapping
-    if (escalationLevel >= 3) {
-      return "CRITICAL";
-    }
-    if (escalationLevel === 2) {
+    if (systemState === "SEVERE_DRIFT") {
       return "SEVERELY_LIMITED";
     }
-    if (escalationLevel === 1) {
+    if (systemState === "EARLY_DRIFT") {
       return "LIMITED";
     }
     return "AVAILABLE";
