@@ -399,7 +399,7 @@ export default function Home() {
         slope={displaySlope}
         preheatStatus={preheatStatus}
         uiState={explicitUiState}
-        demoState={displayMode === "interactive" ? demoState : undefined}
+        demoState={isInteractive ? demoState : undefined}
       />
 
       {!alarmsOnly && displayMode === "presentation" && (
