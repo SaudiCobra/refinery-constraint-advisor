@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import GlobalHeader from "@/components/refinery/GlobalHeader";
 import AlarmBanner from "@/components/refinery/AlarmBanner";
 import HeroMetric from "@/components/refinery/HeroMetric";
+import QuickScenarioSelector from "@/components/refinery/QuickScenarioSelector";
 import InputPanel from "@/components/refinery/InputPanel";
 import ReasoningBlocks from "@/components/refinery/ReasoningBlocks";
 import AcknowledgeSystem from "@/components/refinery/AcknowledgeSystem";
@@ -214,8 +215,11 @@ export default function Home() {
   escalationLevel = adjustEscalationForHotSpot(escalationLevel, hotSpotRisk, timeToNearest);
   const alarmState = getAlarmState(currentValue, activeData.limits);
 
+  // Get explicit uiState from scenario (if in demo mode)
+  const explicitUiState = activeData.demoScenario || null;
+  
   // Derive system state from escalation level (temporary scenario-driven mapping)
-  const systemState = getSystemState(escalationLevel);
+  const systemState = explicitUiState || getSystemState(escalationLevel);
 
   const consequence = nearest && nearest.time < Infinity
     ? `If unchanged: ${nearest.name} in ${formatTime(timeToNearest)}`
@@ -270,6 +274,7 @@ export default function Home() {
         equipment={activeData.equipment}
         slope={slope}
         preheatStatus={preheatStatus}
+        uiState={explicitUiState}
       />
 
       {!alarmsOnly && displayMode === "presentation" && (
@@ -294,12 +299,33 @@ export default function Home() {
         {/* INTERACTIVE MODE */}
         {!alarmsOnly && displayMode === "interactive" && (
           <>
+            <QuickScenarioSelector
+              activeScenario={state.demoScenario || "NORMAL"}
+              onSelect={(scenario) => {
+                import("@/components/refinery/calcEngine").then(({ DEMO_SCENARIOS }) => {
+                  const s = DEMO_SCENARIOS[scenario];
+                  if (s) {
+                    setState({
+                      ...state,
+                      samples: s.samples,
+                      equipment: s.equipment,
+                      feedFlow: s.feedFlow,
+                      sensorQuality: s.sensorQuality,
+                      opMode: s.opMode,
+                      demoScenario: scenario,
+                    });
+                  }
+                });
+              }}
+            />
+            
             <HeroMetric
               timeToNearest={timeToNearest}
               nearestName={nearest?.name}
               escalationLevel={escalationLevel}
               slope={slope}
               consequence={consequence}
+              uiState={explicitUiState}
             />
             
             <div className="max-w-3xl mx-auto space-y-3">

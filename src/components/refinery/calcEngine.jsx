@@ -7,12 +7,15 @@ export function computeRateOfRise(samples, interval) {
   return (now - prev) / interval;
 }
 
-export function computeTimeToConstraint(currentValue, limitValue, slope) {
+export function computeTimeToLimit(currentValue, limitValue, slope) {
   if (slope <= 0) return Infinity;
   const margin = limitValue - currentValue;
   if (margin <= 0) return 0;
   return margin / slope;
 }
+
+// Legacy alias
+export const computeTimeToConstraint = computeTimeToLimit;
 
 export function computeAllConstraints(currentValue, limits, slope) {
   const constraints = [];
@@ -162,7 +165,51 @@ export function getRecommendation(level, nearest, equipment, coolingCapacity, pr
   return "Immediate escalation required. Notify shift lead now.";
 }
 
-// Curated Presentation Scenarios (7 only)
+// Interactive Mode Demo Scenarios (4 only - scenario-driven with explicit uiState)
+export const DEMO_SCENARIOS = {
+  NORMAL: {
+    name: "NORMAL",
+    uiState: "NORMAL",
+    samples: [348, 349, 350, 351, 352],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 84000,
+    sensorQuality: "good",
+    opMode: "steady",
+  },
+  EARLY_DRIFT: {
+    name: "EARLY_DRIFT",
+    uiState: "EARLY_DRIFT",
+    samples: [352, 354, 356, 358, 360],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 87000,
+    sensorQuality: "good",
+    opMode: "steady",
+  },
+  SEVERE_DRIFT: {
+    name: "SEVERE_DRIFT",
+    uiState: "SEVERE_DRIFT",
+    samples: [360, 362, 364, 366, 368],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: true },
+    feedFlow: 91000,
+    sensorQuality: "good",
+    opMode: "transient",
+  },
+  IMMEDIATE_RISK: {
+    name: "IMMEDIATE_RISK",
+    uiState: "IMMEDIATE_RISK",
+    samples: [368, 370, 372, 374, 376],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: false },
+    feedFlow: 95000,
+    sensorQuality: "good",
+    opMode: "transient",
+  },
+};
+
+// Presentation Mode Scenarios (7 existing scenarios preserved)
 export const SCENARIOS = [
   {
     name: "1. Stable Baseline",

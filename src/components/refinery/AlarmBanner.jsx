@@ -2,6 +2,31 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 const BANNER_CONFIG = {
+  NORMAL: {
+    bg: "bg-[#0d2a2a]",
+    border: "border-[#0F5F5F]",
+    text: "text-[#5FB9B9]",
+    message: "System State: Normal — All parameters within range",
+  },
+  EARLY_DRIFT: {
+    bg: "bg-[#1a1208]",
+    border: "border-[#D35400]",
+    text: "text-[#E67E22]",
+    message: "System State: Early Drift — Temperature trending upward",
+  },
+  SEVERE_DRIFT: {
+    bg: "bg-[#1a1210]",
+    border: "border-[#A13A1F]",
+    text: "text-[#D4653F]",
+    message: "System State: Severe Drift — Cooling capacity limited",
+  },
+  IMMEDIATE_RISK: {
+    bg: "bg-[#140a0a]",
+    border: "border-[#7A0F0F]",
+    text: "text-[#C0392B]",
+    message: "IMMEDIATE RISK — Escalation projected",
+  },
+  // Legacy keys for backwards compatibility
   STABLE: {
     bg: "bg-[#0d2a2a]",
     border: "border-[#0F5F5F]",
@@ -9,9 +34,9 @@ const BANNER_CONFIG = {
     message: "System State: Normal — All parameters within range",
   },
   DRIFT: {
-    bg: "bg-[#1a1410]",
-    border: "border-[#B47A1F]",
-    text: "text-[#D4A547]",
+    bg: "bg-[#1a1208]",
+    border: "border-[#D35400]",
+    text: "text-[#E67E22]",
     message: "System State: Early Drift — Temperature trending upward",
   },
   CONSTRAINED: {
@@ -28,14 +53,14 @@ const BANNER_CONFIG = {
   },
   IMMEDIATE: {
     bg: "bg-[#140a0a]",
-    border: "border-[#6A0C0C]",
-    text: "text-[#B86B6B]",
+    border: "border-[#7A0F0F]",
+    text: "text-[#C0392B]",
     message: "IMMEDIATE RISK — Escalation projected",
   },
   HOTSPOT: {
     bg: "bg-[#140a0a]",
-    border: "border-[#6A0C0C]",
-    text: "text-[#B86B6B]",
+    border: "border-[#7A0F0F]",
+    text: "text-[#C0392B]",
     message: "IMMEDIATE RISK — Hot spot developing in reactor bed",
   },
 };
@@ -50,30 +75,34 @@ export default function AlarmBanner({
   equipment,
   slope,
   preheatStatus,
+  uiState,
 }) {
-  // Determine banner state based on strict priority
-  let bannerKey = "STABLE";
+  // Use explicit uiState if provided (scenario-driven), else determine from conditions
+  let bannerKey = uiState || "NORMAL";
   
-  if (!alarmsOnly) {
-    if (hotSpotRisk === "HIGH") {
-      bannerKey = "HOTSPOT";
-    } else if (timeToNearest < 10 && timeToNearest > 0) {
-      bannerKey = "IMMEDIATE";
-    } else if (coolingCapacity === "CONSTRAINED") {
-      bannerKey = "CONSTRAINED";
-    } else if (!equipment?.h2Compressor && escalationLevel >= 1) {
-      bannerKey = "MODERATION";
-    } else if (slope > 1.5 || preheatStatus?.includes("stress")) {
-      bannerKey = "DRIFT";
-    } else if (escalationLevel >= 1) {
-      bannerKey = "DRIFT";
+  if (!uiState) {
+    // Legacy inference logic when uiState is not provided
+    if (!alarmsOnly) {
+      if (hotSpotRisk === "HIGH") {
+        bannerKey = "HOTSPOT";
+      } else if (timeToNearest < 10 && timeToNearest > 0) {
+        bannerKey = "IMMEDIATE_RISK";
+      } else if (coolingCapacity === "CONSTRAINED") {
+        bannerKey = "CONSTRAINED";
+      } else if (!equipment?.h2Compressor && escalationLevel >= 1) {
+        bannerKey = "MODERATION";
+      } else if (slope > 1.5 || preheatStatus?.includes("stress")) {
+        bannerKey = "EARLY_DRIFT";
+      } else if (escalationLevel >= 1) {
+        bannerKey = "EARLY_DRIFT";
+      }
+    } else {
+      // Alarms-only mode uses traditional alarm states
+      bannerKey = alarmState === "NORMAL" ? "NORMAL" : alarmState === "HIGH" ? "EARLY_DRIFT" : "IMMEDIATE_RISK";
     }
-  } else {
-    // Alarms-only mode uses traditional alarm states
-    bannerKey = alarmState === "NORMAL" ? "STABLE" : alarmState === "HIGH" ? "DRIFT" : "IMMEDIATE";
   }
 
-  const config = BANNER_CONFIG[bannerKey] || BANNER_CONFIG.STABLE;
+  const config = BANNER_CONFIG[bannerKey] || BANNER_CONFIG.NORMAL;
 
   return (
     <div

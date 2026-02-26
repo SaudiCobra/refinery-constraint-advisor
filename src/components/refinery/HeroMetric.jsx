@@ -2,16 +2,29 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { formatTime } from "./calcEngine";
 
-const LEVEL_COLORS = {
-  0: { text: "text-[#0F9F9F]", badge: "bg-[#0F5F5F]/50 text-[#0F9F9F] border border-[#0F7F7F]", label: "NORMAL" },
-  1: { text: "text-[#D4A547]", badge: "bg-[#B47A1F]/50 text-[#D4A547] border border-[#B47A1F]", label: "DRIFTING" },
-  2: { text: "text-[#D4653F]", badge: "bg-[#A13A1F]/50 text-[#D4653F] border border-[#A13A1F]", label: "ESCALATION PREPARED" },
-  3: { text: "text-[#B53F3F]", badge: "bg-[#1a0a0a] text-[#B86B6B] border border-[#6A0C0C]", label: "IMMEDIATE RISK" },
+const UI_STATE_COLORS = {
+  NORMAL: { text: "text-[#0F9F9F]", badge: "bg-[#0F5F5F]/50 text-[#0F9F9F] border border-[#0F7F7F]", label: "NORMAL" },
+  EARLY_DRIFT: { text: "text-[#E67E22]", badge: "bg-[#D35400]/40 text-[#E67E22] border border-[#D35400]", label: "EARLY DRIFT" },
+  SEVERE_DRIFT: { text: "text-[#D4653F]", badge: "bg-[#A13A1F]/50 text-[#D4653F] border border-[#A13A1F]", label: "SEVERE DRIFT" },
+  IMMEDIATE_RISK: { text: "text-[#C0392B]", badge: "bg-[#7A0F0F]/60 text-[#C0392B] border border-[#7A0F0F]", label: "IMMEDIATE RISK" },
 };
 
-export default function HeroMetric({ timeToNearest, nearestName, escalationLevel, slope, consequence }) {
+// Legacy escalation level mapping (fallback)
+const LEVEL_COLORS = {
+  0: UI_STATE_COLORS.NORMAL,
+  1: UI_STATE_COLORS.EARLY_DRIFT,
+  2: UI_STATE_COLORS.SEVERE_DRIFT,
+  3: UI_STATE_COLORS.IMMEDIATE_RISK,
+};
+
+export default function HeroMetric({ timeToNearest, nearestName, escalationLevel, slope, consequence, uiState }) {
   const stable = slope <= 0 || timeToNearest === Infinity;
-  const colors = LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0];
+  
+  // Use explicit uiState if provided (scenario-driven), else fallback to escalation level
+  const colors = uiState 
+    ? (UI_STATE_COLORS[uiState] || UI_STATE_COLORS.NORMAL)
+    : (LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0]);
+  
   const displayTime = stable ? "—" : formatTime(timeToNearest);
 
   return (
@@ -24,7 +37,7 @@ export default function HeroMetric({ timeToNearest, nearestName, escalationLevel
       
       {/* Subtitle - compact */}
       <p className="text-[#666] text-xs tracking-wider mb-1 uppercase">
-        {stable ? "No constraint projected" : "Time before nearest constraint"}
+        {stable ? "No operating limit projected" : "Time before nearest operating limit"}
       </p>
 
       {/* Hero Time */}
@@ -32,7 +45,7 @@ export default function HeroMetric({ timeToNearest, nearestName, escalationLevel
         className={cn(
           "text-[72px] md:text-[96px] font-extralight leading-none tracking-tight transition-all duration-700",
           stable ? "text-green-400/80" : colors.text,
-          escalationLevel >= 3 && !stable && "animate-[pulse_3s_ease-in-out_infinite]"
+          uiState === "IMMEDIATE_RISK" && !stable && "animate-[pulse_3s_ease-in-out_infinite]"
         )}
       >
         {displayTime}

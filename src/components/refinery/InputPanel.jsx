@@ -22,6 +22,42 @@ const DEFAULTS = {
 
 export default function InputPanel({ state, onChange, onRunDemo }) {
   const [expanded, setExpanded] = useState(false);
+  const [autoCycle, setAutoCycle] = useState(false);
+  const cycleRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (autoCycle) {
+      const cycle = ["NORMAL", "EARLY_DRIFT", "SEVERE_DRIFT", "IMMEDIATE_RISK"];
+      const delays = [4000, 6000, 6000, 8000]; // NORMAL 4s → Early 6s → Severe 6s → Immediate 8s
+      let currentIndex = cycle.indexOf(state.demoScenario || "NORMAL");
+      
+      const runCycle = () => {
+        currentIndex = (currentIndex + 1) % cycle.length;
+        const next = cycle[currentIndex];
+        import("./calcEngine").then(({ DEMO_SCENARIOS }) => {
+          const scenario = DEMO_SCENARIOS[next];
+          if (scenario) {
+            onChange({ 
+              ...state, 
+              samples: scenario.samples,
+              equipment: scenario.equipment,
+              feedFlow: scenario.feedFlow,
+              sensorQuality: scenario.sensorQuality,
+              opMode: scenario.opMode,
+              demoScenario: next 
+            });
+          }
+        });
+        cycleRef.current = setTimeout(runCycle, delays[currentIndex]);
+      };
+      
+      cycleRef.current = setTimeout(runCycle, delays[currentIndex]);
+    }
+    
+    return () => {
+      if (cycleRef.current) clearTimeout(cycleRef.current);
+    };
+  }, [autoCycle]);
 
   const update = (path, value) => {
     const next = { ...state };
@@ -175,22 +211,24 @@ export default function InputPanel({ state, onChange, onRunDemo }) {
           {/* Demo Scenario Selector */}
           <div className="border-t border-[#333] pt-4 mt-2">
             <Label className="text-[#888] text-xs uppercase tracking-wider mb-2 block">Demo Scenario</Label>
-            <div className="flex gap-3 items-center">
+            <div className="flex gap-3 items-center flex-wrap">
               <Select 
                 value={state.demoScenario || "NORMAL"} 
                 onValueChange={v => {
-                  update("demoScenario", v);
-                  // Map scenario to sample data
-                  const scenarios = {
-                    NORMAL: { samples: [348, 349, 350, 351, 352] },
-                    EARLY_DRIFT: { samples: [356, 358, 360, 362, 364] },
-                    SEVERE_DRIFT: { samples: [362, 364, 366, 368, 370] },
-                    IMMEDIATE_RISK: { samples: [368, 370, 372, 374, 376] },
-                  };
-                  const scenario = scenarios[v];
-                  if (scenario) {
-                    onChange({ ...state, samples: scenario.samples, demoScenario: v });
-                  }
+                  import("./calcEngine").then(({ DEMO_SCENARIOS }) => {
+                    const scenario = DEMO_SCENARIOS[v];
+                    if (scenario) {
+                      onChange({ 
+                        ...state, 
+                        samples: scenario.samples,
+                        equipment: scenario.equipment,
+                        feedFlow: scenario.feedFlow,
+                        sensorQuality: scenario.sensorQuality,
+                        opMode: scenario.opMode,
+                        demoScenario: v 
+                      });
+                    }
+                  });
                 }}
               >
                 <SelectTrigger className="bg-[#2a2a2a] border-[#444] text-white w-64">
@@ -209,19 +247,36 @@ export default function InputPanel({ state, onChange, onRunDemo }) {
                   const current = state.demoScenario || "NORMAL";
                   const nextIndex = (cycle.indexOf(current) + 1) % cycle.length;
                   const next = cycle[nextIndex];
-                  const scenarios = {
-                    NORMAL: { samples: [348, 349, 350, 351, 352] },
-                    EARLY_DRIFT: { samples: [356, 358, 360, 362, 364] },
-                    SEVERE_DRIFT: { samples: [362, 364, 366, 368, 370] },
-                    IMMEDIATE_RISK: { samples: [368, 370, 372, 374, 376] },
-                  };
-                  onChange({ ...state, samples: scenarios[next].samples, demoScenario: next });
+                  import("./calcEngine").then(({ DEMO_SCENARIOS }) => {
+                    const scenario = DEMO_SCENARIOS[next];
+                    if (scenario) {
+                      onChange({ 
+                        ...state, 
+                        samples: scenario.samples,
+                        equipment: scenario.equipment,
+                        feedFlow: scenario.feedFlow,
+                        sensorQuality: scenario.sensorQuality,
+                        opMode: scenario.opMode,
+                        demoScenario: next 
+                      });
+                    }
+                  });
                 }}
                 variant="outline"
                 size="sm"
                 className="border-[#444] text-[#aaa] hover:text-white bg-transparent"
               >
-                Next Scenario
+                Next Scenario →
+              </Button>
+              <Button
+                onClick={() => {
+                  setAutoCycle(!autoCycle);
+                }}
+                variant={autoCycle ? "default" : "outline"}
+                size="sm"
+                className={autoCycle ? "bg-[#0F5F5F] border-[#0F7F7F] text-white" : "border-[#444] text-[#aaa] hover:text-white bg-transparent"}
+              >
+                {autoCycle ? "⏸ Stop Auto-Cycle" : "▶ Auto-Cycle"}
               </Button>
             </div>
           </div>

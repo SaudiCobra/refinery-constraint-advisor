@@ -77,42 +77,40 @@ export default function ProcessMap({
     .toUpperCase()
     .replace(/\s+/g, "_");
   
-  // Presentation mode state override (based on escalation severity)
-  const effectiveState = !interactive
-    ? (escalationLevel >= 2 || hotSpotRisk === "HIGH"
-        ? "IMMEDIATE_RISK"
-        : escalationLevel >= 1
-        ? "EARLY_DRIFT"
-        : normalizedState)
-    : normalizedState;
+  // Use explicit systemState (scenario-driven) in both modes
+  const effectiveState = normalizedState;
   
-  // State-driven color palettes (Presentation Mode)
+  // State-driven color palettes (both modes - scenario-driven)
   const getStateColors = () => {
-    if (!interactive) {
-      if (effectiveState === "IMMEDIATE_RISK") {
-        return {
-          base: "#7A7A7A", // Visible neutral grey
-          affected: "#C0392B", // Amber/dark red (NOT orange)
-          affectedStroke: "5",
-          pipes: "#7A7A7A"
-        };
-      } else if (effectiveState === "EARLY_DRIFT") {
-        return {
-          base: "#7A7A7A",
-          affected: "#E67E22", // Muted orange
-          affectedStroke: "4.5",
-          pipes: "#7A7A7A"
-        };
-      }
-      // NORMAL
+    if (effectiveState === "IMMEDIATE_RISK") {
       return {
-        base: "#7A7A7A", // Visible neutral grey
-        affected: "#7A7A7A",
-        affectedStroke: "3.5",
-        pipes: "#7A7A7A"
+        base: interactive ? "#555" : "#7A7A7A",
+        affected: "#C0392B",
+        affectedStroke: "5",
+        pipes: interactive ? "#555" : "#7A7A7A"
+      };
+    } else if (effectiveState === "SEVERE_DRIFT") {
+      return {
+        base: interactive ? "#555" : "#7A7A7A",
+        affected: "#D4653F",
+        affectedStroke: "4.5",
+        pipes: interactive ? "#555" : "#7A7A7A"
+      };
+    } else if (effectiveState === "EARLY_DRIFT") {
+      return {
+        base: interactive ? "#555" : "#7A7A7A",
+        affected: "#E67E22",
+        affectedStroke: "4",
+        pipes: interactive ? "#555" : "#7A7A7A"
       };
     }
-    return null;
+    // NORMAL
+    return {
+      base: interactive ? "#555" : "#7A7A7A",
+      affected: interactive ? "#555" : "#7A7A7A",
+      affectedStroke: "3.5",
+      pipes: interactive ? "#555" : "#7A7A7A"
+    };
   };
   
   const stateColors = getStateColors();
@@ -156,13 +154,20 @@ export default function ProcessMap({
   const shellThermalColor = getThermalColor(reactorOutletTemp);
   const cooledThermalColor = getThermalColor(coolerOutletTemp);
 
-  // Presentation Mode: Determine which unit is constrained
+  // Determine which unit is constrained (both modes - state-driven)
   const getConstrainedUnit = () => {
-    if (!interactive) {
-      if (hotSpotRisk === "HIGH" || escalationLevel >= 2) return "reactor";
-      if (coolingCapacity === "CONSTRAINED") return "cooler";
+    if (effectiveState === "IMMEDIATE_RISK") {
+      if (hotSpotRisk === "HIGH") return "reactor";
+      if (!equipment.effluentCooler) return "cooler";
+      return "reactor";
+    }
+    if (effectiveState === "SEVERE_DRIFT") {
+      if (coolingCapacity === "CONSTRAINED" || !equipment.effluentCooler) return "cooler";
+      return "reactor";
+    }
+    if (effectiveState === "EARLY_DRIFT") {
       if (preheatStatus?.includes("stress")) return "exchanger";
-      if (escalationLevel >= 1) return "reactor";
+      return "reactor";
     }
     return null;
   };
@@ -184,10 +189,10 @@ export default function ProcessMap({
     return { color: "#777", width: "3" };
   };
   
-  // Subtle muting for non-affected equipment
+  // Subtle muting for non-affected equipment (both modes)
   const getNonAffectedOpacity = (unitType) => {
-    if (!interactive && constrainedUnit && systemState !== "NORMAL") {
-      return unitType === constrainedUnit ? 1 : 0.92;
+    if (constrainedUnit && effectiveState !== "NORMAL") {
+      return unitType === constrainedUnit ? 1 : (interactive ? 0.95 : 0.92);
     }
     return 1;
   };
