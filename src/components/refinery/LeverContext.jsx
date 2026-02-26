@@ -90,28 +90,43 @@ export default function LeverContext({
         {expanded ? "− Hide details" : "+ Show details"}
       </button>
 
-      {/* Corrective action buttons — interactive mode only */}
+      {/* Corrective action toggles — interactive mode only */}
       {onMitigate && (
         <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
           <p className="text-[#666] text-[10px] uppercase tracking-wider mb-2 font-semibold">Corrective Actions</p>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => onMitigate("feedReduction")}
-              className="px-3 py-1.5 rounded border border-[#444] text-[#aaa] text-xs hover:border-[#E67E22] hover:text-[#E67E22] transition-all duration-200"
+              className={cn(
+                "px-3 py-1.5 rounded border text-xs transition-all duration-200",
+                feedReductionActive
+                  ? "border-[#E67E22] text-[#E67E22] bg-[#E67E22]/10"
+                  : "border-[#444] text-[#aaa] hover:border-[#E67E22] hover:text-[#E67E22]"
+              )}
             >
-              ↓ Feed Reduction
+              {feedReductionActive ? "✓ " : "↓ "}Feed Reduction
             </button>
             <button
               onClick={() => onMitigate("quench")}
-              className="px-3 py-1.5 rounded border border-[#444] text-[#aaa] text-xs hover:border-[#4A90E2] hover:text-[#4A90E2] transition-all duration-200"
+              className={cn(
+                "px-3 py-1.5 rounded border text-xs transition-all duration-200",
+                quenchBoostActive
+                  ? "border-[#4A90E2] text-[#4A90E2] bg-[#4A90E2]/10"
+                  : "border-[#444] text-[#aaa] hover:border-[#4A90E2] hover:text-[#4A90E2]"
+              )}
             >
-              ↑ Increase Quench
+              {quenchBoostActive ? "✓ " : "↑ "}Quench Boost
             </button>
             <button
               onClick={() => onMitigate("cooling")}
-              className="px-3 py-1.5 rounded border border-[#444] text-[#aaa] text-xs hover:border-[#0F7F7F] hover:text-[#0F9F9F] transition-all duration-200"
+              className={cn(
+                "px-3 py-1.5 rounded border text-xs transition-all duration-200",
+                coolingBoostActive
+                  ? "border-[#0F9F9F] text-[#0F9F9F] bg-[#0F9F9F]/10"
+                  : "border-[#444] text-[#aaa] hover:border-[#0F7F7F] hover:text-[#0F9F9F]"
+              )}
             >
-              ↑ Boost Cooling
+              {coolingBoostActive ? "✓ " : "↑ "}Cooling Boost
             </button>
           </div>
           {mitigationMsg && (
