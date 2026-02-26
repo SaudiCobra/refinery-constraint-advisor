@@ -65,8 +65,8 @@ export default function Home() {
 
   // ── Physics simulation state (interactive mode only) ────────────────────────
   // These are the raw physics variables; all display values derive from them.
-  const [simTemp,   setSimTemp]   = useState(352);   // currentOutletTempC
-  const [simRoR,    setSimRoR]    = useState(0.30);  // rateOfRiseC_per_min
+  const [simTemp,   setSimTemp]   = useState(358.0); // currentOutletTempC — seeds NORMAL mid-band
+  const [simRoR,    setSimRoR]    = useState(0.25);  // rateOfRiseC_per_min — seeds NORMAL
   const [simRunning, setSimRunning] = useState(true);
   const [mitigationMsg, setMitigationMsg] = useState("");
 
