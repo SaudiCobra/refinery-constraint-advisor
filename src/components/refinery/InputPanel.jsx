@@ -11,12 +11,13 @@ const DEFAULTS = {
   varName: "NHT Reactor Inlet Temperature",
   units: "°C",
   interval: 2,
-  samples: [358, 360, 362, 364, 366],
+  samples: [348, 349, 350, 351, 352],
   limits: { hi: 370, hihi: 380, spec: 375, trip: 390, rampRate: "" },
   opMode: "steady",
   sensorQuality: "good",
   equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
   feedFlow: 84000,
+  demoScenario: "NORMAL",
 };
 
 export default function InputPanel({ state, onChange, onRunDemo }) {
@@ -171,24 +172,43 @@ export default function InputPanel({ state, onChange, onRunDemo }) {
             </div>
           </div>
 
+          {/* Demo Scenario Selector */}
+          <div className="border-t border-[#333] pt-4 mt-2">
+            <Label className="text-[#888] text-xs uppercase tracking-wider mb-2 block">Demo Scenario</Label>
+            <Select 
+              value={state.demoScenario || "NORMAL"} 
+              onValueChange={v => {
+                update("demoScenario", v);
+                // Map scenario to sample data
+                const scenarios = {
+                  NORMAL: { samples: [348, 349, 350, 351, 352] },
+                  EARLY_DRIFT: { samples: [356, 358, 360, 362, 364] },
+                  SEVERE_DRIFT: { samples: [362, 364, 366, 368, 370] },
+                  IMMEDIATE_RISK: { samples: [368, 370, 372, 374, 376] },
+                };
+                const scenario = scenarios[v];
+                if (scenario) {
+                  onChange({ ...state, samples: scenario.samples, demoScenario: v });
+                }
+              }}
+            >
+              <SelectTrigger className="bg-[#2a2a2a] border-[#444] text-white w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NORMAL">NORMAL</SelectItem>
+                <SelectItem value="EARLY_DRIFT">EARLY_DRIFT</SelectItem>
+                <SelectItem value="SEVERE_DRIFT">SEVERE_DRIFT</SelectItem>
+                <SelectItem value="IMMEDIATE_RISK">IMMEDIATE_RISK</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="flex flex-wrap gap-3 pt-4">
             <Button onClick={reset} variant="outline" size="sm" className="border-[#444] text-[#aaa] hover:text-white bg-transparent">
               <RotateCcw className="w-3 h-3 mr-2" /> Reset Defaults
             </Button>
-            <div className="border-l border-[#444] mx-1" />
-            <span className="text-[#666] text-xs self-center mr-2">Demo Scenarios:</span>
-            {SCENARIOS.map((s, i) => (
-              <Button
-                key={i}
-                onClick={() => onRunDemo(i)}
-                variant="outline"
-                size="sm"
-                className="border-[#444] text-[#999] hover:text-white bg-transparent text-xs"
-              >
-                {s.name}
-              </Button>
-            ))}
           </div>
         </div>
       )}
