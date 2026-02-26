@@ -21,13 +21,14 @@ const LEVER_IMPACT = {
   },
 };
 
-export function computeMitigatedRoR(baseRoR, equipment, uiState) {
+export function computeMitigatedRoR(baseRoR, equipment, uiState, feedReductionOverride = false) {
   const state = uiState || "NORMAL";
   
   // Determine active levers
   const coolingActive = equipment.effluentCooler;
   const hydrogenActive = equipment.h2Compressor;
-  const feedReductionActive = equipment.bypassValve;
+  // feedReduction: active if bypassValve available OR explicitly overridden by interactive toggle
+  const feedReductionActive = equipment.bypassValve || feedReductionOverride;
   
   // Get impact factors for current state
   const coolingImpact = coolingActive ? LEVER_IMPACT.cooling[state] : 0;

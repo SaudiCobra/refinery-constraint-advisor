@@ -1,8 +1,8 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, AlertTriangle } from "lucide-react";
+import { CheckCircle2, TrendingDown } from "lucide-react";
 
-export default function LeverContext({ equipment, coolingCapacity, escalationLevel }) {
+export default function LeverContext({ equipment, coolingCapacity, escalationLevel, feedReductionActive, onFeedReductionToggle }) {
   const [expanded, setExpanded] = React.useState(false);
   
   const levers = [
@@ -73,6 +73,32 @@ export default function LeverContext({ equipment, coolingCapacity, escalationLev
               </p>
             )
           ))}
+        </div>
+      )}
+
+      {/* Feed Reduction toggle — interactive only, shown when callback provided */}
+      {onFeedReductionToggle && (
+        <div className="mt-3 pt-3 border-t border-[#2a2a2a] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingDown className={cn("w-3.5 h-3.5", feedReductionActive ? "text-[#E67E22]" : "text-[#555]")} />
+            <span className={cn("text-xs font-medium", feedReductionActive ? "text-[#E67E22]" : "text-[#888]")}>
+              Reduce Feed Rate
+            </span>
+            {feedReductionActive && (
+              <span className="text-[10px] text-[#E67E22]/70 italic">— mitigation active</span>
+            )}
+          </div>
+          <button
+            onClick={onFeedReductionToggle}
+            className={cn(
+              "px-3 py-1 rounded text-xs font-semibold border transition-all duration-300",
+              feedReductionActive
+                ? "bg-[#D35400]/20 border-[#D35400] text-[#E67E22] hover:bg-[#D35400]/30"
+                : "bg-transparent border-[#444] text-[#666] hover:border-[#666] hover:text-[#888]"
+            )}
+          >
+            {feedReductionActive ? "Active — Revert" : "Activate"}
+          </button>
         </div>
       )}
 
