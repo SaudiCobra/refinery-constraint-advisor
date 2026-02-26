@@ -1,8 +1,8 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, TrendingDown } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
-export default function LeverContext({ equipment, coolingCapacity, escalationLevel, feedReductionActive, onFeedReductionToggle }) {
+export default function LeverContext({ equipment, coolingCapacity, escalationLevel, onMitigate, mitigationMsg }) {
   const [expanded, setExpanded] = React.useState(false);
   
   const levers = [
@@ -68,37 +68,9 @@ export default function LeverContext({ equipment, coolingCapacity, escalationLev
         <div className="mt-3 pt-3 border-t border-[#2a2a2a] space-y-1.5">
           {levers.map((lever, idx) => (
             lever.available && (
-              <p key={idx} className="text-[#777] text-xs">
-                • {lever.description}
-              </p>
+              <p key={idx} className="text-[#777] text-xs">• {lever.description}</p>
             )
           ))}
-        </div>
-      )}
-
-      {/* Feed Reduction toggle — interactive only, shown when callback provided */}
-      {onFeedReductionToggle && (
-        <div className="mt-3 pt-3 border-t border-[#2a2a2a] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TrendingDown className={cn("w-3.5 h-3.5", feedReductionActive ? "text-[#E67E22]" : "text-[#555]")} />
-            <span className={cn("text-xs font-medium", feedReductionActive ? "text-[#E67E22]" : "text-[#888]")}>
-              Reduce Feed Rate
-            </span>
-            {feedReductionActive && (
-              <span className="text-[10px] text-[#E67E22]/70 italic">— mitigation active</span>
-            )}
-          </div>
-          <button
-            onClick={onFeedReductionToggle}
-            className={cn(
-              "px-3 py-1 rounded text-xs font-semibold border transition-all duration-300",
-              feedReductionActive
-                ? "bg-[#D35400]/20 border-[#D35400] text-[#E67E22] hover:bg-[#D35400]/30"
-                : "bg-transparent border-[#444] text-[#666] hover:border-[#666] hover:text-[#888]"
-            )}
-          >
-            {feedReductionActive ? "Active — Revert" : "Activate"}
-          </button>
         </div>
       )}
 
@@ -108,6 +80,36 @@ export default function LeverContext({ equipment, coolingCapacity, escalationLev
       >
         {expanded ? "− Hide details" : "+ Show details"}
       </button>
+
+      {/* Corrective action buttons — interactive mode only */}
+      {onMitigate && (
+        <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
+          <p className="text-[#666] text-[10px] uppercase tracking-wider mb-2 font-semibold">Corrective Actions</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => onMitigate("feedReduction")}
+              className="px-3 py-1.5 rounded border border-[#444] text-[#aaa] text-xs hover:border-[#E67E22] hover:text-[#E67E22] transition-all duration-200"
+            >
+              ↓ Feed Reduction
+            </button>
+            <button
+              onClick={() => onMitigate("quench")}
+              className="px-3 py-1.5 rounded border border-[#444] text-[#aaa] text-xs hover:border-[#4A90E2] hover:text-[#4A90E2] transition-all duration-200"
+            >
+              ↑ Increase Quench
+            </button>
+            <button
+              onClick={() => onMitigate("cooling")}
+              className="px-3 py-1.5 rounded border border-[#444] text-[#aaa] text-xs hover:border-[#0F7F7F] hover:text-[#0F9F9F] transition-all duration-200"
+            >
+              ↑ Boost Cooling
+            </button>
+          </div>
+          {mitigationMsg && (
+            <p className="text-[#E67E22] text-xs mt-2 italic">{mitigationMsg}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
