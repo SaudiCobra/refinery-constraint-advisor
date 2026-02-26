@@ -45,23 +45,17 @@ export function getNearestConstraint(constraints) {
   return positive.length > 0 ? positive[0] : null;
 }
 
-export function getSystemState(ror, margin, ttc) {
-  // IMMEDIATE_RISK if ANY:
-  if (ror >= 1.2 || ttc <= 8 || margin <= 3) {
+export function getSystemState(escalationLevel) {
+  // Map escalation level to system state (temporary scenario-driven mapping)
+  if (escalationLevel >= 3) {
     return "IMMEDIATE_RISK";
   }
-  
-  // SEVERE_DRIFT if ANY (and not immediate risk):
-  if ((ror >= 0.8 && ror < 1.2) || (ttc <= 15 && ttc > 8) || (margin <= 6 && margin > 3)) {
+  if (escalationLevel === 2) {
     return "SEVERE_DRIFT";
   }
-  
-  // EARLY_DRIFT if ANY (and not severe/immediate):
-  if ((ror >= 0.4 && ror < 0.8) || (ttc <= 30 && ttc > 15) || (margin <= 10 && margin > 6)) {
+  if (escalationLevel === 1) {
     return "EARLY_DRIFT";
   }
-  
-  // NORMAL otherwise
   return "NORMAL";
 }
 

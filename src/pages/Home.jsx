@@ -214,11 +214,8 @@ export default function Home() {
   escalationLevel = adjustEscalationForHotSpot(escalationLevel, hotSpotRisk, timeToNearest);
   const alarmState = getAlarmState(currentValue, activeData.limits);
 
-  // Calculate systemState based on RoR, Margin, and TTC
-  const hiLimit = activeData.limits.hi != null && activeData.limits.hi !== "" ? Number(activeData.limits.hi) : Infinity;
-  const margin = hiLimit - currentValue;
-  const ttc = slope > 0.2 ? margin / slope : Infinity;
-  const systemState = getSystemState(slope, margin, ttc);
+  // Derive system state from escalation level (temporary scenario-driven mapping)
+  const systemState = getSystemState(escalationLevel);
 
   const consequence = nearest && nearest.time < Infinity
     ? `If unchanged: ${nearest.name} in ${formatTime(timeToNearest)}`
