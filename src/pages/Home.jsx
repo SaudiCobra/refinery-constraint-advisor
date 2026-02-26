@@ -147,8 +147,17 @@ export default function Home() {
         ror -= cfg.steerK * deficit;
       }
 
-      // 3. Hard-clamp RoR to band min/max (prevents runaway)
-      ror = Math.max(cfg.rorMin, Math.min(cfg.rorMax, ror));
+      // 3. Apply active mitigation factors (multiplicative, read from refs)
+      let mitigFactor = 1.0;
+      if (feedReductionRef.current) mitigFactor *= 0.80;
+      if (quenchBoostRef.current)   mitigFactor *= 0.75;
+      if (coolingBoostRef.current)  mitigFactor *= 0.85;
+      ror = ror * mitigFactor;
+
+      // 4. Hard-clamp RoR — use a floor of 0.05 when mitigation is active,
+      //    otherwise respect band minimum so steering stays meaningful.
+      const rorFloor = (mitigFactor < 1.0) ? 0.05 : cfg.rorMin;
+      ror = Math.max(rorFloor, Math.min(cfg.rorMax, ror));
 
       // 4. Advance temperature
       const tempNoise = (Math.random() - 0.5) * 0.04;
