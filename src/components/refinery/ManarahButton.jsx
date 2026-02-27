@@ -172,9 +172,9 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
               position: "absolute",
               inset: -3,
               borderRadius: "50%",
-              border: `2px solid ${cfg.coreColor}`,
+              border: `2.2px solid ${cfg.coreColor}`,
               pointerEvents: "none",
-              opacity: 0.4,
+              opacity: 0.5,
             }}
           />
         )}
