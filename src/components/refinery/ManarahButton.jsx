@@ -7,47 +7,47 @@ function useBeaconSize() {
     window.addEventListener("resize", handler);
     return () => window.removeEventListener("resize", handler);
   }, []);
-  if (vw > 3200) return 96;
-  if (vw > 2560) return 80;
-  return 64;
+  if (vw > 3200) return 80;
+  if (vw > 2560) return 72;
+  return 56;
 }
 
 const STATE_CONFIG = {
   NORMAL: {
     coreColor: "#0F9F9F",
-    glowColor: "rgba(15,159,159,0.08)",
-    glowIntensity: 1.0,
-    haloColor: "rgba(15,159,159,0.06)",
+    glowColor: "rgba(15,159,159,0.06)",
+    glowIntensity: 0.15,
+    haloColor: "rgba(15,159,159,0.22)",
+    haloBgShadow: "0 0 14px rgba(15,159,159,0.20)",
     pulseMs: null,
     sweepMs: null,
-    translateY: 0,
   },
   EARLY_DRIFT: {
     coreColor: "#D4A547",
-    glowColor: "rgba(212,165,71,0.09)",
-    glowIntensity: 1.1,
-    haloColor: "rgba(212,165,71,0.07)",
+    glowColor: "rgba(212,165,71,0.08)",
+    glowIntensity: 0.25,
+    haloColor: "rgba(212,165,71,0.35)",
+    haloBgShadow: "0 0 14px rgba(212,165,71,0.28)",
     pulseMs: null,
-    sweepMs: null,
-    translateY: 0,
+    sweepMs: 4500,
   },
   SEVERE_DRIFT: {
     coreColor: "#D4653F",
     glowColor: "rgba(212,101,63,0.10)",
-    glowIntensity: 1.2,
-    haloColor: "rgba(212,101,63,0.12)",
+    glowIntensity: 0.4,
+    haloColor: "rgba(212,101,63,0.45)",
+    haloBgShadow: "0 0 14px rgba(212,101,63,0.35)",
     pulseMs: null,
     sweepMs: 3000,
-    translateY: -6,
   },
   IMMEDIATE_RISK: {
     coreColor: "#EF4444",
-    glowColor: "rgba(239,68,68,0.12)",
-    glowIntensity: 1.35,
-    haloColor: "rgba(239,68,68,0.18)",
+    glowColor: "rgba(239,68,68,0.14)",
+    glowIntensity: 0.65,
+    haloColor: "rgba(239,68,68,0.55)",
+    haloBgShadow: "0 0 14px rgba(239,68,68,0.42)",
     pulseMs: 900,
     sweepMs: 1400,
-    translateY: -6,
   },
 };
 
@@ -94,16 +94,16 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           width: size,
           height: size,
           borderRadius: "50%",
-          background: "#141820",
+          background: "linear-gradient(145deg, #141820 0%, #0f1319 100%)",
           border: "none",
           padding: 0,
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: `0 4px 18px rgba(0,0,0,0.18), 0 0 0 2px rgba(255,255,255,0.04)`,
+          boxShadow: "0 6px 22px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.06)",
           outline: "none",
-          transition: "box-shadow 0.4s ease",
+          transition: "box-shadow 0.35s cubic-bezier(0.32, 0.72, 0.36, 1), background 0.4s ease, opacity 0.3s ease",
         }}
       >
         {/* Background glow layer */}
@@ -119,16 +119,17 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           }}
         />
 
-        {/* Halo ring — larger, subtle */}
+        {/* Halo ring — precision glow */}
         <span
           style={{
             position: "absolute",
             inset: -6,
             borderRadius: "50%",
             border: `1px solid ${cfg.haloColor}`,
+            boxShadow: cfg.haloBgShadow,
             pointerEvents: "none",
-            opacity: key === "IMMEDIATE_RISK" ? 0.85 : 0.6,
-            transition: "opacity 0.3s ease-in-out, border-color 0.3s ease-in-out",
+            opacity: key === "IMMEDIATE_RISK" ? 0.85 : 0.65,
+            transition: "opacity 0.3s ease-in-out, border-color 0.35s cubic-bezier(0.32, 0.72, 0.36, 1), box-shadow 0.35s cubic-bezier(0.32, 0.72, 0.36, 1)",
           }}
         />
 
