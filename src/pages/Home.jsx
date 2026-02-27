@@ -14,9 +14,7 @@ import DecisionWindowBar from "@/components/refinery/DecisionWindowBar";
 import LeverContext from "@/components/refinery/LeverContext";
 import ProcessMap from "@/components/refinery/ProcessMap";
 import PreheatIndicator from "@/components/refinery/PreheatIndicator";
-import CoolingCapacityIndicator from "@/components/refinery/CoolingCapacityIndicator";
-import H2AvailabilityIndicator from "@/components/refinery/H2AvailabilityIndicator";
-import MitigationCapacity from "@/components/refinery/MitigationCapacity";
+import OpsCapacityPanel from "@/components/refinery/OpsCapacityPanel";
 import {
   computeRateOfRise,
   computeAllConstraints,
