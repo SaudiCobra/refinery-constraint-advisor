@@ -524,6 +524,8 @@ export default function Home() {
 
   const bgDimming = escalationLevel >= 2 ? "bg-[#0b1220]" : escalationLevel >= 1 ? "bg-[#0b1324]" : "bg-[#0b1220]";
 
+  const [manarahOpen, setManarahOpen] = useState(false);
+
   return (
     <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
       <ManarahButton systemState={systemState} />
