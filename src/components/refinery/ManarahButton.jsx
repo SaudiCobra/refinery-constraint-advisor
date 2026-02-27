@@ -17,29 +17,37 @@ const STATE_CONFIG = {
     ringColor: "rgba(15,159,159,0.25)",
     beamColor: "#0F9F9F",
     glowColor: "rgba(15,159,159,0.12)",
+    glowIntensity: 1.0,
     pulseMs: null,
     beamIntensity: 0.70,
+    translateY: 0,
   },
   EARLY_DRIFT: {
     ringColor: "rgba(212,165,71,0.45)",
     beamColor: "#D4A547",
     glowColor: "rgba(212,165,71,0.14)",
-    pulseMs: 3500, // soft breathing
+    glowIntensity: 1.0,
+    pulseMs: 3500,
     beamIntensity: 0.75,
+    translateY: 0,
   },
   SEVERE_DRIFT: {
     ringColor: "rgba(212,101,63,0.65)",
     beamColor: "#D4653F",
     glowColor: "rgba(212,101,63,0.16)",
-    pulseMs: 1800, // stronger glow
+    glowIntensity: 1.2,
+    pulseMs: 3000,
     beamIntensity: 0.85,
+    translateY: -6,
   },
   IMMEDIATE_RISK: {
     ringColor: "rgba(239,68,68,0.85)",
     beamColor: "#EF4444",
     glowColor: "rgba(239,68,68,0.14)",
-    pulseMs: 600, // fast pulse
+    glowIntensity: 1.35,
+    pulseMs: 1800,
     beamIntensity: 0.95,
+    translateY: -6,
   },
 };
 
