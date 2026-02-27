@@ -281,6 +281,30 @@ export default function InputPanel({ state, onChange, onRunDemo, preheatActive, 
             </div>
           </div>
 
+          {/* Preheat Mode Toggle */}
+          {onPreheatToggle && (
+            <div className="border-t border-[#333] pt-4 mt-2 flex items-center justify-between">
+              <div>
+                <p className="text-[#aaa] text-sm font-medium">Preheat Mode Active</p>
+                <p className="text-[#555] text-xs mt-0.5">Enables ramp-rate monitoring during reactor warm-up</p>
+              </div>
+              <button
+                onClick={() => onPreheatToggle(!preheatActive)}
+                className={cn(
+                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
+                  preheatActive ? "bg-[#0F7F7F]" : "bg-[#333]"
+                )}
+              >
+                <span
+                  className={cn(
+                    "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                    preheatActive ? "translate-x-6" : "translate-x-1"
+                  )}
+                />
+              </button>
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-3 pt-4">
             <Button onClick={reset} variant="outline" size="sm" className="border-[#444] text-[#aaa] hover:text-white bg-transparent">
