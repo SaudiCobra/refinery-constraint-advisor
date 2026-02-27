@@ -96,43 +96,44 @@ export default function ManarahButton({ systemState, onClick }) {
           }}
         />
 
-        {/* Light-beam SVG — abstract tapered vertical beam, no emoji */}
+        {/* Light-beam SVG — bold lighthouse geometry */}
         <svg
-          width="26"
-          height="30"
-          viewBox="0 0 26 30"
+          width="32"
+          height="38"
+          viewBox="0 0 32 38"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           style={{ position: "relative", zIndex: 1 }}
         >
-          {/* Narrow base stem */}
-          <rect x="11.5" y="18" width="3" height="8" rx="1" fill={cfg.beamColor} opacity="0.75" />
+          {/* Central vertical pillar — thicker, short */}
+          <rect x="13.5" y="22" width="5" height="10" rx="1.5" fill={cfg.beamColor} opacity="0.80" />
 
-          {/* Tapered mid-body */}
+          {/* Horizontal base platform */}
+          <rect x="9" y="21" width="14" height="2" rx="1" fill={cfg.beamColor} opacity="0.55" />
+
+          {/* Symmetrical triangular beam — wide base, tapers to apex */}
           <path
-            d="M10 10 L13 2 L16 10 Z"
+            d="M3 21 L16 4 L29 21 Z"
             fill={cfg.beamColor}
             opacity="0.90"
           />
 
-          {/* Soft beam spread above apex — two faint outer rays */}
+          {/* Soft outer ray — left */}
           <path
-            d="M13 2 L8 0"
+            d="M16 4 L6 0"
             stroke={cfg.beamColor}
-            strokeWidth="0.8"
+            strokeWidth="1.2"
             strokeLinecap="round"
-            opacity="0.30"
+            opacity="0.28"
           />
+          {/* Soft outer ray — right */}
           <path
-            d="M13 2 L18 0"
+            d="M16 4 L26 0"
             stroke={cfg.beamColor}
-            strokeWidth="0.8"
+            strokeWidth="1.2"
             strokeLinecap="round"
-            opacity="0.30"
+            opacity="0.28"
           />
-
-          {/* Horizontal base bar */}
-          <rect x="8.5" y="17" width="9" height="1.5" rx="0.75" fill={cfg.beamColor} opacity="0.55" />
         </svg>
       </button>
     </>
