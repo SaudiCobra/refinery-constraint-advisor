@@ -71,10 +71,10 @@ export default function Home() {
   const [feedReductionActive, setFeedReductionActive] = useState(false);
   const [quenchBoostActive,   setQuenchBoostActive]   = useState(false);
   const [coolingBoostActive,  setCoolingBoostActive]  = useState(false);
-  // Mirror to refs so the tick can read them without stale closure
-  const feedReductionRef = useRef(false);
-  const quenchBoostRef   = useRef(false);
-  const coolingBoostRef  = useRef(false);
+  // Activation timestamps (null = OFF). Refs so tick reads without stale closure.
+  const feedTsRef    = useRef(null);
+  const h2TsRef      = useRef(null);
+  const coolingTsRef = useRef(null);
 
   // Smoothed TTL for display (prevents jumps > 3 min per tick)
   const [smoothedTTL, setSmoothedTTL] = useState(null);
