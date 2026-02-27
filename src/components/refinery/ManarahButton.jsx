@@ -101,9 +101,23 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 6px 22px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.06)",
+          boxShadow: docked 
+            ? "0 3px 12px rgba(0,0,0,0.16), 0 0 0 1px rgba(255,255,255,0.05), inset 0 0 0 1px rgba(255,255,255,0.04)"
+            : "0 6px 22px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.06)",
+          backdropFilter: docked ? "blur(4px)" : "none",
+          WebkitBackdropFilter: docked ? "blur(4px)" : "none",
           outline: "none",
-          transition: "box-shadow 0.35s cubic-bezier(0.32, 0.72, 0.36, 1), background 0.4s ease, opacity 0.3s ease",
+          transition: "box-shadow 0.25s ease, opacity 0.25s ease, background 0.4s ease",
+        }}
+        onMouseEnter={(e) => {
+          if (!docked) {
+            e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,0,0,0.28), 0 0 0 2px rgba(255,255,255,0.05)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!docked) {
+            e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.06)";
+          }
         }}
       >
         {/* Background glow layer */}
@@ -114,8 +128,8 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
             borderRadius: "50%",
             background: `radial-gradient(circle, ${cfg.glowColor} 0%, transparent 65%)`,
             pointerEvents: "none",
-            opacity: cfg.glowIntensity,
-            transition: "opacity 0.3s ease-in-out",
+            opacity: docked ? cfg.glowIntensity * 0.8 : cfg.glowIntensity,
+            transition: "opacity 0.25s ease",
           }}
         />
 
