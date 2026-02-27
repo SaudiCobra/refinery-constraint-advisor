@@ -203,6 +203,7 @@ export default function ManarahPanel({
   const rankedActions  = getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedReductionActive, quenchBoostActive, coolingBoostActive);
 
   const ttlColor = timeToNearest <= 4 ? "#EF4444" : timeToNearest <= 13 ? "#D4653F" : timeToNearest <= 35 ? "#D4A547" : "#0F9F9F";
+  const isEmergency = stateKey === "SEVERE_DRIFT" || stateKey === "IMMEDIATE_RISK";
 
   const evalResult = evalScenario
     ? (() => {
