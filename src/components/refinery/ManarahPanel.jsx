@@ -273,16 +273,16 @@ export default function ManarahPanel({
         <div style={{ overflowY: "auto", padding: "12px 16px", flex: 1 }}>
 
           {/* SECTION 1 — LIVE STATUS */}
-          <Label>Live Status</Label>
-          <Row label="Time to constraint" value={fmt(timeToNearest)} valueColor={ttlColor} emergency={isEmergency} />
-          <Row label="Rate-of-rise" value={fmtRoR(slope)} valueColor={isEmergency ? severityColor : undefined} emergency={isEmergency} />
+          <Label fs={fs}>Live Status</Label>
+          <Row label="Time to constraint" value={fmt(timeToNearest)} valueColor={ttlColor} emergency={isEmergency} fs={fs} />
+          <Row label="Rate-of-rise" value={fmtRoR(slope)} valueColor={isEmergency ? severityColor : undefined} emergency={isEmergency} fs={fs} />
 
           <Divider />
 
           {/* SECTION 3 — DOMINANT DRIVER — shown immediately in emergency */}
-          <Label>Dominant Driver</Label>
+          <Label fs={fs}>Dominant Driver</Label>
           <p style={{
-            fontSize: isEmergency ? 12 : 11,
+            fontSize: isEmergency ? fs(12) : fs(11),
             color: isEmergency ? severityColor : "#999",
             fontWeight: isEmergency ? 600 : 400,
             lineHeight: 1.5,
@@ -293,17 +293,17 @@ export default function ManarahPanel({
               <Divider />
 
               {/* SECTION 2 — ESCALATION FORECAST (normal/early only) */}
-              <Label>Escalation Forecast</Label>
-              <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} />
-              <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} />
-              <p style={{ fontSize: 9, color: "#333", marginTop: 4 }}>Assumes no intervention and constant rate-of-rise.</p>
+              <Label fs={fs}>Escalation Forecast</Label>
+              <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} fs={fs} />
+              <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} fs={fs} />
+              <p style={{ fontSize: fs(9), color: "#333", marginTop: 4 }}>Assumes no intervention and constant rate-of-rise.</p>
             </>
           )}
 
           <Divider />
 
           {/* SECTION 4 — ACTION PRIORITY */}
-          <Label>Action Priority</Label>
+          <Label fs={fs}>Action Priority</Label>
           {rankedActions.map((a, i) => (
             <ImpactBar
               key={a.key}
@@ -313,6 +313,7 @@ export default function ManarahPanel({
               active={a.active}
               available={a.available}
               pct={a.pct}
+              fs={fs}
             />
           ))}
 
@@ -320,7 +321,7 @@ export default function ManarahPanel({
           {!isEmergency && (
             <>
               <Divider />
-              <Label>Evaluate Adjustment</Label>
+              <Label fs={fs}>Evaluate Adjustment</Label>
               <select
                 value={evalScenario}
                 onChange={e => setEvalScenario(e.target.value)}
@@ -329,7 +330,7 @@ export default function ManarahPanel({
                   background: "#141414",
                   border: "1px solid #2a2a2a",
                   color: "#aaa",
-                  fontSize: 11,
+                  fontSize: fs(11),
                   borderRadius: 5,
                   padding: "5px 8px",
                   outline: "none",
@@ -341,13 +342,13 @@ export default function ManarahPanel({
               </select>
               {evalResult && (
                 <div style={{ background: "#0a0a0a", border: "1px solid #1e1e1e", borderRadius: 6, padding: "8px 10px" }}>
-                  <Row label="Projected TTL if applied" value={fmt(evalResult.projected)} valueColor="#0F9F9F" />
-                  <p style={{ fontSize: 10, color: "#444", marginTop: 2 }}>
+                  <Row label="Projected TTL if applied" value={fmt(evalResult.projected)} valueColor="#0F9F9F" fs={fs} />
+                  <p style={{ fontSize: fs(10), color: "#444", marginTop: 2 }}>
                     {evalResult.gain > 0
                       ? `+${Math.round(evalResult.gain)} min additional margin vs. current trajectory.`
                       : "No significant margin improvement at current operating point."}
                   </p>
-                  <p style={{ fontSize: 9, color: "#2e2e2e", marginTop: 4 }}>Projection only — no action applied.</p>
+                  <p style={{ fontSize: fs(9), color: "#2e2e2e", marginTop: 4 }}>Projection only — no action applied.</p>
                 </div>
               )}
             </>
