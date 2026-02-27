@@ -263,11 +263,25 @@ export default function ManarahPanel({
   feedReductionActive,
   quenchBoostActive,
   coolingBoostActive,
+  onAutoOpen,
 }) {
   const [evalScenario, setEvalScenario] = useState("");
+  const [autoOpenedImmediate, setAutoOpenedImmediate] = useState(false);
   const { panelWidth, fontScale, isLargeDisplay, panelPadding, sectionMargin } = useResponsivePanel();
 
+  const stateKey = (systemState || "NORMAL").toUpperCase().replace(/\s+/g, "_");
+  const isImmediate = stateKey === "IMMEDIATE_RISK";
+  const isSevere = stateKey === "SEVERE_DRIFT";
 
+  // Auto-open once when entering IMMEDIATE_RISK from other states
+  useEffect(() => {
+    if (isImmediate && !autoOpenedImmediate && !open) {
+      setAutoOpenedImmediate(true);
+      if (onAutoOpen) onAutoOpen();
+    } else if (!isImmediate) {
+      setAutoOpenedImmediate(false);
+    }
+  }, [isImmediate, open, autoOpenedImmediate, onAutoOpen]);
 
   if (!open) return null;
 
