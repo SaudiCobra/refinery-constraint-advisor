@@ -248,10 +248,10 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           </svg>
         )}
 
-        {/* Pulse animation for Severe Drift */}
+        {/* Segmented ring animation for Severe Drift */}
         {key === "SEVERE_DRIFT" && (
           <svg
-            className="manarah-beacon-pulse"
+            className="manarah-beacon-segment"
             width={svgSize}
             height={svgHeight}
             viewBox="0 0 32 38"
@@ -264,14 +264,31 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
               pointerEvents: "none",
             }}
           >
-            <circle
-              cx="16"
-              cy="13"
-              r="8.5"
-              stroke={cfg.coreColor}
-              strokeWidth="1"
-              fill="none"
-            />
+            {/* 6 segments illuminating clockwise */}
+            {Array.from({ length: 6 }).map((_, i) => {
+              const angle = (i * 60);
+              const startAngle = angle * (Math.PI / 180);
+              const endAngle = (angle + 50) * (Math.PI / 180);
+              const radius = 8.5;
+              const x1 = 16 + radius * Math.cos(startAngle);
+              const y1 = 13 + radius * Math.sin(startAngle);
+              const x2 = 16 + radius * Math.cos(endAngle);
+              const y2 = 13 + radius * Math.sin(endAngle);
+              const largeArc = 0;
+              return (
+                <path
+                  key={i}
+                  d={`M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`}
+                  stroke={cfg.coreColor}
+                  strokeWidth="1"
+                  fill="none"
+                  opacity={0.3 + 0.4 * Math.sin((angle / 360) * Math.PI * 2)}
+                  style={{
+                    transition: `opacity 1500ms ease-in-out`,
+                  }}
+                />
+              );
+            })}
           </svg>
         )}
       </button>
