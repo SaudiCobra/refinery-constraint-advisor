@@ -135,36 +135,7 @@ export default function Home() {
       const scenarioBand = simRoRRef._scenarioBand || "NORMAL";
       const cfg = BAND_CONFIG[scenarioBand] || BAND_CONFIG.NORMAL;
 
-      // 1. Random RoR wander (within band clamps)
-      const rorNoise = (Math.random() - 0.5) * 2 * cfg.noise;
-      ror = ror + rorNoise;
-
-      // 2. Soft band-steering: proportional nudge if TTL out of [ttlLo, ttlHi]
-      if (currentTTL > cfg.ttlHi) {
-        // Too much time left → accelerate slightly to drift back into band
-        const excess = currentTTL - cfg.ttlHi;
-        ror += cfg.steerK * excess;
-      } else if (currentTTL < cfg.ttlLo) {
-        // Too little time → decelerate slightly to recover band
-        const deficit = cfg.ttlLo - currentTTL;
-        ror -= cfg.steerK * deficit;
-      }
-
-      // 3. Apply ramped mitigation — reads live timestamps from refs
-      const { effectiveRoR } = computeMitigatedRoR(ror, {
-        feedTs:    feedTsRef.current,
-        h2Ts:      h2TsRef.current,
-        coolingTs: coolingTsRef.current,
-      });
-      ror = effectiveRoR;
-
-      // 4. Hard-clamp RoR — floor 0.03 when any lever active, else band min
-      const anyMitig = feedTsRef.current !== null || h2TsRef.current !== null || coolingTsRef.current !== null;
-      const rorFloor = anyMitig ? 0.03 : cfg.rorMin;
-      ror = Math.max(rorFloor, Math.min(cfg.rorMax, ror));
-
-      // 4b. Full-mitigation recovery assist — all 3 levers fully ramped
-      // Check if all three are active and at 100% ramp
+      // Check if all 3 levers are ON and each has completed its full ramp
       const checkFullRamp = (tsMs, action) => {
         if (tsMs === null) return false;
         const { delaySec, rampSec } = ACTION_PARAMS[action];
@@ -175,14 +146,44 @@ export default function Home() {
         checkFullRamp(h2TsRef.current,      'h2')      &&
         checkFullRamp(coolingTsRef.current, 'cooling');
 
-      // When fully mitigated, cool the reactor back toward a safe setpoint
-      // Recovery rate: ~0.08°C/sec — takes ~8–15 s to noticeably climb TTL
-      const RECOVERY_RATE = 0.08 / 60; // °C per demo-minute → slow but visible
-      const TTL_RECOVERY_CAP = 58;     // don't drift beyond Normal ceiling
+      // 1. Random RoR wander (within band clamps)
+      const rorNoise = (Math.random() - 0.5) * 2 * cfg.noise;
+      ror = ror + rorNoise;
+
+      // 2. Soft band-steering — DISABLED during full recovery to avoid fighting it
+      if (!allFullMitigation) {
+        if (currentTTL > cfg.ttlHi) {
+          const excess = currentTTL - cfg.ttlHi;
+          ror += cfg.steerK * excess;
+        } else if (currentTTL < cfg.ttlLo) {
+          const deficit = cfg.ttlLo - currentTTL;
+          ror -= cfg.steerK * deficit;
+        }
+      }
+
+      // 3. Apply ramped mitigation — reads live timestamps from refs
+      const { effectiveRoR } = computeMitigatedRoR(ror, {
+        feedTs:    feedTsRef.current,
+        h2Ts:      h2TsRef.current,
+        coolingTs: coolingTsRef.current,
+      });
+      ror = effectiveRoR;
+
+      // 4. Hard-clamp RoR
+      const anyMitig = feedTsRef.current !== null || h2TsRef.current !== null || coolingTsRef.current !== null;
+      // During full recovery, allow RoR to drop below band min (don't fight it)
+      const rorFloor = anyMitig ? 0.03 : cfg.rorMin;
+      const rorCeil  = allFullMitigation ? cfg.rorMax : cfg.rorMax;
+      ror = Math.max(rorFloor, Math.min(rorCeil, ror));
+
+      // 4b. Full-mitigation thermal recovery assist
+      // Pulls temperature down each tick — makes TTL climb across all bands toward NORMAL
+      // Rate tuned so ~10 ticks (10 s) moves ~0.6°C → ~5+ min TTL gain at SEVERE RoR
+      const TTL_RECOVERY_CAP = 58; // minutes — NORMAL ceiling
       const currentRawTTL = getSimTTL(temp, ror, limits);
       if (allFullMitigation && currentRawTTL < TTL_RECOVERY_CAP) {
-        // Pull temperature down gently each tick (effective thermal recovery)
-        temp -= RECOVERY_RATE;
+        // 0.06°C/tick thermal pullback — enough to outpace even SEVERE RoR drift
+        temp -= 0.06;
       }
 
       // 5. Advance temperature
