@@ -105,13 +105,24 @@ export default function AlarmBanner({
         config.border
       )}
     >
-      <div className="max-w-[1600px] mx-auto flex items-center gap-3">
+      <div className="max-w-[1600px] mx-auto flex items-center gap-4">
+        {/* Dot */}
         <div
           className={cn(
             "w-2 h-2 rounded-full flex-shrink-0",
             config.text.replace("text-", "bg-")
           )}
         />
+        
+        {/* Fixed Label */}
+        <span className="text-xs font-semibold tracking-widest text-[#666] opacity-90 flex-shrink-0">
+          SYSTEM STATUS
+        </span>
+        
+        {/* Divider */}
+        <div className="w-px h-4 bg-[#444] opacity-40 flex-shrink-0" />
+        
+        {/* Live Condition Message */}
         <p className={cn("text-base font-medium tracking-wide", config.text)}>
           {config.message}
         </p>
