@@ -11,6 +11,8 @@ export default function LeverContext({
   feedReductionActive,
   quenchBoostActive,
   coolingBoostActive,
+  rampProgress,       // { feed: 0-100, h2: 0-100, cooling: 0-100 }
+  minutesRecovered,   // number | null
 }) {
   const [expanded, setExpanded] = React.useState(false);
   
