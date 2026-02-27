@@ -546,13 +546,6 @@ export default function Home() {
               </div>
             </div>
 
-            <PreheatIndicator
-              preheatActive={preheatActive}
-              onToggle={setPreheatActive}
-              currentTemp={currentValue}
-              slope={displaySlope}
-            />
-
             <div className="max-w-3xl mx-auto">
               <OpsCapacityPanel
                 systemState={systemState}
