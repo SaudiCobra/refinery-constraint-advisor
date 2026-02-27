@@ -570,7 +570,7 @@ export default function Home() {
       {!alarmsOnly && displayMode === "presentation" && (
         <div className="max-w-[2200px] mx-auto px-20 pt-4">
           <p className="text-[#999] text-sm">
-            Escalation driven by sustained temperature rise; intervention window remains available.
+            Constraint escalation driven by sustained temperature acceleration; intervention window remains intact.
           </p>
         </div>
       )}
