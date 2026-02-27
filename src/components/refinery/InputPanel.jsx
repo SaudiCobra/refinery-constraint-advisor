@@ -20,7 +20,7 @@ const DEFAULTS = {
   demoScenario: "NORMAL",
 };
 
-export default function InputPanel({ state, onChange, onRunDemo }) {
+export default function InputPanel({ state, onChange, onRunDemo, preheatActive, onPreheatToggle }) {
   const [expanded, setExpanded] = useState(false);
   const [autoCycle, setAutoCycle] = useState(false);
   const cycleRef = React.useRef(null);

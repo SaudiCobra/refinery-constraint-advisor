@@ -2,17 +2,28 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { formatTime } from "./calcEngine";
 
-export default function ReasoningBlocks({ slope, nearest, constraints, equipment, sensorQuality, units }) {
+export default function ReasoningBlocks({ slope, nearest, constraints, equipment, sensorQuality, units, systemState, timeToNearest }) {
   const stable = slope <= 0;
-  const unavailable = Object.entries(equipment)
-    .filter(([, v]) => !v)
-    .map(([k]) => {
-      const names = { preheatExchanger: "Preheat Exchanger", effluentCooler: "Effluent Cooler", bypassValve: "Bypass Valve", h2Compressor: "H₂ Compressor" };
-      return names[k] || k;
-    });
 
   const hiConstraint = constraints.find(c => c.name === "High");
   const hihiConstraint = constraints.find(c => c.name === "High-High");
+
+  // Reality check and shift summary driven by live systemState
+  const getRealityCheck = () => {
+    if (systemState === "IMMEDIATE_RISK") return ["Mitigation capacity nearly exhausted", "Hard limit breach imminent"];
+    if (systemState === "SEVERE_DRIFT")   return ["High-impact interventions required", "Effluent temperature approaching Hi-Hi"];
+    if (systemState === "EARLY_DRIFT")    return ["Corrective flexibility remains", "Reactor outlet drifting toward High"];
+    return ["Mitigation capacity available", "No hard limits active"];
+  };
+
+  const getShiftStatus = () => {
+    if (systemState === "IMMEDIATE_RISK") return "Critical — immediate action required";
+    if (systemState === "SEVERE_DRIFT")   return "Severe drift — escalating";
+    if (systemState === "EARLY_DRIFT")    return "Early drift — monitor closely";
+    return "Stable";
+  };
+
+  const [realityLine1, realityLine2] = getRealityCheck();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -24,15 +35,15 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
           <>
             <Line>Rate-of-rise: +{slope.toFixed(1)} {units}/min (confirmed)</Line>
             {nearest && <Line>Margin to {nearest.name.toLowerCase()}: {nearest.margin.toFixed(1)} {units}</Line>}
-            <Line>Escalation window: narrowing</Line>
+            <Line>Escalation window: {systemState === "IMMEDIATE_RISK" ? "critical" : "narrowing"}</Line>
           </>
         )}
       </Block>
 
       {/* Reality Check */}
       <Block title="Reality Check" color="amber">
-        <Line>Mitigation capacity remains</Line>
-        <Line>No hard limits active</Line>
+        <Line>{realityLine1}</Line>
+        <Line>{realityLine2}</Line>
       </Block>
 
       {/* Consequence */}
@@ -54,9 +65,9 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
 
       {/* Shift Summary */}
       <Block title="Shift Summary" color="green">
-        <Line>Status: {stable ? "Stable" : "Escalation forming"}</Line>
+        <Line>Status: {getShiftStatus()}</Line>
         {!stable && nearest && (
-          <Line>Nearest constraint: Reactor outlet temperature</Line>
+          <Line>Nearest constraint: {nearest.name}</Line>
         )}
         <Line>Attention focus: Rate-of-rise & margin</Line>
       </Block>
