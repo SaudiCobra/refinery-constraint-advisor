@@ -366,9 +366,20 @@ export default function ManarahPanel({
         <div style={{ height: 4, background: severityColor, opacity: 0.85, flexShrink: 0 }} />
 
         {/* Header */}
-        <div style={{ padding: isLargeDisplay ? "14px 18px 12px" : "12px 16px 10px", borderBottom: "1px solid #1a1a1a", flexShrink: 0, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div style={{
+          padding: isLargeDisplay ? "14px 18px 12px" : "12px 16px 10px",
+          borderBottom: "1px solid #1a1a1a",
+          flexShrink: 0,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          borderTopLeftRadius: 9,
+          borderTopRightRadius: 9,
+          background: isImmediate ? "rgba(239,68,68,0.04)" : "transparent",
+          transition: "background 0.3s ease-in-out",
+        }}>
           <div>
-            <p style={{ fontSize: isLargeDisplay ? fs(14) : fs(13), fontWeight: 700, color: "#e0e0e0", letterSpacing: "0.06em", marginBottom: 2 }}>MANARAH</p>
+            <p style={{ fontSize: isLargeDisplay ? fs(14) : fs(13), fontWeight: 700, color: isImmediate ? "#ff6b6b" : "#e0e0e0", letterSpacing: "0.06em", marginBottom: 2, transition: "color 0.3s ease-in-out" }}>MANARAH</p>
             <p style={{ fontSize: isLargeDisplay ? fs(11) : fs(10), color: "#444", letterSpacing: "0.04em" }}>Advisory Watchtower — Operator retains full control</p>
           </div>
 
