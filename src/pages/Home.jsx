@@ -436,6 +436,31 @@ export default function Home() {
     ? `If unchanged: ${nearest.name} in ${formatTime(displayTTL)}`
     : null;
 
+  // ── Ramp progress (0-100) for each active lever ──────────────────────────
+  const getRampPct = (tsRef, action) => {
+    if (tsRef.current === null) return 0;
+    const { delaySec, rampSec } = ACTION_PARAMS[action];
+    const elapsed = (Date.now() - tsRef.current) / 1000;
+    if (elapsed < delaySec) return 0;
+    return Math.min(100, ((elapsed - delaySec) / rampSec) * 100);
+  };
+
+  // Live ramp progress (re-read on every render — driven by tick state updates)
+  const rampProgress = {
+    feed:    getRampPct(feedTsRef,    'feed'),
+    h2:      getRampPct(h2TsRef,      'h2'),
+    cooling: getRampPct(coolingTsRef, 'cooling'),
+  };
+
+  // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL)
+  const baselineTTL = isInteractive
+    ? getSimTTL(currentValue, simRoRRef.current, activeData.limits)  // unmitigated
+    : null;
+  const mitigatedTTL = isInteractive ? displayTTL : null;
+  const minutesRecovered = (baselineTTL !== null && mitigatedTTL !== null)
+    ? Math.max(0, mitigatedTTL - baselineTTL)
+    : 0;
+
   const handleRunDemo = useCallback((scenarioIndex) => {
     const s = SCENARIOS[scenarioIndex];
     setState({
