@@ -189,26 +189,31 @@ export default function Home() {
   }, [simRunning, displayMode, state.limits]);
 
   // ── Mitigation toggle handler ─────────────────────────────────────────────
-  // Feed: −25% immediate | Hydrogen: −20% immediate | Cooling: 0→−30% over 12 s
+  // Each lever stores a start timestamp. Effect ramps from 0 → max after delay.
   const handleMitigate = (action) => {
     if (action === "feedReduction") {
-      const next = !feedReductionRef.current;
-      feedReductionRef.current = next;
+      const next = !feedReductionActive;
+      feedTsRef.current = next ? Date.now() : null;
       setFeedReductionActive(next);
-      setMitigationMsg(next ? "Feed reduction active — RoR reduced 25% immediately" : "Feed reduction deactivated");
+      setMitigationMsg(next
+        ? "Feed reduction active — effect builds over ~7 s (max −25% RoR)"
+        : "Feed reduction deactivated");
     } else if (action === "quench") {
-      const next = !quenchBoostRef.current;
-      quenchBoostRef.current = next;
+      const next = !quenchBoostActive;
+      h2TsRef.current = next ? Date.now() : null;
       setQuenchBoostActive(next);
-      setMitigationMsg(next ? "Hydrogen quench active — RoR reduced 20%" : "Hydrogen quench deactivated");
+      setMitigationMsg(next
+        ? "Hydrogen quench active — effect builds over ~9 s (max −20% RoR)"
+        : "Hydrogen quench deactivated");
     } else if (action === "cooling") {
-      const next = !coolingBoostRef.current;
-      coolingBoostRef.current = next;
+      const next = !coolingBoostActive;
+      coolingTsRef.current = next ? Date.now() : null;
       setCoolingBoostActive(next);
-      if (!next) resetCoolingRamp();
-      setMitigationMsg(next ? "Cooling boost active — ramping to −30% RoR over ~12 s" : "Cooling boost deactivated");
+      setMitigationMsg(next
+        ? "Cooling boost active — ramps to −30% RoR over ~14 s"
+        : "Cooling boost deactivated");
     }
-    setTimeout(() => setMitigationMsg(""), 5000);
+    setTimeout(() => setMitigationMsg(""), 6000);
   };
 
   // ── Scenario seeds: initial (temp, ror) chosen so TTL starts mid-band ───────
