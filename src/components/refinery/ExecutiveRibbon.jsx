@@ -9,7 +9,7 @@ export default function ExecutiveRibbon({ timeToNearest, equipment, sensorQualit
   const decisionTime = timeToNearest === Infinity || timeToNearest == null ? "—" : formatTime(timeToNearest);
 
   return (
-    <div className="flex flex-wrap items-center gap-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-5 py-3">
+    <div className="flex flex-wrap items-center gap-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded-t-lg rounded-b-none border-b-0 px-5 py-3">
       <Metric
         label="Prediction confidence"
         value={confidenceLabel}
