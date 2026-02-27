@@ -319,6 +319,7 @@ export default function ManarahPanel({
               available={a.available}
               pct={a.pct}
               fs={fs}
+              isLargeDisplay={isLargeDisplay}
             />
           ))}
 
