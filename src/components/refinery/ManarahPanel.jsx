@@ -340,7 +340,7 @@ export default function ManarahPanel({
           position: "fixed",
           bottom: 96,
           right: 20,
-          width: panelWidth,
+          width: adjustedPanelWidth,
           maxHeight: "70vh",
           zIndex: 9998,
           background: isLargeDisplay ? "rgba(14,14,14,0.92)" : "#0e0e0e",
@@ -351,14 +351,15 @@ export default function ManarahPanel({
           borderRadius: 10,
           boxShadow: stateKey === "IMMEDIATE_RISK"
             ? (isLargeDisplay
-              ? "0 20px 60px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.05), 0 0 20px rgba(239,68,68,0.15)"
-              : "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(239,68,68,0.12)")
+              ? "0 28px 72px rgba(0,0,0,0.80), 0 0 0 1px rgba(255,255,255,0.05), 0 0 24px rgba(239,68,68,0.18)"
+              : "0 16px 48px rgba(0,0,0,0.62), 0 0 0 1px rgba(255,255,255,0.03), 0 0 20px rgba(239,68,68,0.14)")
             : (isLargeDisplay
               ? "0 20px 60px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.05)"
               : "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)"),
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          transition: "width 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-left 0.3s ease-in-out",
         }}
       >
         {/* Severity bar */}
