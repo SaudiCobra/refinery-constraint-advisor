@@ -579,6 +579,8 @@ export default function Home() {
               state={state}
               onChange={setState}
               onRunDemo={handleRunDemo}
+              preheatActive={preheatActive}
+              onPreheatToggle={setPreheatActive}
             />
 
             <ReasoningBlocks
