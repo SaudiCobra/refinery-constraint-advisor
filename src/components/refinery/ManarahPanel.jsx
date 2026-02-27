@@ -388,6 +388,14 @@ export default function ManarahPanel({
               <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} fs={fs} />
               <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} fs={fs} />
               <p style={{ fontSize: fs(9), color: "#333", marginTop: 4 }}>Assumes no intervention and constant rate-of-rise.</p>
+
+              <Divider isLargeDisplay={isLargeDisplay} />
+
+              {/* SECTION 2B — OPERATOR ADVANTAGE */}
+              <Label fs={fs}>Operator Advantage</Label>
+              <p style={{ fontSize: fs(11), color: "#999", lineHeight: 1.4 }}>
+                {getOperatorAdvantage(timeToNearest, slope, coolingCapacity, equipment, feedReductionActive, coolingBoostActive)}
+              </p>
             </>
           )}
 
