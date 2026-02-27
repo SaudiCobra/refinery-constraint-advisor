@@ -151,6 +151,7 @@ export default function ManarahPanel({
   quenchBoostActive,
   coolingBoostActive,
 }) {
+  const [evalScenario, setEvalScenario] = useState("");
   if (!open) return null;
 
   // TTL at Severe and Immediate thresholds
