@@ -14,11 +14,13 @@ export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, on
           <p className="text-[#aaa] text-sm font-normal tracking-tight">
             Operating Limits Watchtower (NHT)
           </p>
-          <div className="flex items-center gap-3 mt-2">
-            <span className="text-[#888] text-sm">Unit: NHT Preheat Section (Demo)</span>
-            <span className="text-[#555]">|</span>
-            <span className="text-[#888] text-sm">Assessment as of: {moment().format("HH:mm")}</span>
-          </div>
+          {displayMode === "interactive" && (
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-[#888] text-sm">Unit: NHT Preheat Section (Demo)</span>
+              <span className="text-[#555]">|</span>
+              <span className="text-[#888] text-sm">Assessment as of: {moment().format("HH:mm")}</span>
+            </div>
+          )}
         </div>
 
         {/* Right */}
