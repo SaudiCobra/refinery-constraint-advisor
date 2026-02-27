@@ -149,17 +149,16 @@ export default function Home() {
         ror -= cfg.steerK * deficit;
       }
 
-      // 3. Apply mitigation via engine (cooling ramps over ~12 s, others instant)
-      const coolingRamp = tickCoolingRamp(coolingBoostRef.current);
+      // 3. Apply ramped mitigation — reads live timestamps from refs
       const { effectiveRoR } = computeMitigatedRoR(ror, {
-        feedActive:     feedReductionRef.current,
-        hydrogenActive: quenchBoostRef.current,
-        coolingActive:  coolingBoostRef.current,
-      }, coolingRamp);
+        feedTs:    feedTsRef.current,
+        h2Ts:      h2TsRef.current,
+        coolingTs: coolingTsRef.current,
+      });
       ror = effectiveRoR;
 
-      // 4. Hard-clamp RoR — use floor of 0.03 when mitigation active, else band min
-      const anyMitig = feedReductionRef.current || quenchBoostRef.current || coolingBoostRef.current;
+      // 4. Hard-clamp RoR — floor 0.03 when any lever active, else band min
+      const anyMitig = feedTsRef.current !== null || h2TsRef.current !== null || coolingTsRef.current !== null;
       const rorFloor = anyMitig ? 0.03 : cfg.rorMin;
       ror = Math.max(rorFloor, Math.min(cfg.rorMax, ror));
 
