@@ -525,6 +525,7 @@ export default function Home() {
   const bgDimming = escalationLevel >= 2 ? "bg-[#0b1220]" : escalationLevel >= 1 ? "bg-[#0b1324]" : "bg-[#0b1220]";
 
   const [manarahOpen, setManarahOpen] = useState(false);
+  const manarahPanelRef = useRef(null);
 
   const handleManarahAutoOpen = () => {
     setManarahOpen(true);
@@ -532,8 +533,9 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
-      <ManarahButton systemState={systemState} onClick={() => setManarahOpen(!manarahOpen)} drawerOpen={manarahOpen} />
+      <ManarahButton systemState={systemState} onClick={() => setManarahOpen(!manarahOpen)} drawerOpen={manarahOpen} panelRef={manarahPanelRef} />
       <ManarahPanel
+        ref={manarahPanelRef}
         open={manarahOpen}
         systemState={systemState}
         timeToNearest={displayTTL}
