@@ -387,16 +387,18 @@ export default function ManarahPanel({
         </div>
 
         {/* Scrollable body */}
-        <div style={{ overflowY: "auto", padding: panelPadding, flex: 1 }}>
+         <div style={{ overflowY: "auto", padding: panelPadding, flex: 1 }}>
 
-          {/* SECTION 1 — LIVE STATUS */}
-          <Label fs={fs}>Live Status</Label>
-          <Row label="Time to constraint" value={fmt(timeToNearest)} valueColor={ttlColor} emergency={isEmergency} fs={fs} />
-          <Row label="Rate-of-rise" value={fmtRoR(slope)} valueColor={isEmergency ? severityColor : undefined} emergency={isEmergency} fs={fs} />
+           {/* SECTION 1 — LIVE STATUS */}
+           <Label fs={fs}>Live Status</Label>
+           <Row label="Time to constraint" value={fmt(timeToNearest)} valueColor={ttlColor} emergency={isEmergency} fs={fs} />
+           <Row label="Rate-of-rise" value={fmtRoR(slope)} valueColor={isEmergency ? severityColor : undefined} emergency={isEmergency} fs={fs} />
 
-          <TrajectoryBar slope={slope} fs={fs} isLargeDisplay={isLargeDisplay} />
+           <TrajectoryBar slope={slope} fs={fs} isLargeDisplay={isLargeDisplay} />
 
-          <Divider isLargeDisplay={isLargeDisplay} />
+           {/* Subtle divider */}
+           <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: sectionMargin }} />
+
 
           {/* SECTION 3 — DOMINANT DRIVER — shown immediately in emergency */}
           <Label fs={fs}>Dominant Driver</Label>
