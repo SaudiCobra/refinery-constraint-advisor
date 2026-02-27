@@ -337,6 +337,7 @@ export default function ManarahPanel({
 
       <div
         className="manarah-panel"
+        data-manarah-panel
         style={{
           position: "fixed",
           bottom: 96,
