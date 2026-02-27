@@ -138,7 +138,7 @@ function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs }
   const labelColor = !available ? "#3a3a3a" : active ? "#ddd" : "#888";
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: isLargeDisplay ? 11 : 7 }}>
       <span style={{ fontSize: fs(11), color: labelColor, width: 120, flexShrink: 0 }}>
         {label}
         {active && pct !== null && <span style={{ fontSize: fs(9), color: "#555", marginLeft: 4 }}>[{pct}%]</span>}
