@@ -57,7 +57,7 @@ function resolveState(s) {
   return STATE_CONFIG[k] ? k : "NORMAL";
 }
 
-export default function ManarahButton({ systemState, onClick, drawerOpen = false }) {
+export default function ManarahButton({ systemState, onClick, drawerOpen = false, panelRef = null }) {
   const key = resolveState(systemState);
   const cfg = STATE_CONFIG[key];
   const animName = `manarah-ring-${key.toLowerCase()}`;
@@ -66,13 +66,28 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
   const svgSize = Math.round(size * 0.56);
   const svgHeight = Math.round(svgSize * 1.19);
   const [vw, setVw] = React.useState(window.innerWidth);
+  const [panelRect, setPanelRect] = React.useState(null);
   const translateYPx = Math.round((cfg.translateY / 100) * vw);
 
-  // Drawer positioning constants (from ManarahPanel)
-  const basePanelWidth = vw > 3200 ? 760 : vw > 2560 ? 680 : 420;
-  const panelWidth = Math.round(basePanelWidth * 1.08);
-  const adjustedPanelWidth = Math.round(panelWidth * (key === "IMMEDIATE_RISK" ? 1.18 : 1.0));
-  const overlapPx = 20; // Center overlap into drawer
+  // Calculate button position based on panel position
+  React.useEffect(() => {
+    const updatePanelPosition = () => {
+      if (drawerOpen && panelRef?.current) {
+        const rect = panelRef.current.getBoundingClientRect();
+        setPanelRect(rect);
+      }
+    };
+
+    updatePanelPosition();
+    window.addEventListener("resize", updatePanelPosition);
+    const observer = new ResizeObserver(updatePanelPosition);
+    if (panelRef?.current) observer.observe(panelRef.current);
+
+    return () => {
+      window.removeEventListener("resize", updatePanelPosition);
+      observer.disconnect();
+    };
+  }, [drawerOpen, panelRef]);
 
   React.useEffect(() => {
     const handler = () => setVw(window.innerWidth);
@@ -104,8 +119,10 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
         title="Manarah — Advisory Watchtower"
         style={{
           position: "fixed",
-          bottom: drawerOpen ? Math.round(96 + adjustedPanelWidth / 2 - size / 2 + overlapPx) : 20,
-          right: drawerOpen ? 20 : 20,
+          bottom: drawerOpen && panelRect 
+            ? panelRect.height / 2 + window.innerHeight - panelRect.bottom
+            : 20,
+          right: 20,
           zIndex: 9999,
           width: size,
           height: size,
@@ -120,7 +137,7 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           boxShadow: `0 4px 18px rgba(0,0,0,0.18), 0 0 0 2px rgba(255,255,255,0.04)`,
           outline: "none",
           transform: `translateY(${translateYPx}px)`,
-          transition: "bottom 0.3s cubic-bezier(0.32, 0.72, 0.36, 1), transform 0.3s ease-in-out, box-shadow 0.4s ease",
+          transition: "bottom 0.15s cubic-bezier(0.32, 0.72, 0.36, 1), transform 0.3s ease-in-out, box-shadow 0.4s ease",
         }}
       >
         {/* Background glow layer */}
