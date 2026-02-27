@@ -420,7 +420,8 @@ export default function ManarahPanel({
               <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} fs={fs} />
               <p style={{ fontSize: fs(9), color: "#333", marginTop: 4 }}>Assumes no intervention and constant rate-of-rise.</p>
 
-              <Divider isLargeDisplay={isLargeDisplay} />
+              {/* Subtle divider */}
+              <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: sectionMargin }} />
 
               {/* SECTION 2B — OPERATOR ADVANTAGE */}
               <Label fs={fs}>Operator Advantage</Label>
