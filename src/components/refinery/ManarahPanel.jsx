@@ -262,9 +262,7 @@ export default function ManarahPanel({
             <p style={{ fontSize: isLargeDisplay ? fs(14) : fs(13), fontWeight: 700, color: "#e0e0e0", letterSpacing: "0.06em", marginBottom: 2 }}>MANARAH</p>
             <p style={{ fontSize: isLargeDisplay ? fs(11) : fs(10), color: "#444", letterSpacing: "0.04em" }}>Advisory Watchtower — Operator retains full control</p>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#444", padding: 2, lineHeight: 1, marginTop: 2 }}>
-            <X size={14} />
-          </button>
+
         </div>
 
         {/* Scrollable body */}
