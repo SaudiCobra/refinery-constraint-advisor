@@ -35,9 +35,24 @@ export function getLeverEffect(startTs, action) {
 export function computeMitigatedRoR(baseRoR, timestamps) {
   const { feedTs = null, h2Ts = null, coolingTs = null } = timestamps || {};
 
-  const feedEff    = getLeverEffect(feedTs,    'feed');
-  const h2Eff      = getLeverEffect(h2Ts,      'h2');
-  const coolingEff = getLeverEffect(coolingTs, 'cooling');
+  // Priority order: Feed (1st), Cooling (2nd), H2 (3rd)
+  // Diminishing multipliers: 1.0 / 0.8 / 0.6 based on rank among active levers
+  const MULTIPLIERS = [1.0, 0.8, 0.6];
+  const levers = [
+    { ts: feedTs,    action: 'feed' },
+    { ts: coolingTs, action: 'cooling' },
+    { ts: h2Ts,      action: 'h2' },
+  ];
+  const active = levers.filter(l => l.ts !== null);
+  const effects = { feed: 0, h2: 0, cooling: 0 };
+  active.forEach((lever, rank) => {
+    const base = getLeverEffect(lever.ts, lever.action);
+    effects[lever.action] = base * MULTIPLIERS[rank];
+  });
+
+  const feedEff    = effects.feed;
+  const h2Eff      = effects.h2;
+  const coolingEff = effects.cooling;
 
   const totalEffect = Math.min(0.55, feedEff + h2Eff + coolingEff);
   const effectiveRoR = Math.max(0.03, baseRoR * (1 - totalEffect));
