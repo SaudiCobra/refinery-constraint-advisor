@@ -265,7 +265,6 @@ export default function ManarahPanel({
   quenchBoostActive,
   coolingBoostActive,
   onAutoOpen,
-  panelRef,
 }) {
   const [evalScenario, setEvalScenario] = useState("");
   const [autoOpenedImmediate, setAutoOpenedImmediate] = useState(false);
@@ -337,7 +336,6 @@ export default function ManarahPanel({
       )}
 
       <div
-        ref={panelRef}
         className="manarah-panel"
         style={{
           position: "fixed",
