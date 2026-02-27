@@ -149,22 +149,38 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           }}
         />
 
-        {/* Radial sweep effect (Immediate Risk only) */}
+        {/* Beacon sweep effect for Severe & Immediate */}
         {cfg.sweepMs && (
-          <span
-            className="manarah-beacon-sweep"
+          <svg
+            className="manarah-beacon-sweep-rotate"
+            width={svgSize}
+            height={svgHeight}
+            viewBox="0 0 32 38"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
             style={{
               position: "absolute",
-              inset: -3,
-              borderRadius: "50%",
-              border: `2.2px solid ${cfg.coreColor}`,
+              inset: 0,
+              zIndex: 0,
               pointerEvents: "none",
-              opacity: 0.5,
             }}
-          />
+          >
+            <defs>
+              <filter id={`${animName}-sweep-blur`}>
+                <feGaussianBlur in="SourceGraphic" stdDeviation={key === "IMMEDIATE_RISK" ? "10" : "11"} />
+              </filter>
+            </defs>
+            {/* Sweep cone originating from top-center (lens direction) */}
+            <path
+              d="M 16 13 L 12 1 L 20 1 Z"
+              fill={cfg.coreColor}
+              opacity={key === "IMMEDIATE_RISK" ? 0.22 : 0.15}
+              filter={`url(#${animName}-sweep-blur)`}
+            />
+          </svg>
         )}
 
-        {/* Minimal geometric beacon: tower + disc + core */}
+        {/* Minimal geometric beacon: tower + disc + core + ring */}
         <svg
           width={svgSize}
           height={svgHeight}
@@ -186,16 +202,29 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           {/* Flat circular top disc */}
           <circle cx="16" cy="13" r="8.5" stroke={cfg.coreColor} strokeWidth="1" fill="none" />
 
-          {/* Central light core — main visual anchor */}
+          {/* Status ring — thicker for Immediate Risk */}
+          <circle
+            cx="16"
+            cy="13"
+            r="8.5"
+            stroke={cfg.coreColor}
+            strokeWidth={key === "IMMEDIATE_RISK" ? "1.5" : "1"}
+            fill="none"
+            opacity={0.7}
+          />
+
+          {/* Central light core — pulse for Immediate Risk */}
           <circle
             cx="16"
             cy="15"
             r="4"
             fill={cfg.coreColor}
-            opacity={cfg.pulseMs || cfg.sweepMs ? 0.9 : 0.8}
+            className={key === "IMMEDIATE_RISK" ? "manarah-beacon-core-pulse" : ""}
+            opacity={key === "IMMEDIATE_RISK" ? 0.85 : key === "SEVERE_DRIFT" ? 0.9 : 0.8}
+            style={{ opacity: key === "IMMEDIATE_RISK" ? undefined : (key === "SEVERE_DRIFT" ? 0.9 : 0.8) }}
           />
 
-          {/* Subtle outer halo — static reference */}
+          {/* Subtle outer halo — stronger for Immediate Risk */}
           <circle
             cx="16"
             cy="16"
@@ -203,79 +232,9 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
             fill="none"
             stroke={cfg.coreColor}
             strokeWidth="0.6"
-            opacity={cfg.sweepMs ? 0.15 : 0.08}
+            opacity={key === "IMMEDIATE_RISK" ? 0.12 : 0.08}
           />
         </svg>
-
-        {/* Breathing animation for Early Drift */}
-        {key === "EARLY_DRIFT" && (
-          <svg
-            className="manarah-beacon-breathe"
-            width={svgSize}
-            height={svgHeight}
-            viewBox="0 0 32 38"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 0,
-              pointerEvents: "none",
-            }}
-          >
-            <circle
-              cx="16"
-              cy="15"
-              r="4"
-              fill={cfg.coreColor}
-              opacity="0.3"
-            />
-          </svg>
-        )}
-
-        {/* Segmented ring animation for Severe Drift */}
-        {key === "SEVERE_DRIFT" && (
-          <svg
-            className="manarah-beacon-segment"
-            width={svgSize}
-            height={svgHeight}
-            viewBox="0 0 32 38"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 0,
-              pointerEvents: "none",
-            }}
-          >
-            {/* 6 segments illuminating clockwise */}
-            {Array.from({ length: 6 }).map((_, i) => {
-              const angle = (i * 60);
-              const startAngle = angle * (Math.PI / 180);
-              const endAngle = (angle + 50) * (Math.PI / 180);
-              const radius = 8.5;
-              const x1 = 16 + radius * Math.cos(startAngle);
-              const y1 = 13 + radius * Math.sin(startAngle);
-              const x2 = 16 + radius * Math.cos(endAngle);
-              const y2 = 13 + radius * Math.sin(endAngle);
-              const largeArc = 0;
-              return (
-                <path
-                  key={i}
-                  d={`M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`}
-                  stroke={cfg.coreColor}
-                  strokeWidth="1"
-                  fill="none"
-                  opacity={0.3 + 0.4 * Math.sin((angle / 360) * Math.PI * 2)}
-                  style={{
-                    transition: `opacity 1500ms ease-in-out`,
-                  }}
-                />
-              );
-            })}
-          </svg>
-        )}
       </button>
     </>
   );
