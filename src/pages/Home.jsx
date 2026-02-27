@@ -554,17 +554,14 @@ export default function Home() {
               slope={displaySlope}
             />
 
-            <MitigationCapacity 
-              systemState={systemState}
-            />
-
-            <CoolingCapacityIndicator capacity={coolingCapacity} />
-
-            <H2AvailabilityIndicator 
-              equipment={activeData.equipment} 
-              coolingCapacity={coolingCapacity}
-              slope={displaySlope}
-            />
+            <div className="max-w-3xl mx-auto">
+              <OpsCapacityPanel
+                systemState={systemState}
+                coolingCapacity={coolingCapacity}
+                equipment={activeData.equipment}
+                slope={displaySlope}
+              />
+            </div>
 
             <ProcessMap
               escalationLevel={escalationLevel}
