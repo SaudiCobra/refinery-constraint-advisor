@@ -8,10 +8,13 @@ export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, on
       <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Left */}
         <div>
-          <h1 className="text-white text-lg font-semibold tracking-wide">
-            Manarah — Operating Limits Watchtower (NHT)
+          <h1 className="text-white text-xl font-bold tracking-normal">
+            Manarah
           </h1>
-          <div className="flex items-center gap-3 mt-1">
+          <p className="text-[#aaa] text-sm font-normal tracking-tight">
+            Operating Limits Watchtower (NHT)
+          </p>
+          <div className="flex items-center gap-3 mt-2">
             <span className="text-[#888] text-sm">Unit: NHT Preheat Section (Demo)</span>
             <span className="text-[#555]">|</span>
             <span className="text-[#888] text-sm">Assessment as of: {moment().format("HH:mm")}</span>
