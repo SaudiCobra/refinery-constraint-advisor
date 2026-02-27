@@ -120,15 +120,12 @@ export default function Home() {
   const sequenceRef = useRef(null);
   const demoRef = useRef(null);
 
-  // ── Real-time physics tick (1 000 ms = 1/60 of a demo-minute) ───────────────
-  // dt = 1/60 min  →  temp changes by RoR * dt each real second.
-  // Band steering: if TTL drifts outside scenario band, gently push RoR back.
-  //   • TTL too HIGH (> ttlHi): nudge RoR up   → time shrinks back into band
-  //   • TTL too LOW  (< ttlLo): nudge RoR down → time grows  back into band
-  //   steerK controls how fast the nudge is (dimensionless gain per tick).
+  // ── Real-time physics tick (1 000 ms = 1/90 of a demo-minute) ───────────────
+  // DT = 1/90 min per real second — slower than before so the countdown feels
+  // realistic rather than "fast AF". Band steering keeps TTL in the named band.
   useEffect(() => {
     if (!simRunning || displayMode !== "interactive") return;
-    const DT = 1 / 60; // real seconds → demo minutes
+    const DT = 1 / 90; // real seconds → demo minutes (slowed from 1/60)
 
     const tick = setInterval(() => {
       let temp = simTempRef.current;
