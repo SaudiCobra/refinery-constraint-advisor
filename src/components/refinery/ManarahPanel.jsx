@@ -285,7 +285,7 @@ export default function ManarahPanel({
 
           {!isEmergency && (
             <>
-              <Divider />
+              <Divider isLargeDisplay={isLargeDisplay} />
 
               {/* SECTION 2 — ESCALATION FORECAST (normal/early only) */}
               <Label fs={fs}>Escalation Forecast</Label>
