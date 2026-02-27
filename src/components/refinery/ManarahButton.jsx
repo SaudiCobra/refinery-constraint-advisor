@@ -57,7 +57,7 @@ function resolveState(s) {
   return STATE_CONFIG[k] ? k : "NORMAL";
 }
 
-export default function ManarahButton({ systemState, onClick, drawerOpen = false }) {
+export default function ManarahButton({ systemState, onClick, drawerOpen = false, docked = false }) {
   const key = resolveState(systemState);
   const cfg = STATE_CONFIG[key];
   const animName = `manarah-ring-${key.toLowerCase()}`;
@@ -65,36 +65,6 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
   const ringThickness = Math.round(size / 32);
   const svgSize = Math.round(size * 0.56);
   const svgHeight = Math.round(svgSize * 1.19);
-  const [vw, setVw] = React.useState(window.innerWidth);
-  const [vh, setVh] = React.useState(window.innerHeight);
-  const [topPx, setTopPx] = React.useState(window.innerHeight - size - 20);
-
-  React.useEffect(() => {
-    const handler = () => {
-      setVw(window.innerWidth);
-      setVh(window.innerHeight);
-    };
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
-
-  React.useEffect(() => {
-    if (!drawerOpen) {
-      setTopPx(vh - size - 20);
-    } else {
-      const panelElement = document.querySelector('[data-manarah-panel]');
-      if (panelElement) {
-        const rect = panelElement.getBoundingClientRect();
-        const panelCenterY = rect.top + rect.height / 2;
-        let calculatedTop = panelCenterY - size / 2;
-        
-        // Clamp to screen bounds
-        calculatedTop = Math.max(12, Math.min(calculatedTop, vh - size - 12));
-        
-        setTopPx(calculatedTop);
-      }
-    }
-  }, [drawerOpen, vh, size]);
 
   return (
     <>
@@ -117,12 +87,10 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
 
       <button
         onClick={onClick}
-        title="Manarah — Advisory Watchtower"
+        title={docked ? "Close Manarah Panel" : "Manarah — Advisory Watchtower"}
         style={{
-          position: "fixed",
-          top: topPx,
-          right: 20,
-          zIndex: 9999,
+          position: docked ? "absolute" : "fixed",
+          ...(docked ? { top: 12, right: 12, zIndex: 10000 } : { bottom: 20, right: 20, zIndex: 9999 }),
           width: size,
           height: size,
           borderRadius: "50%",
@@ -135,7 +103,7 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           justifyContent: "center",
           boxShadow: `0 4px 18px rgba(0,0,0,0.18), 0 0 0 2px rgba(255,255,255,0.04)`,
           outline: "none",
-          transition: "top 0.3s cubic-bezier(0.32, 0.72, 0.36, 1), box-shadow 0.4s ease",
+          transition: "box-shadow 0.4s ease",
         }}
       >
         {/* Background glow layer */}
