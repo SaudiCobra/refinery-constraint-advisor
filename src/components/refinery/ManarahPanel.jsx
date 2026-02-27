@@ -265,6 +265,8 @@ export default function ManarahPanel({
   quenchBoostActive,
   coolingBoostActive,
   onAutoOpen,
+  onClose,
+  beacon,
 }) {
   const [evalScenario, setEvalScenario] = useState("");
   const [autoOpenedImmediate, setAutoOpenedImmediate] = useState(false);
@@ -339,7 +341,7 @@ export default function ManarahPanel({
         className="manarah-panel"
         data-manarah-panel
         style={{
-          position: "relative",
+          position: "fixed",
           bottom: 96,
           right: 20,
           width: adjustedPanelWidth,
@@ -367,8 +369,8 @@ export default function ManarahPanel({
         {/* Severity bar */}
         <div style={{ height: 4, background: severityColor, opacity: 0.85, flexShrink: 0 }} />
 
-        {/* Header */}
-        <div style={{
+        {/* Header with Beacon */}
+         <div style={{
           padding: isLargeDisplay ? "14px 18px 12px" : "12px 16px 10px",
           borderBottom: "1px solid #0a0a0a",
           flexShrink: 0,
@@ -379,13 +381,14 @@ export default function ManarahPanel({
           borderTopRightRadius: 9,
           background: isImmediate ? "rgba(239,68,68,0.03)" : isSevere ? "rgba(212,101,63,0.02)" : "transparent",
           transition: "background 0.3s ease-in-out",
+          position: "relative",
         }}>
           <div>
             <p style={{ fontSize: isLargeDisplay ? fs(13) : fs(12), fontWeight: 600, color: isImmediate ? "#ff6b6b" : isSevere ? "#D4653F" : "#e0e0e0", letterSpacing: "0.02em", marginBottom: 3, transition: "color 0.3s ease-in-out" }}>Manarah</p>
             <p style={{ fontSize: isLargeDisplay ? fs(10) : fs(9), color: "#666", fontWeight: 400, letterSpacing: "0.01em", opacity: 0.85 }}>Advisory Watchtower</p>
           </div>
-
-        </div>
+          {beacon}
+         </div>
 
         {/* Scrollable body */}
          <div style={{ overflowY: "auto", padding: panelPadding, flex: 1 }}>
