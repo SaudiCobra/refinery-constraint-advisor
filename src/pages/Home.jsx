@@ -572,6 +572,8 @@ export default function Home() {
                 feedReductionActive={feedReductionActive}
                 quenchBoostActive={quenchBoostActive}
                 coolingBoostActive={coolingBoostActive}
+                rampProgress={rampProgress}
+                minutesRecovered={minutesRecovered}
               />
               
               <div className="text-center pt-2 border-t border-[#2a2a2a]">
