@@ -41,6 +41,12 @@ export default function DecisionWindowBar({
   const timeDisplay = activeTime === Infinity || activeTime == null
     ? "—"
     : formatDemoTime(activeTime);
+
+  // Resolve state from live timer — same thresholds as getBandFromTTL in Home
+  const timerState = activeTime <= 4 ? "IMMEDIATE_RISK" : activeTime <= 13 ? "SEVERE_DRIFT" : activeTime <= 35 ? "EARLY_DRIFT" : "NORMAL";
+  const activeState = demoState || timerState;
+  // Resolve actual escalationLevel from activeState for lever relationship logic
+  const activeEscalation = activeState === "IMMEDIATE_RISK" ? 3 : activeState === "SEVERE_DRIFT" ? 2 : activeState === "EARLY_DRIFT" ? 1 : escalationLevel;
   
   // Determine primary operating limit
   const getPrimaryConstraint = () => {
@@ -63,12 +69,6 @@ export default function DecisionWindowBar({
   };
   
   const primaryConstraint = getPrimaryConstraint();
-  
-  // Resolve state from live timer (same thresholds as getBandFromTTL in Home)
-  const timerState = activeTime <= 4 ? "IMMEDIATE_RISK" : activeTime <= 13 ? "SEVERE_DRIFT" : activeTime <= 35 ? "EARLY_DRIFT" : "NORMAL";
-  const activeState = demoState || timerState;
-  // Resolve actual escalationLevel from activeState for lever relationship logic
-  const activeEscalation = activeState === "IMMEDIATE_RISK" ? 3 : activeState === "SEVERE_DRIFT" ? 2 : activeState === "EARLY_DRIFT" ? 1 : escalationLevel;
   
   // Trend credibility statement
   const getTrendCredibility = () => {
