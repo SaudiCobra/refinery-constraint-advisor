@@ -109,24 +109,24 @@ function Divider() {
   return <div style={{ borderTop: "1px solid #1e1e1e", margin: "10px 0" }} />;
 }
 
-function Label({ children }) {
+function Label({ children, fs }) {
   return (
-    <p style={{ fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#4a4a4a", fontWeight: 600, marginBottom: 6 }}>
+    <p style={{ fontSize: fs(9), letterSpacing: "0.12em", textTransform: "uppercase", color: "#4a4a4a", fontWeight: 600, marginBottom: 6 }}>
       {children}
     </p>
   );
 }
 
-function Row({ label, value, valueColor, emergency }) {
+function Row({ label, value, valueColor, emergency, fs }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: emergency ? 8 : 4 }}>
-      <span style={{ fontSize: emergency ? 12 : 11, color: emergency ? "#888" : "#666", fontWeight: emergency ? 500 : 400 }}>{label}</span>
-      <span style={{ fontSize: emergency ? 18 : 12, fontFamily: "monospace", color: valueColor || "#c0c0c0", fontWeight: emergency ? 700 : 400, letterSpacing: emergency ? "0.02em" : "normal" }}>{value}</span>
+      <span style={{ fontSize: emergency ? fs(12) : fs(11), color: emergency ? "#888" : "#666", fontWeight: emergency ? 500 : 400 }}>{label}</span>
+      <span style={{ fontSize: emergency ? fs(18) : fs(12), fontFamily: "monospace", color: valueColor || "#c0c0c0", fontWeight: emergency ? 700 : 400, letterSpacing: emergency ? "0.02em" : "normal" }}>{value}</span>
     </div>
   );
 }
 
-function ImpactBar({ label, barFill, strengthLabel, active, available, pct }) {
+function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs }) {
   const TOTAL_BLOCKS = 9;
   const filled = Math.round(barFill * TOTAL_BLOCKS);
   const barColor = !available ? "#2a2a2a"
@@ -139,9 +139,9 @@ function ImpactBar({ label, barFill, strengthLabel, active, available, pct }) {
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
-      <span style={{ fontSize: 11, color: labelColor, width: 120, flexShrink: 0 }}>
+      <span style={{ fontSize: fs(11), color: labelColor, width: 120, flexShrink: 0 }}>
         {label}
-        {active && pct !== null && <span style={{ fontSize: 9, color: "#555", marginLeft: 4 }}>[{pct}%]</span>}
+        {active && pct !== null && <span style={{ fontSize: fs(9), color: "#555", marginLeft: 4 }}>[{pct}%]</span>}
       </span>
       <div style={{ display: "flex", gap: 2, flex: 1 }}>
         {Array.from({ length: TOTAL_BLOCKS }).map((_, i) => (
@@ -157,7 +157,7 @@ function ImpactBar({ label, barFill, strengthLabel, active, available, pct }) {
           />
         ))}
       </div>
-      <span style={{ fontSize: 10, color: !available ? "#3a3a3a" : barColor, width: 62, textAlign: "right", flexShrink: 0 }}>
+      <span style={{ fontSize: fs(10), color: !available ? "#3a3a3a" : barColor, width: 62, textAlign: "right", flexShrink: 0 }}>
         {strengthLabel}
       </span>
     </div>
