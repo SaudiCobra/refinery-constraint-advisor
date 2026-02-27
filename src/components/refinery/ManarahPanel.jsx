@@ -260,36 +260,33 @@ export default function ManarahPanel({
 
           {/* SECTION 1 — LIVE STATUS */}
           <Label>Live Status</Label>
-          <Row label="Time to constraint" value={fmt(timeToNearest)} valueColor={ttlColor} />
-          <Row label="Rate-of-rise" value={fmtRoR(slope)} />
+          <Row label="Time to constraint" value={fmt(timeToNearest)} valueColor={ttlColor} emergency={isEmergency} />
+          <Row label="Rate-of-rise" value={fmtRoR(slope)} valueColor={isEmergency ? severityColor : undefined} emergency={isEmergency} />
 
           <Divider />
 
-          {/* SECTION 2 — ESCALATION FORECAST */}
-          <Label>Escalation Forecast</Label>
-          {stateKey === "IMMEDIATE_RISK" ? (
+          {/* SECTION 3 — DOMINANT DRIVER — shown immediately in emergency */}
+          <Label>Dominant Driver</Label>
+          <p style={{
+            fontSize: isEmergency ? 12 : 11,
+            color: isEmergency ? severityColor : "#999",
+            fontWeight: isEmergency ? 600 : 400,
+            lineHeight: 1.5,
+          }}>{dominantDriver}</p>
+
+          {!isEmergency && (
             <>
-              <Row label="Immediate Risk" value="Currently active" valueColor="#EF4444" />
-              <Row label="Constraint breach" value={fmt(timeToNearest)} valueColor="#EF4444" />
-            </>
-          ) : stateKey === "SEVERE_DRIFT" ? (
-            <>
-              <Row label="Severe Drift" value="Currently in band" valueColor="#D4653F" />
-              <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 3 ? "#EF4444" : "#D4A547"} />
-            </>
-          ) : (
-            <>
-              <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} />
-              <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} />
+              <Divider />
+
+              {/* SECTION 2 — ESCALATION FORECAST (normal/early only) */}
+              <Label>Escalation Forecast</Label>
+              <>
+                <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} />
+                <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} />
+              </>
+              <p style={{ fontSize: 9, color: "#333", marginTop: 4 }}>Assumes no intervention and constant rate-of-rise.</p>
             </>
           )}
-          <p style={{ fontSize: 9, color: "#333", marginTop: 4 }}>Assumes no intervention and constant rate-of-rise.</p>
-
-          <Divider />
-
-          {/* SECTION 3 — DOMINANT DRIVER */}
-          <Label>Dominant Driver</Label>
-          <p style={{ fontSize: 11, color: "#999", lineHeight: 1.5 }}>{dominantDriver}</p>
 
           <Divider />
 
@@ -307,9 +304,13 @@ export default function ManarahPanel({
             />
           ))}
 
-          <Divider />
+          {!isEmergency && <Divider />}
 
-          {/* SECTION 5 — EVALUATE ADJUSTMENT */}
+          {/* SECTION 5 — EVALUATE ADJUSTMENT (hidden in emergency) */}
+          {!isEmergency && <></> /* label below */}
+          {!isEmergency && (
+            <>
+              <Divider />
           <Label>Evaluate Adjustment</Label>
           <select
             value={evalScenario}
