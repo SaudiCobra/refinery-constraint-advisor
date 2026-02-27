@@ -83,34 +83,19 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
   return (
     <>
       <style>{`
-        @keyframes ${animName}-breathe {
-          0%, 100% { opacity: 0.8; }
-          50%       { opacity: 1.0; }
+        @keyframes ${animName}-core-pulse {
+          0%, 100% { opacity: 0.75; }
+          50%       { opacity: 0.95; }
         }
-        @keyframes ${animName}-pulse {
-          0%, 100% { opacity: 1.0; }
-          50%       { opacity: 0.6; }
+        @keyframes ${animName}-sweep-rotate {
+          0%   { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
-        @keyframes ${animName}-sweep {
-          0%   { transform: rotate(0deg); opacity: 0.4; }
-          50%  { opacity: 0.8; }
-          100% { transform: rotate(360deg); opacity: 0.4; }
+        .manarah-beacon-core-pulse {
+          animation: ${animName}-core-pulse ${cfg.pulseMs}ms ease-in-out infinite;
         }
-        @keyframes ${animName}-segment-glow {
-          0%   { --segment-offset: 0; }
-          100% { --segment-offset: 360deg; }
-        }
-        .manarah-beacon-breathe {
-          animation: ${animName}-breathe ${cfg.pulseMs}ms ease-in-out infinite;
-        }
-        .manarah-beacon-pulse {
-          animation: ${animName}-pulse ${cfg.pulseMs}ms ease-in-out infinite;
-        }
-        .manarah-beacon-sweep {
-          animation: ${animName}-sweep ${cfg.sweepMs}ms linear infinite;
-        }
-        .manarah-beacon-segment {
-          animation: ${animName}-segment-glow 8000ms linear infinite;
+        .manarah-beacon-sweep-rotate {
+          animation: ${animName}-sweep-rotate ${cfg.sweepMs}ms linear infinite;
         }
       `}</style>
 
