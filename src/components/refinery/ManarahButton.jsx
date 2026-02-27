@@ -112,7 +112,7 @@ export default function ManarahButton({ systemState, onClick }) {
           }}
         />
 
-        {/* Light-beam SVG — bold lighthouse geometry */}
+        {/* Light-beam SVG — tower + crown + beam */}
         <svg
           width={svgSize}
           height={svgHeight}
@@ -121,34 +121,40 @@ export default function ManarahButton({ systemState, onClick }) {
           xmlns="http://www.w3.org/2000/svg"
           style={{ position: "relative", zIndex: 1 }}
         >
-          {/* Central vertical pillar — thicker, short */}
-          <rect x="13.5" y="22" width="5" height="10" rx="1.5" fill={cfg.beamColor} opacity="0.80" />
+          <defs>
+            {/* Gradient for beam glow — bright center, fades outward */}
+            <radialGradient id="beamGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor={cfg.beamColor} stopOpacity={cfg.pulseMs ? "0.75" : "0.70"} />
+              <stop offset="100%" stopColor={cfg.beamColor} stopOpacity="0.10" />
+            </radialGradient>
+          </defs>
 
-          {/* Horizontal base platform */}
-          <rect x="9" y="21" width="14" height="2" rx="1" fill={cfg.beamColor} opacity="0.55" />
-
-          {/* Symmetrical triangular beam — wide base, tapers to apex */}
+          {/* Base tower — slim, tapered upward (18% width → narrower at top) */}
           <path
-            d="M3 21 L16 4 L29 21 Z"
+            d="M 11 28 L 13 16 L 19 16 L 21 28 Z"
             fill={cfg.beamColor}
-            opacity="0.90"
+            opacity="0.85"
           />
 
-          {/* Soft outer ray — left */}
+          {/* Crown — thin circular disc on top */}
+          <circle cx="16" cy="15" r="10" fill={cfg.beamColor} opacity="0.75" />
+
+          {/* Light beam — upward triangle with gradient, wide base at crown */}
           <path
-            d="M16 4 L6 0"
-            stroke={cfg.beamColor}
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            opacity="0.28"
+            d="M 5.6 15 L 16 -8 L 26.4 15 Z"
+            fill="url(#beamGlow)"
+            opacity={cfg.pulseMs ? 0.85 : 0.75}
           />
-          {/* Soft outer ray — right */}
-          <path
-            d="M16 4 L26 0"
+
+          {/* Soft outer halo glow around beacon */}
+          <circle
+            cx="16"
+            cy="16"
+            r="15"
+            fill="none"
             stroke={cfg.beamColor}
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            opacity="0.28"
+            strokeWidth="0.8"
+            opacity={cfg.pulseMs ? 0.18 : 0.10}
           />
         </svg>
       </button>
