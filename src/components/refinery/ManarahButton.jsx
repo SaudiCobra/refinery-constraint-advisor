@@ -96,6 +96,10 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           50%  { opacity: 0.8; }
           100% { transform: rotate(360deg); opacity: 0.4; }
         }
+        @keyframes ${animName}-segment-glow {
+          0%   { --segment-offset: 0; }
+          100% { --segment-offset: 360deg; }
+        }
         .manarah-beacon-breathe {
           animation: ${animName}-breathe ${cfg.pulseMs}ms ease-in-out infinite;
         }
@@ -104,6 +108,9 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
         }
         .manarah-beacon-sweep {
           animation: ${animName}-sweep ${cfg.sweepMs}ms linear infinite;
+        }
+        .manarah-beacon-segment {
+          animation: ${animName}-segment-glow 8000ms linear infinite;
         }
       `}</style>
 
