@@ -230,7 +230,6 @@ export default function ManarahPanel({
       `}</style>
 
       <div
-        ref={panelRef}
         className="manarah-panel"
         style={{
           position: "fixed",
