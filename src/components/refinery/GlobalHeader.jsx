@@ -9,7 +9,7 @@ export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, on
         {/* Left */}
         <div>
           <h1 className="text-white text-lg font-semibold tracking-wide">
-            Refinery Early Warning – Operating Limits Advisor
+            Manarah — Operating Limits Watchtower (NHT)
           </h1>
           <div className="flex items-center gap-3 mt-1">
             <span className="text-[#888] text-sm">Unit: NHT Preheat Section (Demo)</span>
