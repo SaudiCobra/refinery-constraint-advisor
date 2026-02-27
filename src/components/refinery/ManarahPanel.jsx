@@ -358,7 +358,7 @@ export default function ManarahPanel({
 
         {/* Footer */}
         <div style={{ padding: "8px 16px", borderTop: "1px solid #181818", flexShrink: 0 }}>
-          <p style={{ fontSize: 9, color: "#2e2e2e" }}>Advisory only — no control actions initiated by this system.</p>
+          <p style={{ fontSize: fs(9), color: "#2e2e2e" }}>Advisory only — no control actions initiated by this system.</p>
         </div>
       </div>
     </>
