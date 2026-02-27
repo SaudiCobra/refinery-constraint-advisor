@@ -453,7 +453,8 @@ export default function ManarahPanel({
           {/* SECTION 5 — EVALUATE ADJUSTMENT (hidden in emergency) */}
           {!isEmergency && (
             <>
-              <Divider isLargeDisplay={isLargeDisplay} />
+              {/* Subtle divider */}
+              <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: sectionMargin }} />
               <Label fs={fs}>Evaluate Adjustment</Label>
               <select
                 value={evalScenario}
