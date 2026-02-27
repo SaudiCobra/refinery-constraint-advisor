@@ -294,10 +294,15 @@ export default function ManarahPanel({
           backdropFilter: isLargeDisplay ? "blur(6px)" : "none",
           WebkitBackdropFilter: isLargeDisplay ? "blur(6px)" : "none",
           border: "1px solid #222",
+          borderLeft: stateKey === "SEVERE_DRIFT" ? "3px solid rgba(212,165,71,0.5)" : stateKey === "IMMEDIATE_RISK" ? "3px solid rgba(239,68,68,0.6)" : "1px solid #222",
           borderRadius: 10,
-          boxShadow: isLargeDisplay
-            ? "0 20px 60px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.05)"
-            : "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)",
+          boxShadow: stateKey === "IMMEDIATE_RISK"
+            ? (isLargeDisplay
+              ? "0 20px 60px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.05), 0 0 20px rgba(239,68,68,0.15)"
+              : "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(239,68,68,0.12)")
+            : (isLargeDisplay
+              ? "0 20px 60px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.05)"
+              : "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)"),
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
