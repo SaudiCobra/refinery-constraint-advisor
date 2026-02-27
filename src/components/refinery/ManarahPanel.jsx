@@ -314,7 +314,7 @@ export default function ManarahPanel({
       {/* Fade-in overlay — no slide */}
       <style>{`
         @keyframes manarah-fadein { from { opacity: 0; transform: scale(0.97) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .manarah-panel { animation: manarah-fadein 0.18s ease-out forwards; }
+        .manarah-panel { animation: manarah-fadein 0.3s ease-out forwards; }
       `}</style>
 
       {/* Light gradient link from beacon to panel (large displays only) */}
