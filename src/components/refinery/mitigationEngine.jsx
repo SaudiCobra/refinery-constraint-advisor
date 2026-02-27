@@ -1,23 +1,25 @@
 // Dynamic Mitigation Engine — Rate-of-Rise Reduction with Diminishing Returns
 
+// RoR reduction fractions per lever per state.
+// Higher = more aggressive effect on rate-of-rise.
 const LEVER_IMPACT = {
   cooling: {
-    NORMAL: 0.40,
-    EARLY_DRIFT: 0.30,
-    SEVERE_DRIFT: 0.15,
-    IMMEDIATE_RISK: 0.05,
+    NORMAL:         0.45,
+    EARLY_DRIFT:    0.42,
+    SEVERE_DRIFT:   0.38,  // largest lever — control valves fully open
+    IMMEDIATE_RISK: 0.25,
   },
   hydrogen: {
-    NORMAL: 0.35,
-    EARLY_DRIFT: 0.25,
-    SEVERE_DRIFT: 0.20,
-    IMMEDIATE_RISK: 0.10,
+    NORMAL:         0.40,
+    EARLY_DRIFT:    0.36,
+    SEVERE_DRIFT:   0.32,  // medium-strong quench authority
+    IMMEDIATE_RISK: 0.18,
   },
   feedReduction: {
-    NORMAL: 0.50,
-    EARLY_DRIFT: 0.40,
-    SEVERE_DRIFT: 0.30,
-    IMMEDIATE_RISK: 0.20,
+    NORMAL:         0.35,
+    EARLY_DRIFT:    0.30,
+    SEVERE_DRIFT:   0.25,  // medium — less immediate than cooling/H2
+    IMMEDIATE_RISK: 0.15,
   },
 };
 
