@@ -505,7 +505,7 @@ export default function Home() {
         {!alarmsOnly && displayMode === "interactive" && (
           <>
             <QuickScenarioSelector
-              activeScenario={computedState}
+              activeScenario={derivedSystemState}
               onSelect={handleSelectScenario}
             />
             
