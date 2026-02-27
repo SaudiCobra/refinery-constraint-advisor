@@ -57,7 +57,7 @@ function resolveState(s) {
   return STATE_CONFIG[k] ? k : "NORMAL";
 }
 
-export default function ManarahButton({ systemState, onClick }) {
+export default function ManarahButton({ systemState, onClick, drawerOpen = false }) {
   const key = resolveState(systemState);
   const cfg = STATE_CONFIG[key];
   const animName = `manarah-ring-${key.toLowerCase()}`;
@@ -67,6 +67,12 @@ export default function ManarahButton({ systemState, onClick }) {
   const svgHeight = Math.round(svgSize * 1.19);
   const [vw, setVw] = React.useState(window.innerWidth);
   const translateYPx = Math.round((cfg.translateY / 100) * vw);
+
+  // Drawer positioning constants (from ManarahPanel)
+  const basePanelWidth = vw > 3200 ? 760 : vw > 2560 ? 680 : 420;
+  const panelWidth = Math.round(basePanelWidth * 1.08);
+  const adjustedPanelWidth = Math.round(panelWidth * (key === "IMMEDIATE_RISK" ? 1.18 : 1.0));
+  const overlapPx = 20; // Center overlap into drawer
 
   React.useEffect(() => {
     const handler = () => setVw(window.innerWidth);
