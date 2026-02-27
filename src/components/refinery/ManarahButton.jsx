@@ -1,107 +1,138 @@
 import React from "react";
-import { cn } from "@/lib/utils";
 
 const STATE_CONFIG = {
   NORMAL: {
-    ring: "ring-[#1a3a3a]",
-    bg: "bg-[#0F2F2F]",
-    glow: "shadow-[0_0_10px_2px_rgba(15,159,159,0.15)]",
-    pulse: null,
-    iconColor: "#0F9F9F",
+    ringColor: "rgba(15,159,159,0.25)",
+    beamColor: "#0F9F9F",
+    glowColor: "rgba(15,159,159,0.12)",
+    pulseMs: null,
   },
   EARLY_DRIFT: {
-    ring: "ring-[#7A5A1F]",
-    bg: "bg-[#2a1f08]",
-    glow: "shadow-[0_0_14px_3px_rgba(212,165,71,0.25)]",
-    pulse: "manarah-pulse-slow",
-    iconColor: "#D4A547",
+    ringColor: "rgba(212,165,71,0.45)",
+    beamColor: "#D4A547",
+    glowColor: "rgba(212,165,71,0.14)",
+    pulseMs: 3000,
   },
   SEVERE_DRIFT: {
-    ring: "ring-[#9A3A1F]",
-    bg: "bg-[#2a1008]",
-    glow: "shadow-[0_0_18px_4px_rgba(212,101,63,0.35)]",
-    pulse: "manarah-pulse-medium",
-    iconColor: "#D4653F",
+    ringColor: "rgba(212,101,63,0.65)",
+    beamColor: "#D4653F",
+    glowColor: "rgba(212,101,63,0.16)",
+    pulseMs: 1500,
   },
   IMMEDIATE_RISK: {
-    ring: "ring-[#cc2222]",
-    bg: "bg-[#2a0808]",
-    glow: "shadow-[0_0_22px_5px_rgba(220,50,50,0.45)]",
-    pulse: "manarah-pulse-fast",
-    iconColor: "#EF4444",
+    ringColor: "rgba(239,68,68,0.85)",
+    beamColor: "#EF4444",
+    glowColor: "rgba(239,68,68,0.14)",
+    pulseMs: 700,
   },
 };
 
-// Map display state names → config keys
-function resolveState(systemState) {
-  if (!systemState) return "NORMAL";
-  const s = systemState.toUpperCase().replace(/\s+/g, "_");
-  return STATE_CONFIG[s] ? s : "NORMAL";
+function resolveState(s) {
+  if (!s) return "NORMAL";
+  const k = s.toUpperCase().replace(/\s+/g, "_");
+  return STATE_CONFIG[k] ? k : "NORMAL";
 }
 
 export default function ManarahButton({ systemState, onClick }) {
   const key = resolveState(systemState);
   const cfg = STATE_CONFIG[key];
+  const animName = `manarah-ring-${key.toLowerCase()}`;
 
   return (
     <>
       <style>{`
-        @keyframes manarah-slow {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.07); opacity: 0.85; }
+        @keyframes ${animName} {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50%       { opacity: 0.4; transform: scale(1.18); }
         }
-        @keyframes manarah-medium {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.10); opacity: 0.80; }
+        .manarah-ring-pulse {
+          animation: ${animName} ${cfg.pulseMs}ms ease-in-out infinite;
         }
-        @keyframes manarah-fast {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.13); opacity: 0.75; }
-        }
-        .manarah-pulse-slow   { animation: manarah-slow   3s ease-in-out infinite; }
-        .manarah-pulse-medium { animation: manarah-medium 1.5s ease-in-out infinite; }
-        .manarah-pulse-fast   { animation: manarah-fast  0.7s ease-in-out infinite; }
       `}</style>
 
       <button
         onClick={onClick}
-        title="Manarah"
-        className={cn(
-          "fixed bottom-6 right-6 z-50",
-          "w-13 h-13 rounded-full",
-          "flex items-center justify-center",
-          "border border-[#333]",
-          "ring-2",
-          cfg.ring,
-          cfg.bg,
-          cfg.glow,
-          cfg.pulse,
-          "transition-all duration-500"
-        )}
-        style={{ width: 52, height: 52 }}
+        title="Manarah — Advisory Watchtower"
+        style={{
+          position: "fixed",
+          bottom: 20,
+          right: 20,
+          zIndex: 9999,
+          width: 64,
+          height: 64,
+          borderRadius: "50%",
+          background: "#141820",
+          border: "none",
+          padding: 0,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: `0 4px 18px rgba(0,0,0,0.18), 0 0 0 2px rgba(255,255,255,0.04)`,
+          outline: "none",
+          transition: "box-shadow 0.4s ease",
+        }}
       >
-        {/* Manarah (watchtower/lighthouse) SVG icon */}
+        {/* Outer ring — animated */}
+        <span
+          className={cfg.pulseMs ? "manarah-ring-pulse" : ""}
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "50%",
+            border: `2px solid ${cfg.ringColor}`,
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Radial glow behind beam */}
+        <span
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "50%",
+            background: `radial-gradient(circle at 50% 55%, ${cfg.glowColor} 0%, transparent 72%)`,
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Light-beam SVG — abstract tapered vertical beam, no emoji */}
         <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
+          width="26"
+          height="30"
+          viewBox="0 0 26 30"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          style={{ position: "relative", zIndex: 1 }}
         >
-          {/* Tower base */}
-          <rect x="9" y="14" width="6" height="7" rx="0.5" fill={cfg.iconColor} opacity="0.9" />
-          {/* Tower body */}
-          <path d="M8 8 L10 14 H14 L16 8 Z" fill={cfg.iconColor} opacity="0.85" />
-          {/* Tower top / parapet */}
-          <rect x="7" y="6" width="10" height="2.5" rx="0.5" fill={cfg.iconColor} />
-          {/* Beacon light */}
-          <circle cx="12" cy="4" r="1.8" fill={cfg.iconColor} opacity="0.95" />
-          {/* Light rays */}
-          <line x1="12" y1="1.5" x2="12" y2="0.5" stroke={cfg.iconColor} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
-          <line x1="14.2" y1="2.2" x2="15" y2="1.4" stroke={cfg.iconColor} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
-          <line x1="9.8" y1="2.2" x2="9" y2="1.4" stroke={cfg.iconColor} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
-          {/* Door */}
-          <rect x="10.5" y="17" width="3" height="4" rx="1.5" fill={cfg.bg} />
+          {/* Narrow base stem */}
+          <rect x="11.5" y="18" width="3" height="8" rx="1" fill={cfg.beamColor} opacity="0.75" />
+
+          {/* Tapered mid-body */}
+          <path
+            d="M10 10 L13 2 L16 10 Z"
+            fill={cfg.beamColor}
+            opacity="0.90"
+          />
+
+          {/* Soft beam spread above apex — two faint outer rays */}
+          <path
+            d="M13 2 L8 0"
+            stroke={cfg.beamColor}
+            strokeWidth="0.8"
+            strokeLinecap="round"
+            opacity="0.30"
+          />
+          <path
+            d="M13 2 L18 0"
+            stroke={cfg.beamColor}
+            strokeWidth="0.8"
+            strokeLinecap="round"
+            opacity="0.30"
+          />
+
+          {/* Horizontal base bar */}
+          <rect x="8.5" y="17" width="9" height="1.5" rx="0.75" fill={cfg.beamColor} opacity="0.55" />
         </svg>
       </button>
     </>
