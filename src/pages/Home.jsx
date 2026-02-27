@@ -163,6 +163,28 @@ export default function Home() {
       const rorFloor = anyMitig ? 0.03 : cfg.rorMin;
       ror = Math.max(rorFloor, Math.min(cfg.rorMax, ror));
 
+      // 4b. Full-mitigation recovery assist — all 3 levers fully ramped
+      // Check if all three are active and at 100% ramp
+      const checkFullRamp = (tsMs, action) => {
+        if (tsMs === null) return false;
+        const { delaySec, rampSec } = ACTION_PARAMS[action];
+        return (Date.now() - tsMs) / 1000 >= delaySec + rampSec;
+      };
+      const allFullMitigation =
+        checkFullRamp(feedTsRef.current,    'feed')    &&
+        checkFullRamp(h2TsRef.current,      'h2')      &&
+        checkFullRamp(coolingTsRef.current, 'cooling');
+
+      // When fully mitigated, cool the reactor back toward a safe setpoint
+      // Recovery rate: ~0.08°C/sec — takes ~8–15 s to noticeably climb TTL
+      const RECOVERY_RATE = 0.08 / 60; // °C per demo-minute → slow but visible
+      const TTL_RECOVERY_CAP = 58;     // don't drift beyond Normal ceiling
+      const currentRawTTL = getSimTTL(temp, ror, limits);
+      if (allFullMitigation && currentRawTTL < TTL_RECOVERY_CAP) {
+        // Pull temperature down gently each tick (effective thermal recovery)
+        temp -= RECOVERY_RATE;
+      }
+
       // 5. Advance temperature
       const tempNoise = (Math.random() - 0.5) * 0.04;
       temp = temp + ror * DT + tempNoise * DT;
