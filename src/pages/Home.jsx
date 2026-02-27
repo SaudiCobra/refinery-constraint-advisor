@@ -526,6 +526,10 @@ export default function Home() {
 
   const [manarahOpen, setManarahOpen] = useState(false);
 
+  const handleManarahAutoOpen = () => {
+    setManarahOpen(true);
+  };
+
   return (
     <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
       <ManarahButton systemState={systemState} onClick={() => setManarahOpen(!manarahOpen)} />
@@ -540,6 +544,7 @@ export default function Home() {
         feedReductionActive={feedReductionActive}
         quenchBoostActive={quenchBoostActive}
         coolingBoostActive={coolingBoostActive}
+        onAutoOpen={handleManarahAutoOpen}
       />
       <GlobalHeader
         displayMode={displayMode}
