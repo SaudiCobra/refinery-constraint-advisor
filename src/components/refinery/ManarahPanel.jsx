@@ -166,6 +166,18 @@ function ImpactBar({ label, barFill, strengthLabel, active, available, pct }) {
 
 // ── Main panel ────────────────────────────────────────────────────────────────
 
+function useResponsivePanel() {
+  const [vw, setVw] = useState(window.innerWidth);
+  useEffect(() => {
+    const handler = () => setVw(window.innerWidth);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  const panelWidth = vw > 3200 ? 620 : vw > 2560 ? 520 : 420;
+  const fontScale  = vw > 2560 ? 1.08 : 1.0;
+  return { panelWidth, fontScale };
+}
+
 export default function ManarahPanel({
   open,
   onClose,
@@ -181,6 +193,7 @@ export default function ManarahPanel({
 }) {
   const [evalScenario, setEvalScenario] = useState("");
   const panelRef = useRef(null);
+  const { panelWidth, fontScale } = useResponsivePanel();
 
   useEffect(() => {
     if (!open) return;
@@ -195,6 +208,7 @@ export default function ManarahPanel({
 
   const stateKey = (systemState || "NORMAL").toUpperCase().replace(/\s+/g, "_");
   const severityColor = SEVERITY_COLOR[stateKey] || "#0F9F9F";
+  const fs = (base) => Math.round(base * fontScale);
 
   const ttlToSevere    = timeToNearest > 13 ? timeToNearest - 13 : 0;
   const ttlToImmediate = timeToNearest > 4  ? timeToNearest - 4  : 0;
