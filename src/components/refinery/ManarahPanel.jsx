@@ -304,47 +304,41 @@ export default function ManarahPanel({
             />
           ))}
 
-          {!isEmergency && <Divider />}
-
           {/* SECTION 5 — EVALUATE ADJUSTMENT (hidden in emergency) */}
-          {!isEmergency && <></> /* label below */}
           {!isEmergency && (
             <>
               <Divider />
-          <Label>Evaluate Adjustment</Label>
-          <select
-            value={evalScenario}
-            onChange={e => setEvalScenario(e.target.value)}
-            style={{
-              width: "100%",
-              background: "#141414",
-              border: "1px solid #2a2a2a",
-              color: "#aaa",
-              fontSize: 11,
-              borderRadius: 5,
-              padding: "5px 8px",
-              outline: "none",
-              marginBottom: 8,
-            }}
-          >
-            <option value="">— select scenario —</option>
-            {EVAL_SCENARIOS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-          </select>
-
-          {evalResult && (
-            <div style={{ background: "#0a0a0a", border: "1px solid #1e1e1e", borderRadius: 6, padding: "8px 10px" }}>
-              <Row
-                label="Projected TTL if applied"
-                value={fmt(evalResult.projected)}
-                valueColor="#0F9F9F"
-              />
-              <p style={{ fontSize: 10, color: "#444", marginTop: 2 }}>
-                {evalResult.gain > 0
-                  ? `+${Math.round(evalResult.gain)} min additional margin vs. current trajectory.`
-                  : "No significant margin improvement at current operating point."}
-              </p>
-              <p style={{ fontSize: 9, color: "#2e2e2e", marginTop: 4 }}>Projection only — no action applied.</p>
-            </div>
+              <Label>Evaluate Adjustment</Label>
+              <select
+                value={evalScenario}
+                onChange={e => setEvalScenario(e.target.value)}
+                style={{
+                  width: "100%",
+                  background: "#141414",
+                  border: "1px solid #2a2a2a",
+                  color: "#aaa",
+                  fontSize: 11,
+                  borderRadius: 5,
+                  padding: "5px 8px",
+                  outline: "none",
+                  marginBottom: 8,
+                }}
+              >
+                <option value="">— select scenario —</option>
+                {EVAL_SCENARIOS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
+              {evalResult && (
+                <div style={{ background: "#0a0a0a", border: "1px solid #1e1e1e", borderRadius: 6, padding: "8px 10px" }}>
+                  <Row label="Projected TTL if applied" value={fmt(evalResult.projected)} valueColor="#0F9F9F" />
+                  <p style={{ fontSize: 10, color: "#444", marginTop: 2 }}>
+                    {evalResult.gain > 0
+                      ? `+${Math.round(evalResult.gain)} min additional margin vs. current trajectory.`
+                      : "No significant margin improvement at current operating point."}
+                  </p>
+                  <p style={{ fontSize: 9, color: "#2e2e2e", marginTop: 4 }}>Projection only — no action applied.</p>
+                </div>
+              )}
+            </>
           )}
 
         </div>
