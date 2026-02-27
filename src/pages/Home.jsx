@@ -146,25 +146,26 @@ export default function Home() {
         checkFullRamp(h2TsRef.current,      'h2')      &&
         checkFullRamp(coolingTsRef.current, 'cooling');
 
-      // 1. Random RoR wander (within band clamps)
-      const rorNoise = (Math.random() - 0.5) * 2 * cfg.noise;
-      ror = ror + rorNoise;
-
       // Count active levers for decay scaling
       const activeLeverCount = [feedTsRef.current, h2TsRef.current, coolingTsRef.current].filter(ts => ts !== null).length;
-      // decayScale reduces how strongly band-steering and noise worsen the system
+      // decayScale reduces worsening forces (band steering + noise) per active lever count
       const decayScaleByCount = [1.00, 0.75, 0.35, 0.15];
       const decayScale = decayScaleByCount[activeLeverCount] ?? 1.00;
+
+      // 1. Random RoR wander — scaled down when levers are active
+      const rorNoise = (Math.random() - 0.5) * 2 * cfg.noise * decayScale;
+      ror = ror + rorNoise;
 
       // 2. Soft band-steering — DISABLED during full recovery to avoid fighting it
       if (!allFullMitigation) {
         if (currentTTL > cfg.ttlHi) {
+          // TTL too high → nudge RoR up (more worsening) — scale down when mitigating
           const excess = currentTTL - cfg.ttlHi;
           ror += cfg.steerK * excess * decayScale;
         } else if (currentTTL < cfg.ttlLo) {
-          // Band tries to pull RoR up (worsen) — scale this down when mitigating
+          // TTL too low → nudge RoR down (toward recovery) — always apply this beneficial direction
           const deficit = cfg.ttlLo - currentTTL;
-          ror += cfg.steerK * deficit * decayScale; // positive = higher RoR = worse
+          ror -= cfg.steerK * deficit;
         }
       }
 
