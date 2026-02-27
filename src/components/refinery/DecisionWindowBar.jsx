@@ -16,19 +16,24 @@ export default function DecisionWindowBar({
 }) {
   const activeTime = (demoTimeMin !== null && demoTimeMin !== undefined) ? demoTimeMin : timeToNearest;
 
-  // Bar scale = 35 min so EARLY_DRIFT fills nicely
+  // Bar fill clamps to 35 min scale so NORMAL overflows to 100% (that's fine).
+  // The displayed label always shows the real value including >35.
   const maxTime = 35;
   const fillPercent = activeTime === Infinity || activeTime == null 
     ? 100 
     : Math.min(100, (activeTime / maxTime) * 100);
   
-  // Color aligned to 4 states
+  // Color thresholds aligned to 4 states:
+  //   IMMEDIATE_RISK: <=4   deep red
+  //   SEVERE_DRIFT:   <=13  burnt orange
+  //   EARLY_DRIFT:    <=35  amber
+  //   NORMAL:         >35   neutral grey/teal
   const getBarColor = (time) => {
-    if (time === Infinity || time == null) return "#3a3a3a";
-    if (time < 1)  return "#7A0F0F"; // IMMEDIATE_RISK — deep red
-    if (time < 5)  return "#A13A1F"; // SEVERE_DRIFT — burnt orange
-    if (time <= 35) return "#D35400"; // EARLY_DRIFT — orange
-    return "#3a3a3a"; // NORMAL — neutral grey
+    if (time === Infinity || time == null) return "#1a6a6a"; // NORMAL teal
+    if (time <= 4)  return "#7A0F0F"; // IMMEDIATE_RISK — deep red
+    if (time <= 13) return "#A13A1F"; // SEVERE_DRIFT — burnt orange
+    if (time <= 35) return "#D35400"; // EARLY_DRIFT — amber
+    return "#1a6a6a"; // NORMAL — teal
   };
   
   const barColor = getBarColor(activeTime);
