@@ -32,10 +32,8 @@ import {
 import {
   computeMitigatedRoR,
   computeMitigatedTimeToLimit,
-  smoothTransition,
   clampTimeToBaseline,
-  tickCoolingRamp,
-  resetCoolingRamp,
+  getLeverEffect,
 } from "@/components/refinery/mitigationEngine";
 import {
   simulateBedTemperatures,
