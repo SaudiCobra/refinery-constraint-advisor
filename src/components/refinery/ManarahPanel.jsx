@@ -247,10 +247,14 @@ export default function ManarahPanel({
           width: panelWidth,
           maxHeight: "70vh",
           zIndex: 9998,
-          background: "#0e0e0e",
+          background: isLargeDisplay ? "rgba(14,14,14,0.92)" : "#0e0e0e",
+          backdropFilter: isLargeDisplay ? "blur(6px)" : "none",
+          WebkitBackdropFilter: isLargeDisplay ? "blur(6px)" : "none",
           border: "1px solid #222",
           borderRadius: 10,
-          boxShadow: "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)",
+          boxShadow: isLargeDisplay
+            ? "0 20px 60px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.05)"
+            : "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
