@@ -150,14 +150,21 @@ export default function Home() {
       const rorNoise = (Math.random() - 0.5) * 2 * cfg.noise;
       ror = ror + rorNoise;
 
+      // Count active levers for decay scaling
+      const activeLeverCount = [feedTsRef.current, h2TsRef.current, coolingTsRef.current].filter(ts => ts !== null).length;
+      // decayScale reduces how strongly band-steering and noise worsen the system
+      const decayScaleByCount = [1.00, 0.75, 0.35, 0.15];
+      const decayScale = decayScaleByCount[activeLeverCount] ?? 1.00;
+
       // 2. Soft band-steering — DISABLED during full recovery to avoid fighting it
       if (!allFullMitigation) {
         if (currentTTL > cfg.ttlHi) {
           const excess = currentTTL - cfg.ttlHi;
-          ror += cfg.steerK * excess;
+          ror += cfg.steerK * excess * decayScale;
         } else if (currentTTL < cfg.ttlLo) {
+          // Band tries to pull RoR up (worsen) — scale this down when mitigating
           const deficit = cfg.ttlLo - currentTTL;
-          ror -= cfg.steerK * deficit;
+          ror += cfg.steerK * deficit * decayScale; // positive = higher RoR = worse
         }
       }
 
