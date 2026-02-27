@@ -528,7 +528,20 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
-      <ManarahButton systemState={systemState} />
+      <ManarahButton systemState={systemState} onClick={() => setManarahOpen(true)} />
+      <ManarahPanel
+        open={manarahOpen}
+        onClose={() => setManarahOpen(false)}
+        systemState={systemState}
+        timeToNearest={displayTTL}
+        slope={displaySlope}
+        coolingCapacity={coolingCapacity}
+        equipment={activeData.equipment}
+        rampProgress={rampProgress}
+        feedReductionActive={feedReductionActive}
+        quenchBoostActive={quenchBoostActive}
+        coolingBoostActive={coolingBoostActive}
+      />
       <GlobalHeader
         displayMode={displayMode}
         onModeChange={setDisplayMode}
