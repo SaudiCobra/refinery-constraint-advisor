@@ -14,7 +14,7 @@ export default function AcknowledgeSystem() {
 
   if (ack) {
     return (
-      <div className="flex items-center gap-4 bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3">
+      <div className="flex items-center gap-4 bg-[#1e1e1e] border border-[#333] rounded-b-lg rounded-t-none px-5 py-3">
         <div className="w-2 h-2 rounded-full bg-amber-500" />
         <div className="flex-1">
           <p className="text-amber-400 text-sm font-medium">Acknowledged at {ack.time}</p>
