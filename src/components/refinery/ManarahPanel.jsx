@@ -193,7 +193,6 @@ export default function ManarahPanel({
   coolingBoostActive,
 }) {
   const [evalScenario, setEvalScenario] = useState("");
-  const panelRef = useRef(null);
   const { panelWidth, fontScale, isLargeDisplay } = useResponsivePanel();
 
 
