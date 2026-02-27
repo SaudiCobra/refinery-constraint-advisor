@@ -96,7 +96,7 @@ export default function ManarahButton({ systemState, onClick }) {
             position: "absolute",
             inset: 0,
             borderRadius: "50%",
-            border: `2px solid ${cfg.ringColor}`,
+            border: `${ringThickness}px solid ${cfg.ringColor}`,
             pointerEvents: "none",
           }}
         />
