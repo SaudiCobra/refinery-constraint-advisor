@@ -134,6 +134,39 @@ export default function LeverContext({
           {mitigationMsg && (
             <p className="text-[#E67E22] text-xs mt-2 italic">{mitigationMsg}</p>
           )}
+
+          {/* Ramp progress + minutes recovered feedback */}
+          {rampProgress && (() => {
+            const activeProgresses = [
+              feedReductionActive ? rampProgress.feed : null,
+              quenchBoostActive   ? rampProgress.h2   : null,
+              coolingBoostActive  ? rampProgress.cooling : null,
+            ].filter(p => p !== null);
+
+            const anyActive = activeProgresses.length > 0;
+            if (!anyActive) return (
+              <p className="text-[#444] text-[10px] mt-2">Mitigation response: Idle</p>
+            );
+
+            const maxPct = Math.round(Math.max(...activeProgresses));
+            const allFull = activeProgresses.every(p => p >= 100);
+            const statusText = allFull
+              ? "Stabilizing (Full effect)"
+              : `Building (${maxPct}%)`;
+
+            return (
+              <div className="mt-2 space-y-0.5">
+                <p className="text-[#666] text-[10px]">
+                  Mitigation response: <span className={allFull ? "text-[#0F9F9F]" : "text-[#E67E22]"}>{statusText}</span>
+                </p>
+                {minutesRecovered > 0.3 && (
+                  <p className="text-[#555] text-[10px]">
+                    Minutes recovered: <span className="text-[#7DBF9E]">+{Math.min(minutesRecovered, 30).toFixed(1)} min</span>
+                  </p>
+                )}
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>
