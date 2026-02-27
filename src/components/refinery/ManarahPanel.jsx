@@ -339,7 +339,7 @@ export default function ManarahPanel({
         className="manarah-panel"
         data-manarah-panel
         style={{
-          position: "fixed",
+          position: "relative",
           bottom: 96,
           right: 20,
           width: adjustedPanelWidth,
