@@ -112,8 +112,8 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
         title="Manarah — Advisory Watchtower"
         style={{
           position: "fixed",
-          bottom: 20,
-          right: 20,
+          bottom: drawerOpen ? Math.round(96 + adjustedPanelWidth / 2 - size / 2 + overlapPx) : 20,
+          right: drawerOpen ? 20 : 20,
           zIndex: 9999,
           width: size,
           height: size,
@@ -128,7 +128,7 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           boxShadow: `0 4px 18px rgba(0,0,0,0.18), 0 0 0 2px rgba(255,255,255,0.04)`,
           outline: "none",
           transform: `translateY(${translateYPx}px)`,
-          transition: "transform 0.3s ease-in-out, box-shadow 0.4s ease",
+          transition: "bottom 0.3s cubic-bezier(0.32, 0.72, 0.36, 1), transform 0.3s ease-in-out, box-shadow 0.4s ease",
         }}
       >
         {/* Background glow layer */}
