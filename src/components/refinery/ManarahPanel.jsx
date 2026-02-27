@@ -266,6 +266,40 @@ export default function ManarahPanel({
             <p className="text-[#bbb] text-xs leading-relaxed">{dominantDriver}</p>
           </Section>
 
+          {/* 5. Evaluate Adjustment */}
+          <Section title="Evaluate Adjustment">
+            <select
+              value={evalScenario}
+              onChange={e => setEvalScenario(e.target.value)}
+              className="w-full bg-[#1a1a1a] border border-[#2a2a2a] text-[#bbb] text-xs rounded px-2 py-1.5 focus:outline-none focus:border-[#444]"
+            >
+              <option value="">— select scenario —</option>
+              {EVAL_SCENARIOS.map(s => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+            {evalScenario && (() => {
+              const scenario = EVAL_SCENARIOS.find(s => s.value === evalScenario);
+              const projected = projectTTL(timeToNearest, slope, scenario.rorReduction);
+              const gain = projected - timeToNearest;
+              return (
+                <div className="mt-2 p-2 border border-[#2a2a2a] rounded bg-[#0f0f0f]">
+                  <p className="text-[10px] text-[#555] uppercase tracking-widest mb-1">Projected outcome</p>
+                  <p className="text-xs text-[#ccc]">
+                    Projected TTL if applied:{" "}
+                    <span className="font-mono text-[#0F9F9F]">{fmt(projected)}</span>
+                  </p>
+                  <p className="text-[10px] text-[#666] mt-1">
+                    {gain > 0
+                      ? `+${Math.round(gain)} min additional margin vs. current trajectory.`
+                      : "No significant margin improvement at current operating point."}
+                  </p>
+                  <p className="text-[10px] text-[#3a3a3a] mt-2">Projection only — no action applied.</p>
+                </div>
+              );
+            })()}
+          </Section>
+
           {/* 4. Ranked Mitigation Options */}
           <Section title="Ranked Mitigation Options">
             {rankedOptions.map((opt, i) => (
