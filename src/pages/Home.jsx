@@ -680,13 +680,14 @@ export default function Home() {
               timeToNearest={displayTTL}
             />
 
-            <AcknowledgeSystem />
-
-            <ExecutiveRibbon
-              timeToNearest={displayTTL}
-              equipment={activeData.equipment}
-              sensorQuality={activeData.sensorQuality}
-            />
+            <div className="max-w-3xl mx-auto space-y-0">
+              <ExecutiveRibbon
+                timeToNearest={displayTTL}
+                equipment={activeData.equipment}
+                sensorQuality={activeData.sensorQuality}
+              />
+              <AcknowledgeSystem />
+            </div>
           </>
         )}
 
