@@ -649,8 +649,11 @@ export default function Home() {
               )}
             </div>
 
-            <MitigationCapacity 
+            <OpsCapacityPanel
               systemState={systemState}
+              coolingCapacity={coolingCapacity}
+              equipment={activeData.equipment}
+              slope={displaySlope}
             />
 
             <ProcessMap
