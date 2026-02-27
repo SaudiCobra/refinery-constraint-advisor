@@ -39,6 +39,26 @@ function getDominantDriver(slope, coolingCapacity, equipment, systemState) {
   return `Risk driven primarily by ${drivers[0].label} and ${drivers[1].label}.`;
 }
 
+// ── Operator advantage insight ────────────────────────────────────────────────
+
+function getOperatorAdvantage(timeToNearest, slope, coolingCapacity, equipment, feedActive, coolingActive) {
+  if (timeToNearest > 60) return "System stable. Monitor normal operating limits.";
+  if (timeToNearest > 35) {
+    if (!feedActive && !coolingActive) return "Mitigation levers available—early action preferred.";
+    return "Current mitigation sufficient. Continue monitoring.";
+  }
+  if (timeToNearest > 13) {
+    if (coolingCapacity === "SEVERELY_LIMITED") return "Cooling offline. Prioritize feed reduction immediately.";
+    if (!equipment?.effluentCooler) return "Cooling unavailable. Feed reduction is primary lever.";
+    return "Multiple levers active. Assess combined effect.";
+  }
+  if (timeToNearest > 4) {
+    if (slope < 0.5) return "Rate-of-rise slowing. Intervention is taking effect.";
+    return "High rate-of-rise despite mitigation. Escalating.";
+  }
+  return "Critical window. All available levers should be active.";
+}
+
 // ── Ranked actions with bar widths ────────────────────────────────────────────
 
 function getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedActive, h2Active, coolingActive) {
