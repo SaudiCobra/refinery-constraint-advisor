@@ -253,7 +253,7 @@ function useResponsivePanel() {
   return { panelWidth, fontScale, isLargeDisplay, panelPadding, sectionMargin };
 }
 
-export default React.forwardRef(function ManarahPanel({
+export default function ManarahPanel({
   open,
   systemState,
   timeToNearest,
@@ -265,14 +265,10 @@ export default React.forwardRef(function ManarahPanel({
   quenchBoostActive,
   coolingBoostActive,
   onAutoOpen,
-}, ref) {
+}) {
   const [evalScenario, setEvalScenario] = useState("");
   const [autoOpenedImmediate, setAutoOpenedImmediate] = useState(false);
   const { panelWidth, fontScale, isLargeDisplay, panelPadding, sectionMargin } = useResponsivePanel();
-  const internalRef = useRef(null);
-  
-  // Forward ref for panel positioning
-  React.useImperativeHandle(ref, () => internalRef.current);
 
   const stateKey = (systemState || "NORMAL").toUpperCase().replace(/\s+/g, "_");
   const isImmediate = stateKey === "IMMEDIATE_RISK";
@@ -340,7 +336,6 @@ export default React.forwardRef(function ManarahPanel({
       )}
 
       <div
-        ref={internalRef}
         className="manarah-panel"
         style={{
           position: "fixed",
@@ -502,4 +497,4 @@ export default React.forwardRef(function ManarahPanel({
       </div>
     </>
   );
-});
+}
