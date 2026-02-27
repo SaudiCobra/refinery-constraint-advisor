@@ -244,11 +244,12 @@ function useResponsivePanel() {
     window.addEventListener("resize", handler);
     return () => window.removeEventListener("resize", handler);
   }, []);
-  const panelWidth  = vw > 3200 ? 760 : vw > 2560 ? 680 : 420;
+  const basePanelWidth = vw > 3200 ? 760 : vw > 2560 ? 680 : 420;
+  const panelWidth = Math.round(basePanelWidth * 1.08);
   const fontScale   = vw > 2560 ? 1.08 : 1.0;
   const isLargeDisplay = vw > 2560;
-  const panelPadding = isLargeDisplay ? "14px 18px" : "12px 16px";
-  const sectionMargin = isLargeDisplay ? "12px 0" : "10px 0";
+  const panelPadding = isLargeDisplay ? "14px 19px" : "13px 17px";
+  const sectionMargin = isLargeDisplay ? "14px 0" : "12px 0";
   return { panelWidth, fontScale, isLargeDisplay, panelPadding, sectionMargin };
 }
 
