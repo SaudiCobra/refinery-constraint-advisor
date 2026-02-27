@@ -253,7 +253,7 @@ function useResponsivePanel() {
   return { panelWidth, fontScale, isLargeDisplay, panelPadding, sectionMargin };
 }
 
-export default function ManarahPanel({
+export default React.forwardRef(function ManarahPanel({
   open,
   systemState,
   timeToNearest,
@@ -502,4 +502,4 @@ export default function ManarahPanel({
       </div>
     </>
   );
-}
+});
