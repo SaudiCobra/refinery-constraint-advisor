@@ -49,6 +49,10 @@ export default function ManarahButton({ systemState, onClick }) {
   const key = resolveState(systemState);
   const cfg = STATE_CONFIG[key];
   const animName = `manarah-ring-${key.toLowerCase()}`;
+  const size = useBeaconSize();
+  const ringThickness = Math.round(size / 32); // scales proportionally (2px at 64, 2.5 at 80, 3 at 96)
+  const svgSize = Math.round(size * 0.56);     // inner SVG ~56% of circle diameter
+  const svgHeight = Math.round(svgSize * 1.19);
 
   return (
     <>
