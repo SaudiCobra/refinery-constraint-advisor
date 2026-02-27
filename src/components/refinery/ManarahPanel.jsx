@@ -281,6 +281,24 @@ export default function ManarahPanel({
         .manarah-panel { animation: manarah-fadein 0.18s ease-out forwards; }
       `}</style>
 
+      {/* Light gradient link from beacon to panel (large displays only) */}
+      {isLargeDisplay && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 40,
+            right: 20,
+            width: 2,
+            height: 56,
+            zIndex: 9997,
+            background: `linear-gradient(180deg, ${severityColor} 0%, ${severityColor} 20%, transparent 100%)`,
+            opacity: 0.12,
+            pointerEvents: "none",
+            borderRadius: 1,
+          }}
+        />
+      )}
+
       <div
         className="manarah-panel"
         style={{
