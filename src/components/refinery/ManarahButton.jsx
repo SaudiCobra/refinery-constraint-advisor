@@ -130,6 +130,8 @@ export default function ManarahButton({ systemState, onClick }) {
             borderRadius: "50%",
             background: `radial-gradient(circle at 50% 55%, ${cfg.glowColor} 0%, transparent 72%)`,
             pointerEvents: "none",
+            opacity: cfg.glowIntensity,
+            transition: "opacity 0.3s ease-in-out",
           }}
         />
 
