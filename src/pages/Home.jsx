@@ -590,6 +590,8 @@ export default function Home() {
               equipment={activeData.equipment}
               sensorQuality={activeData.sensorQuality}
               units={activeData.units}
+              systemState={systemState}
+              timeToNearest={displayTTL}
             />
 
             <AcknowledgeSystem />
