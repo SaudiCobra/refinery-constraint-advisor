@@ -105,8 +105,8 @@ function projectTTL(timeToNearest, slope, rorReduction) {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function Divider() {
-  return <div style={{ borderTop: "1px solid #1e1e1e", margin: "10px 0" }} />;
+function Divider({ isLargeDisplay }) {
+  return <div style={{ borderTop: "1px solid #1e1e1e", margin: isLargeDisplay ? "12px 0" : "10px 0" }} />;
 }
 
 function Label({ children, fs }) {
