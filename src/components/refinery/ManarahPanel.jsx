@@ -126,7 +126,7 @@ function Row({ label, value, valueColor, emergency, fs }) {
   );
 }
 
-function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs }) {
+function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs, isLargeDisplay }) {
   const TOTAL_BLOCKS = 9;
   const filled = Math.round(barFill * TOTAL_BLOCKS);
   const barColor = !available ? "#2a2a2a"
