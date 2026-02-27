@@ -1,26 +1,7 @@
-import React, { useState } from "react";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 
-// ── Scenario evaluation model ─────────────────────────────────────────────────
-// Each option defines a RoR multiplier reduction applied on top of current slope.
-const EVAL_SCENARIOS = [
-  { value: "feed5",    label: "5% feed reduction",    rorReduction: 0.08 },
-  { value: "feed10",   label: "10% feed reduction",   rorReduction: 0.15 },
-  { value: "h2plus",   label: "+5% hydrogen",          rorReduction: 0.07 },
-  { value: "cooling",  label: "Cooling boost",         rorReduction: 0.18 },
-  { value: "combined", label: "Combined mitigation",   rorReduction: 0.38 },
-];
-
-function projectTTL(currentTTL, slope, rorReduction, highLimit, currentTemp) {
-  // Derive current temp from TTL and slope if not provided
-  const projectedSlope = Math.max(0.03, slope * (1 - rorReduction));
-  const margin = slope > 0 ? slope * currentTTL : (highLimit - currentTemp);
-  const projectedTTL = projectedSlope > 0 ? margin / projectedSlope : Infinity;
-  return Math.min(projectedTTL, 120);
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function fmt(min) {
   if (!isFinite(min) || min > 999) return "> 60 min";
@@ -33,17 +14,24 @@ function fmtRoR(ror) {
   return `${ror >= 0 ? "+" : ""}${ror.toFixed(2)} °C/min`;
 }
 
+const SEVERITY_COLOR = {
+  NORMAL:         "#0F9F9F",
+  EARLY_DRIFT:    "#D4A547",
+  SEVERE_DRIFT:   "#D4653F",
+  IMMEDIATE_RISK: "#EF4444",
+};
+
+// ── Dominant driver ───────────────────────────────────────────────────────────
+
 function getDominantDriver(slope, coolingCapacity, equipment, systemState) {
   const drivers = [];
-  if (slope > 1.0) drivers.push({ label: "rising RoR", weight: slope });
+  if (slope > 1.0) drivers.push({ label: "rising rate-of-rise", weight: slope });
   if (coolingCapacity === "SEVERELY_LIMITED") drivers.push({ label: "severely limited cooling capacity", weight: 3 });
   else if (coolingCapacity === "REDUCED") drivers.push({ label: "reduced cooling margin", weight: 2 });
   if (!equipment?.h2Compressor) drivers.push({ label: "hydrogen compressor offline", weight: 2.5 });
   if (!equipment?.effluentCooler) drivers.push({ label: "effluent cooler unavailable", weight: 2 });
-  if (systemState === "IMMEDIATE_RISK" || systemState === "SEVERE_DRIFT") {
-    if (!drivers.some(d => d.label.includes("RoR"))) {
-      drivers.push({ label: "sustained high rate-of-rise", weight: 1.5 });
-    }
+  if ((systemState === "IMMEDIATE_RISK" || systemState === "SEVERE_DRIFT") && !drivers.some(d => d.label.includes("rate"))) {
+    drivers.push({ label: "sustained high rate-of-rise", weight: 1.5 });
   }
   if (drivers.length === 0) return "No dominant risk driver identified at current operating point.";
   drivers.sort((a, b) => b.weight - a.weight);
@@ -51,87 +39,127 @@ function getDominantDriver(slope, coolingCapacity, equipment, systemState) {
   return `Risk driven primarily by ${drivers[0].label} and ${drivers[1].label}.`;
 }
 
-function getRankedMitigations(slope, coolingCapacity, equipment, rampProgress, feedActive, h2Active, coolingActive) {
-  const options = [];
+// ── Ranked actions with bar widths ────────────────────────────────────────────
 
-  // Feed reduction — strongest lever (maxEffect 0.25)
-  const feedPct = feedActive ? Math.round(rampProgress?.feed ?? 0) : null;
-  options.push({
-    key: "feed",
-    label: "Feed reduction",
-    baseScore: 25,
-    active: feedActive,
-    pct: feedPct,
-    impactLabel: feedActive
-      ? (feedPct >= 100 ? "Strong — fully engaged" : `Strong — building (${feedPct}%)`)
-      : "Strong — not active",
-    available: true,
-  });
-
-  // Cooling boost — (maxEffect 0.30 but diminished if 2nd lever)
-  const coolPct = coolingActive ? Math.round(rampProgress?.cooling ?? 0) : null;
+function getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedActive, h2Active, coolingActive) {
   const coolingAvail = coolingCapacity !== "SEVERELY_LIMITED" && equipment?.effluentCooler !== false;
-  options.push({
-    key: "cooling",
-    label: "Cooling boost",
-    baseScore: coolingAvail ? 22 : 8,
-    active: coolingActive,
-    pct: coolPct,
-    impactLabel: !coolingAvail
-      ? "Limited — cooling headroom constrained"
-      : coolingActive
-        ? (coolPct >= 100 ? "Moderate — fully engaged" : `Moderate — building (${coolPct}%)`)
-        : "Moderate — not active",
-    available: coolingAvail,
-  });
-
-  // H2 / Quench — (maxEffect 0.20)
-  const h2Pct = h2Active ? Math.round(rampProgress?.h2 ?? 0) : null;
   const h2Avail = equipment?.h2Compressor !== false;
-  options.push({
-    key: "h2",
-    label: "Hydrogen quench",
-    baseScore: h2Avail ? 18 : 5,
-    active: h2Active,
-    pct: h2Pct,
-    impactLabel: !h2Avail
-      ? "Unavailable — H2 compressor offline"
-      : h2Active
-        ? (h2Pct >= 100 ? "Mild stabilization — fully engaged" : `Mild stabilization — building (${h2Pct}%)`)
-        : "Mild stabilization — not active",
-    available: h2Avail,
+
+  const items = [
+    {
+      key: "feed",
+      label: "Feed reduction",
+      score: 25,
+      strengthLabel: "Strong",
+      barFill: 0.80,
+      active: feedActive,
+      available: true,
+      pct: feedActive ? Math.round(rampProgress?.feed ?? 0) : null,
+    },
+    {
+      key: "cooling",
+      label: "Cooling boost",
+      score: coolingAvail ? 22 : 6,
+      strengthLabel: coolingAvail ? "Moderate" : "Limited",
+      barFill: coolingAvail ? 0.58 : 0.18,
+      active: coolingActive,
+      available: coolingAvail,
+      pct: coolingActive ? Math.round(rampProgress?.cooling ?? 0) : null,
+    },
+    {
+      key: "h2",
+      label: "Hydrogen quench",
+      score: h2Avail ? 18 : 3,
+      strengthLabel: h2Avail ? "Mild" : "Unavailable",
+      barFill: h2Avail ? 0.38 : 0.08,
+      active: h2Active,
+      available: h2Avail,
+      pct: h2Active ? Math.round(rampProgress?.h2 ?? 0) : null,
+    },
+  ];
+
+  items.sort((a, b) => {
+    const s = o => o.active ? o.score + 40 : o.score;
+    return s(b) - s(a);
   });
 
-  // Sort: active+full first, then active building, then available+not active, then unavailable
-  options.sort((a, b) => {
-    const score = (o) => {
-      if (!o.available) return 0;
-      if (o.active && o.pct >= 100) return o.baseScore + 50;
-      if (o.active) return o.baseScore + 25;
-      return o.baseScore;
-    };
-    return score(b) - score(a);
-  });
-
-  return options;
+  return items;
 }
 
-// ── Section wrapper ───────────────────────────────────────────────────────────
+// ── Scenario evaluation ───────────────────────────────────────────────────────
 
-function Section({ title, children }) {
+const EVAL_SCENARIOS = [
+  { value: "feed5",    label: "5% feed reduction",   rorReduction: 0.08 },
+  { value: "feed10",   label: "10% feed reduction",  rorReduction: 0.15 },
+  { value: "h2plus",   label: "+5% hydrogen",         rorReduction: 0.07 },
+  { value: "cooling",  label: "Cooling boost",        rorReduction: 0.18 },
+  { value: "combined", label: "Combined mitigation",  rorReduction: 0.38 },
+];
+
+function projectTTL(timeToNearest, slope, rorReduction) {
+  const projectedSlope = Math.max(0.03, slope * (1 - rorReduction));
+  const margin = slope > 0 ? slope * timeToNearest : 0;
+  const projected = projectedSlope > 0 ? margin / projectedSlope : Infinity;
+  return Math.min(projected, 120);
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function Divider() {
+  return <div style={{ borderTop: "1px solid #1e1e1e", margin: "10px 0" }} />;
+}
+
+function Label({ children }) {
   return (
-    <div className="border border-[#2a2a2a] rounded-md p-3 space-y-2">
-      <p className="text-[10px] uppercase tracking-widest text-[#666] font-semibold">{title}</p>
+    <p style={{ fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#4a4a4a", fontWeight: 600, marginBottom: 6 }}>
       {children}
+    </p>
+  );
+}
+
+function Row({ label, value, valueColor }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+      <span style={{ fontSize: 11, color: "#666" }}>{label}</span>
+      <span style={{ fontSize: 12, fontFamily: "monospace", color: valueColor || "#c0c0c0" }}>{value}</span>
     </div>
   );
 }
 
-function DataLine({ label, value, valueColor }) {
+function ImpactBar({ label, barFill, strengthLabel, active, available, pct }) {
+  const TOTAL_BLOCKS = 9;
+  const filled = Math.round(barFill * TOTAL_BLOCKS);
+  const barColor = !available ? "#2a2a2a"
+    : strengthLabel === "Strong"    ? "#0F9F9F"
+    : strengthLabel === "Moderate"  ? "#D4A547"
+    : strengthLabel === "Mild"      ? "#6a6a6a"
+    : "#2a2a2a";
+
+  const labelColor = !available ? "#3a3a3a" : active ? "#ddd" : "#888";
+
   return (
-    <div className="flex items-baseline justify-between gap-3">
-      <span className="text-[#777] text-xs">{label}</span>
-      <span className={cn("text-xs font-mono text-right", valueColor || "text-[#ccc]")}>{value}</span>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
+      <span style={{ fontSize: 11, color: labelColor, width: 120, flexShrink: 0 }}>
+        {label}
+        {active && pct !== null && <span style={{ fontSize: 9, color: "#555", marginLeft: 4 }}>[{pct}%]</span>}
+      </span>
+      <div style={{ display: "flex", gap: 2, flex: 1 }}>
+        {Array.from({ length: TOTAL_BLOCKS }).map((_, i) => (
+          <div
+            key={i}
+            style={{
+              height: 6,
+              flex: 1,
+              borderRadius: 2,
+              background: i < filled ? barColor : "#1e1e1e",
+              opacity: i < filled ? (active ? 1 : 0.65) : 1,
+            }}
+          />
+        ))}
+      </div>
+      <span style={{ fontSize: 10, color: !available ? "#3a3a3a" : barColor, width: 62, textAlign: "right", flexShrink: 0 }}>
+        {strengthLabel}
+      </span>
     </div>
   );
 }
@@ -152,177 +180,176 @@ export default function ManarahPanel({
   coolingBoostActive,
 }) {
   const [evalScenario, setEvalScenario] = useState("");
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (panelRef.current && !panelRef.current.contains(e.target)) onClose();
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open, onClose]);
+
   if (!open) return null;
 
-  // TTL at Severe and Immediate thresholds
-  const ttlToSevere    = timeToNearest > 13 ? Math.max(0, timeToNearest - 13) : 0;
-  const ttlToImmediate = timeToNearest > 4  ? Math.max(0, timeToNearest - 4)  : 0;
+  const stateKey = (systemState || "NORMAL").toUpperCase().replace(/\s+/g, "_");
+  const severityColor = SEVERITY_COLOR[stateKey] || "#0F9F9F";
 
-  const stateColor = {
-    NORMAL:         "#0F9F9F",
-    EARLY_DRIFT:    "#D4A547",
-    SEVERE_DRIFT:   "#D4653F",
-    IMMEDIATE_RISK: "#EF4444",
-  }[systemState] || "#aaa";
+  const ttlToSevere    = timeToNearest > 13 ? timeToNearest - 13 : 0;
+  const ttlToImmediate = timeToNearest > 4  ? timeToNearest - 4  : 0;
 
-  const dominantDriver = getDominantDriver(slope, coolingCapacity, equipment, systemState);
-  const rankedOptions  = getRankedMitigations(
-    slope, coolingCapacity, equipment, rampProgress,
-    feedReductionActive, quenchBoostActive, coolingBoostActive
-  );
+  const dominantDriver = getDominantDriver(slope, coolingCapacity, equipment, stateKey);
+  const rankedActions  = getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedReductionActive, quenchBoostActive, coolingBoostActive);
 
-  const impactColor = (label) => {
-    if (label.startsWith("Strong")) return "#0F9F9F";
-    if (label.startsWith("Moderate")) return "#D4A547";
-    if (label.startsWith("Mild")) return "#888";
-    if (label.startsWith("Limited") || label.startsWith("Unavailable")) return "#555";
-    return "#777";
-  };
+  const ttlColor = timeToNearest <= 4 ? "#EF4444" : timeToNearest <= 13 ? "#D4653F" : timeToNearest <= 35 ? "#D4A547" : "#0F9F9F";
+
+  const evalResult = evalScenario
+    ? (() => {
+        const sc = EVAL_SCENARIOS.find(s => s.value === evalScenario);
+        const projected = projectTTL(timeToNearest, slope, sc.rorReduction);
+        const gain = projected - timeToNearest;
+        return { projected, gain };
+      })()
+    : null;
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px]"
-        onClick={onClose}
-      />
+      {/* Fade-in overlay — no slide */}
+      <style>{`
+        @keyframes manarah-fadein { from { opacity: 0; transform: scale(0.97) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .manarah-panel { animation: manarah-fadein 0.18s ease-out forwards; }
+      `}</style>
 
-      {/* Drawer */}
-      <div className="fixed top-0 right-0 h-full w-80 z-50 bg-[#111] border-l border-[#2a2a2a] flex flex-col shadow-2xl">
+      <div
+        ref={panelRef}
+        className="manarah-panel"
+        style={{
+          position: "fixed",
+          bottom: 96,
+          right: 20,
+          width: 400,
+          maxHeight: "70vh",
+          zIndex: 9998,
+          background: "#0e0e0e",
+          border: "1px solid #222",
+          borderRadius: 10,
+          boxShadow: "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        {/* Severity bar */}
+        <div style={{ height: 4, background: severityColor, opacity: 0.85, flexShrink: 0 }} />
+
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#2a2a2a]">
+        <div style={{ padding: "12px 16px 10px", borderBottom: "1px solid #1a1a1a", flexShrink: 0, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <p className="text-white text-sm font-semibold tracking-wide">Manarah Advisory</p>
-            <p className="text-[#555] text-[10px] uppercase tracking-widest mt-0.5">
-              Real-time operating limit analysis
-            </p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: "#e0e0e0", letterSpacing: "0.06em", marginBottom: 2 }}>MANARAH</p>
+            <p style={{ fontSize: 10, color: "#444", letterSpacing: "0.04em" }}>Advisory Watchtower — Operator retains full control</p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-[#555] hover:text-[#aaa] transition-colors"
-          >
-            <X className="w-4 h-4" />
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#444", padding: 2, lineHeight: 1, marginTop: 2 }}>
+            <X size={14} />
           </button>
         </div>
 
-        {/* System state pill */}
-        <div className="px-4 pt-3">
-          <span
-            className="inline-block text-[10px] font-semibold uppercase tracking-widest px-2 py-1 rounded border"
-            style={{ color: stateColor, borderColor: stateColor + "55", background: stateColor + "11" }}
-          >
-            {systemState?.replace(/_/g, " ") || "NORMAL"}
-          </span>
-        </div>
-
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        <div style={{ overflowY: "auto", padding: "12px 16px", flex: 1 }}>
 
-          {/* 1. Live Scan */}
-          <Section title="Live Scan">
-            <DataLine
-              label="Time to constraint"
-              value={fmt(timeToNearest)}
-              valueColor={timeToNearest <= 4 ? "#EF4444" : timeToNearest <= 13 ? "#D4653F" : timeToNearest <= 35 ? "#D4A547" : "#0F9F9F"}
+          {/* SECTION 1 — LIVE STATUS */}
+          <Label>Live Status</Label>
+          <Row label="Time to constraint" value={fmt(timeToNearest)} valueColor={ttlColor} />
+          <Row label="Rate-of-rise" value={fmtRoR(slope)} />
+
+          <Divider />
+
+          {/* SECTION 2 — ESCALATION FORECAST */}
+          <Label>Escalation Forecast</Label>
+          {stateKey === "IMMEDIATE_RISK" ? (
+            <>
+              <Row label="Immediate Risk" value="Currently active" valueColor="#EF4444" />
+              <Row label="Constraint breach" value={fmt(timeToNearest)} valueColor="#EF4444" />
+            </>
+          ) : stateKey === "SEVERE_DRIFT" ? (
+            <>
+              <Row label="Severe Drift" value="Currently in band" valueColor="#D4653F" />
+              <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 3 ? "#EF4444" : "#D4A547"} />
+            </>
+          ) : (
+            <>
+              <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} />
+              <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} />
+            </>
+          )}
+          <p style={{ fontSize: 9, color: "#333", marginTop: 4 }}>Assumes no intervention and constant rate-of-rise.</p>
+
+          <Divider />
+
+          {/* SECTION 3 — DOMINANT DRIVER */}
+          <Label>Dominant Driver</Label>
+          <p style={{ fontSize: 11, color: "#999", lineHeight: 1.5 }}>{dominantDriver}</p>
+
+          <Divider />
+
+          {/* SECTION 4 — ACTION PRIORITY */}
+          <Label>Action Priority</Label>
+          {rankedActions.map((a, i) => (
+            <ImpactBar
+              key={a.key}
+              label={`${i + 1}. ${a.label}`}
+              barFill={a.barFill}
+              strengthLabel={a.strengthLabel}
+              active={a.active}
+              available={a.available}
+              pct={a.pct}
             />
-            <DataLine label="Rate-of-rise" value={fmtRoR(slope)} />
-          </Section>
+          ))}
 
-          {/* 2. Escalation Projection */}
-          <Section title="Escalation Projection">
-            {systemState === "NORMAL" || systemState === "EARLY_DRIFT" ? (
-              <>
-                <DataLine
-                  label="Severe Drift threshold"
-                  value={ttlToSevere > 0 ? `in ${fmt(ttlToSevere)}` : "Already reached"}
-                  valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"}
-                />
-                <DataLine
-                  label="Immediate Risk threshold"
-                  value={ttlToImmediate > 0 ? `in ${fmt(ttlToImmediate)}` : "Already reached"}
-                  valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"}
-                />
-              </>
-            ) : systemState === "SEVERE_DRIFT" ? (
-              <>
-                <DataLine label="Severe Drift" value="Currently in band" valueColor="#D4653F" />
-                <DataLine
-                  label="Immediate Risk threshold"
-                  value={ttlToImmediate > 0 ? `in ${fmt(ttlToImmediate)}` : "Already reached"}
-                  valueColor={ttlToImmediate <= 3 ? "#EF4444" : "#D4A547"}
-                />
-              </>
-            ) : (
-              <>
-                <DataLine label="Immediate Risk" value="Currently active" valueColor="#EF4444" />
-                <DataLine label="Constraint breach" value={fmt(timeToNearest)} valueColor="#EF4444" />
-              </>
-            )}
-            <p className="text-[#444] text-[10px] pt-1">Projection assumes no intervention and constant rate-of-rise.</p>
-          </Section>
+          <Divider />
 
-          {/* 3. Dominant Driver */}
-          <Section title="Dominant Driver">
-            <p className="text-[#bbb] text-xs leading-relaxed">{dominantDriver}</p>
-          </Section>
+          {/* SECTION 5 — EVALUATE ADJUSTMENT */}
+          <Label>Evaluate Adjustment</Label>
+          <select
+            value={evalScenario}
+            onChange={e => setEvalScenario(e.target.value)}
+            style={{
+              width: "100%",
+              background: "#141414",
+              border: "1px solid #2a2a2a",
+              color: "#aaa",
+              fontSize: 11,
+              borderRadius: 5,
+              padding: "5px 8px",
+              outline: "none",
+              marginBottom: 8,
+            }}
+          >
+            <option value="">— select scenario —</option>
+            {EVAL_SCENARIOS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
 
-          {/* 5. Evaluate Adjustment */}
-          <Section title="Evaluate Adjustment">
-            <select
-              value={evalScenario}
-              onChange={e => setEvalScenario(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-[#2a2a2a] text-[#bbb] text-xs rounded px-2 py-1.5 focus:outline-none focus:border-[#444]"
-            >
-              <option value="">— select scenario —</option>
-              {EVAL_SCENARIOS.map(s => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
-            {evalScenario && (() => {
-              const scenario = EVAL_SCENARIOS.find(s => s.value === evalScenario);
-              const projected = projectTTL(timeToNearest, slope, scenario.rorReduction);
-              const gain = projected - timeToNearest;
-              return (
-                <div className="mt-2 p-2 border border-[#2a2a2a] rounded bg-[#0f0f0f]">
-                  <p className="text-[10px] text-[#555] uppercase tracking-widest mb-1">Projected outcome</p>
-                  <p className="text-xs text-[#ccc]">
-                    Projected TTL if applied:{" "}
-                    <span className="font-mono text-[#0F9F9F]">{fmt(projected)}</span>
-                  </p>
-                  <p className="text-[10px] text-[#666] mt-1">
-                    {gain > 0
-                      ? `+${Math.round(gain)} min additional margin vs. current trajectory.`
-                      : "No significant margin improvement at current operating point."}
-                  </p>
-                  <p className="text-[10px] text-[#3a3a3a] mt-2">Projection only — no action applied.</p>
-                </div>
-              );
-            })()}
-          </Section>
-
-          {/* 4. Ranked Mitigation Options */}
-          <Section title="Ranked Mitigation Options">
-            {rankedOptions.map((opt, i) => (
-              <div key={opt.key} className="flex items-start gap-2 py-1 border-t border-[#1e1e1e] first:border-t-0">
-                <span className="text-[#444] text-[10px] font-mono mt-0.5 w-4 flex-shrink-0">#{i + 1}</span>
-                <div className="flex-1">
-                  <p className={cn("text-xs", opt.active ? "text-[#ddd]" : opt.available ? "text-[#aaa]" : "text-[#555]")}>
-                    {opt.label}
-                    {opt.active && <span className="ml-1 text-[10px] text-[#555]">[active]</span>}
-                  </p>
-                  <p className="text-[10px] mt-0.5" style={{ color: impactColor(opt.impactLabel) }}>
-                    {opt.impactLabel}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </Section>
+          {evalResult && (
+            <div style={{ background: "#0a0a0a", border: "1px solid #1e1e1e", borderRadius: 6, padding: "8px 10px" }}>
+              <Row
+                label="Projected TTL if applied"
+                value={fmt(evalResult.projected)}
+                valueColor="#0F9F9F"
+              />
+              <p style={{ fontSize: 10, color: "#444", marginTop: 2 }}>
+                {evalResult.gain > 0
+                  ? `+${Math.round(evalResult.gain)} min additional margin vs. current trajectory.`
+                  : "No significant margin improvement at current operating point."}
+              </p>
+              <p style={{ fontSize: 9, color: "#2e2e2e", marginTop: 4 }}>Projection only — no action applied.</p>
+            </div>
+          )}
 
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-3 border-t border-[#1e1e1e]">
-          <p className="text-[#333] text-[10px]">Advisory only — no control actions initiated by this system.</p>
+        <div style={{ padding: "8px 16px", borderTop: "1px solid #181818", flexShrink: 0 }}>
+          <p style={{ fontSize: 9, color: "#2e2e2e" }}>Advisory only — no control actions initiated by this system.</p>
         </div>
       </div>
     </>
