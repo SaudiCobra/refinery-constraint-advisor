@@ -1,6 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+
+// ── Scenario evaluation model ─────────────────────────────────────────────────
+// Each option defines a RoR multiplier reduction applied on top of current slope.
+const EVAL_SCENARIOS = [
+  { value: "feed5",    label: "5% feed reduction",    rorReduction: 0.08 },
+  { value: "feed10",   label: "10% feed reduction",   rorReduction: 0.15 },
+  { value: "h2plus",   label: "+5% hydrogen",          rorReduction: 0.07 },
+  { value: "cooling",  label: "Cooling boost",         rorReduction: 0.18 },
+  { value: "combined", label: "Combined mitigation",   rorReduction: 0.38 },
+];
+
+function projectTTL(currentTTL, slope, rorReduction, highLimit, currentTemp) {
+  // Derive current temp from TTL and slope if not provided
+  const projectedSlope = Math.max(0.03, slope * (1 - rorReduction));
+  const margin = slope > 0 ? slope * currentTTL : (highLimit - currentTemp);
+  const projectedTTL = projectedSlope > 0 ? margin / projectedSlope : Infinity;
+  return Math.min(projectedTTL, 120);
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
