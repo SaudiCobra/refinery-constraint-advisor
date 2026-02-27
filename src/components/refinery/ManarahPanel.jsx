@@ -360,7 +360,7 @@ export default function ManarahPanel({
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          transition: "width 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-left 0.3s ease-in-out",
+          transition: "width 0.3s cubic-bezier(0.32, 0.72, 0.36, 1), box-shadow 0.3s ease-in-out, border-left 0.3s ease-in-out",
         }}
       >
         {/* Severity bar */}
