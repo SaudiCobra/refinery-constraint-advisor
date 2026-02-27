@@ -181,7 +181,6 @@ function useResponsivePanel() {
 
 export default function ManarahPanel({
   open,
-  onClose,
   systemState,
   timeToNearest,
   slope,
