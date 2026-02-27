@@ -194,7 +194,7 @@ export default function ManarahPanel({
 }) {
   const [evalScenario, setEvalScenario] = useState("");
   const panelRef = useRef(null);
-  const { panelWidth, fontScale } = useResponsivePanel();
+  const { panelWidth, fontScale, isLargeDisplay } = useResponsivePanel();
 
   useEffect(() => {
     if (!open) return;
