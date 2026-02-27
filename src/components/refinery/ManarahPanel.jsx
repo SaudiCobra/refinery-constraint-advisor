@@ -173,10 +173,12 @@ function useResponsivePanel() {
     window.addEventListener("resize", handler);
     return () => window.removeEventListener("resize", handler);
   }, []);
-  const panelWidth  = vw > 3200 ? 620 : vw > 2560 ? 520 : 420;
+  const panelWidth  = vw > 3200 ? 760 : vw > 2560 ? 680 : 420;
   const fontScale   = vw > 2560 ? 1.08 : 1.0;
   const isLargeDisplay = vw > 2560;
-  return { panelWidth, fontScale, isLargeDisplay };
+  const panelPadding = isLargeDisplay ? "14px 18px" : "12px 16px";
+  const sectionMargin = isLargeDisplay ? "12px 0" : "10px 0";
+  return { panelWidth, fontScale, isLargeDisplay, panelPadding, sectionMargin };
 }
 
 export default function ManarahPanel({
