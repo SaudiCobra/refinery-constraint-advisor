@@ -77,12 +77,27 @@ export default function ManarahButton({ systemState, onClick }) {
   return (
     <>
       <style>{`
-        @keyframes ${animName} {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50%       { opacity: 0.4; transform: scale(1.18); }
+        @keyframes ${animName}-breathe {
+          0%, 100% { opacity: 0.8; }
+          50%       { opacity: 1.0; }
         }
-        .manarah-ring-pulse {
-          animation: ${animName} ${cfg.pulseMs}ms ease-in-out infinite;
+        @keyframes ${animName}-pulse {
+          0%, 100% { opacity: 1.0; }
+          50%       { opacity: 0.6; }
+        }
+        @keyframes ${animName}-sweep {
+          0%   { transform: rotate(0deg); opacity: 0.4; }
+          50%  { opacity: 0.8; }
+          100% { transform: rotate(360deg); opacity: 0.4; }
+        }
+        .manarah-beacon-breathe {
+          animation: ${animName}-breathe ${cfg.pulseMs}ms ease-in-out infinite;
+        }
+        .manarah-beacon-pulse {
+          animation: ${animName}-pulse ${cfg.pulseMs}ms ease-in-out infinite;
+        }
+        .manarah-beacon-sweep {
+          animation: ${animName}-sweep ${cfg.sweepMs}ms linear infinite;
         }
       `}</style>
 
