@@ -13,7 +13,6 @@ import PresentationHero from "@/components/refinery/PresentationHero";
 import DecisionWindowBar from "@/components/refinery/DecisionWindowBar";
 import LeverContext from "@/components/refinery/LeverContext";
 import ProcessMap from "@/components/refinery/ProcessMap";
-import PreheatIndicator from "@/components/refinery/PreheatIndicator";
 import OpsCapacityPanel from "@/components/refinery/OpsCapacityPanel";
 import {
   computeRateOfRise,
