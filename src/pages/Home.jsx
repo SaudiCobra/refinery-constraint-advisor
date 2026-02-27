@@ -151,16 +151,18 @@ export default function Home() {
         ror -= cfg.steerK * deficit;
       }
 
-      // 3. Apply active mitigation factors (multiplicative, read from refs)
-      let mitigFactor = 1.0;
-      if (feedReductionRef.current) mitigFactor *= 0.80;
-      if (quenchBoostRef.current)   mitigFactor *= 0.75;
-      if (coolingBoostRef.current)  mitigFactor *= 0.85;
-      ror = ror * mitigFactor;
+      // 3. Apply mitigation via engine (cooling ramps over ~12 s, others instant)
+      const coolingRamp = tickCoolingRamp(coolingBoostRef.current);
+      const { effectiveRoR } = computeMitigatedRoR(ror, {
+        feedActive:     feedReductionRef.current,
+        hydrogenActive: quenchBoostRef.current,
+        coolingActive:  coolingBoostRef.current,
+      }, coolingRamp);
+      ror = effectiveRoR;
 
-      // 4. Hard-clamp RoR — use a floor of 0.05 when mitigation is active,
-      //    otherwise respect band minimum so steering stays meaningful.
-      const rorFloor = (mitigFactor < 1.0) ? 0.05 : cfg.rorMin;
+      // 4. Hard-clamp RoR — use floor of 0.03 when mitigation active, else band min
+      const anyMitig = feedReductionRef.current || quenchBoostRef.current || coolingBoostRef.current;
+      const rorFloor = anyMitig ? 0.03 : cfg.rorMin;
       ror = Math.max(rorFloor, Math.min(cfg.rorMax, ror));
 
       // 5. Advance temperature
