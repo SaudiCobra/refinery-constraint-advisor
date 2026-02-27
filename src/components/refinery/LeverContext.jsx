@@ -96,46 +96,78 @@ export default function LeverContext({
       {onMitigate && (
         <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
           <p className="text-[#666] text-[10px] uppercase tracking-wider mb-2 font-semibold">Corrective Actions</p>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => onMitigate("feedReduction")}
-              className={cn(
-                "px-3 py-1.5 rounded border text-xs transition-all duration-200",
-                feedReductionActive
-                  ? "border-[#E67E22] text-[#E67E22] bg-[#E67E22]/10"
-                  : "border-[#444] text-[#aaa] hover:border-[#E67E22] hover:text-[#E67E22]"
-              )}
-            >
-              {feedReductionActive ? "✓ " : "↓ "}Feed Reduction
-            </button>
-            <button
-              onClick={() => onMitigate("quench")}
-              className={cn(
-                "px-3 py-1.5 rounded border text-xs transition-all duration-200",
-                quenchBoostActive
-                  ? "border-[#4A90E2] text-[#4A90E2] bg-[#4A90E2]/10"
-                  : "border-[#444] text-[#aaa] hover:border-[#4A90E2] hover:text-[#4A90E2]"
-              )}
-            >
-              {quenchBoostActive ? "✓ " : "↑ "}Quench Boost
-            </button>
-            <button
-              onClick={() => onMitigate("cooling")}
-              className={cn(
-                "px-3 py-1.5 rounded border text-xs transition-all duration-200",
-                coolingBoostActive
-                  ? "border-[#0F9F9F] text-[#0F9F9F] bg-[#0F9F9F]/10"
-                  : "border-[#444] text-[#aaa] hover:border-[#0F7F7F] hover:text-[#0F9F9F]"
-              )}
-            >
-              {coolingBoostActive ? "✓ " : "↑ "}Cooling Boost
-            </button>
-          </div>
+
+          {/* Helper: derive per-lever status label from rampProgress */}
+          {(() => {
+            const getLeverStatus = (isActive, pct) => {
+              if (!isActive) return { label: "Idle", color: "#444" };
+              if (pct === 0)   return { label: "Commanded", color: "#aaa" };
+              if (pct < 100)   return { label: `Building (${Math.round(pct)}%)`, color: "#E67E22" };
+              return { label: "Full (100%)", color: "#0F9F9F" };
+            };
+
+            const feedStatus    = getLeverStatus(feedReductionActive, rampProgress?.feed    ?? 0);
+            const quenchStatus  = getLeverStatus(quenchBoostActive,   rampProgress?.h2      ?? 0);
+            const coolingStatus = getLeverStatus(coolingBoostActive,  rampProgress?.cooling ?? 0);
+
+            return (
+              <div className="flex flex-wrap gap-2">
+                {/* Feed Reduction */}
+                <div className="flex flex-col items-start gap-0.5">
+                  <button
+                    onClick={() => onMitigate("feedReduction")}
+                    className={cn(
+                      "px-3 py-1.5 rounded border text-xs transition-all duration-200",
+                      feedReductionActive
+                        ? "border-[#E67E22] text-[#E67E22] bg-[#E67E22]/10"
+                        : "border-[#444] text-[#aaa] hover:border-[#E67E22] hover:text-[#E67E22]"
+                    )}
+                  >
+                    {feedReductionActive ? "✓ " : "↓ "}Feed Reduction
+                  </button>
+                  <span className="text-[10px] pl-0.5" style={{ color: feedStatus.color }}>{feedStatus.label}</span>
+                </div>
+
+                {/* Quench Boost */}
+                <div className="flex flex-col items-start gap-0.5">
+                  <button
+                    onClick={() => onMitigate("quench")}
+                    className={cn(
+                      "px-3 py-1.5 rounded border text-xs transition-all duration-200",
+                      quenchBoostActive
+                        ? "border-[#4A90E2] text-[#4A90E2] bg-[#4A90E2]/10"
+                        : "border-[#444] text-[#aaa] hover:border-[#4A90E2] hover:text-[#4A90E2]"
+                    )}
+                  >
+                    {quenchBoostActive ? "✓ " : "↑ "}Quench Boost
+                  </button>
+                  <span className="text-[10px] pl-0.5" style={{ color: quenchStatus.color }}>{quenchStatus.label}</span>
+                </div>
+
+                {/* Cooling Boost */}
+                <div className="flex flex-col items-start gap-0.5">
+                  <button
+                    onClick={() => onMitigate("cooling")}
+                    className={cn(
+                      "px-3 py-1.5 rounded border text-xs transition-all duration-200",
+                      coolingBoostActive
+                        ? "border-[#0F9F9F] text-[#0F9F9F] bg-[#0F9F9F]/10"
+                        : "border-[#444] text-[#aaa] hover:border-[#0F7F7F] hover:text-[#0F9F9F]"
+                    )}
+                  >
+                    {coolingBoostActive ? "✓ " : "↑ "}Cooling Boost
+                  </button>
+                  <span className="text-[10px] pl-0.5" style={{ color: coolingStatus.color }}>{coolingStatus.label}</span>
+                </div>
+              </div>
+            );
+          })()}
+
           {mitigationMsg && (
             <p className="text-[#E67E22] text-xs mt-2 italic">{mitigationMsg}</p>
           )}
 
-          {/* Ramp progress + minutes recovered feedback */}
+          {/* Overall mitigation response summary */}
           {rampProgress && (() => {
             const activeProgresses = [
               feedReductionActive ? rampProgress.feed : null,
@@ -143,26 +175,20 @@ export default function LeverContext({
               coolingBoostActive  ? rampProgress.cooling : null,
             ].filter(p => p !== null);
 
-            const anyActive = activeProgresses.length > 0;
-            if (!anyActive) return (
+            if (activeProgresses.length === 0) return (
               <p className="text-[#444] text-[10px] mt-2">Mitigation response: Idle</p>
             );
 
-            const maxPct = Math.round(Math.max(...activeProgresses));
             const allFull = activeProgresses.every(p => p >= 100);
-            const statusText = allFull
-              ? "Stabilizing (Full effect)"
-              : `Building (${maxPct}%)`;
-
             return (
               <div className="mt-2 space-y-0.5">
-                <p className="text-[#666] text-[10px]">
-                  Mitigation response: <span className={allFull ? "text-[#0F9F9F]" : "text-[#E67E22]"}>{statusText}</span>
-                </p>
                 {minutesRecovered > 0.3 && (
                   <p className="text-[#555] text-[10px]">
                     Minutes recovered: <span className="text-[#7DBF9E]">+{Math.min(minutesRecovered, 30).toFixed(1)} min</span>
                   </p>
+                )}
+                {allFull && (
+                  <p className="text-[#0F9F9F] text-[10px]">All levers at full effect — stabilizing</p>
                 )}
               </div>
             );
