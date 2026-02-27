@@ -295,7 +295,7 @@ export default function ManarahPanel({
             </>
           )}
 
-          <Divider />
+          <Divider isLargeDisplay={isLargeDisplay} />
 
           {/* SECTION 4 — ACTION PRIORITY */}
           <Label fs={fs}>Action Priority</Label>
