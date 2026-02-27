@@ -28,10 +28,11 @@ export default function AcknowledgeSystem() {
   }
 
   return (
-    <div className="flex justify-center">
+    <div className="flex items-center justify-between bg-[#161616] border border-[#2a2a2a] rounded-b-lg rounded-t-none px-5 py-3">
+      <p className="text-[#555] text-xs">Final action — operator confirms awareness of active drift.</p>
       <Button
         onClick={handleAck}
-        className="bg-[#2a2a2a] border border-[#444] text-[#ccc] hover:text-white hover:border-[#666] px-6"
+        className="bg-[#2a2a2a] border border-[#444] text-[#ccc] hover:text-white hover:border-[#666] px-6 text-sm"
       >
         Acknowledge Early Warning
       </Button>
