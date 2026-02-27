@@ -567,6 +567,7 @@ export default function Home() {
         preheatStatus={preheatStatus}
         uiState={explicitUiState}
         demoState={isInteractive ? demoState : undefined}
+        displayMode={displayMode}
       />
 
       {!alarmsOnly && displayMode === "presentation" && (
