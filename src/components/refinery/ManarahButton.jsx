@@ -159,7 +159,7 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
             borderRadius: "50%",
             border: `1px solid ${cfg.haloColor}`,
             pointerEvents: "none",
-            opacity: 0.6,
+            opacity: key === "IMMEDIATE_RISK" ? 0.85 : 0.6,
             transition: "opacity 0.3s ease-in-out, border-color 0.3s ease-in-out",
           }}
         />
