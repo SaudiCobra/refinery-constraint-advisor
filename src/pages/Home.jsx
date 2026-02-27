@@ -173,11 +173,11 @@ export default function Home() {
       // Compute new raw TTL
       const rawTTL = getSimTTL(temp, ror, limits);
 
-      // Smooth: cap jump to 2 min per tick to prevent display lurching
+      // Smooth: cap gain to +0.8 min/sec (anti-teleport), allow drops freely
       setSmoothedTTL(prev => {
         if (prev === null) return rawTTL;
         const delta = rawTTL - prev;
-        const capped = prev + Math.max(-2, Math.min(2, delta));
+        const capped = prev + Math.max(-3, Math.min(0.8, delta));
         return Math.max(0, capped);
       });
 
