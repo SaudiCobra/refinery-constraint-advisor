@@ -528,10 +528,9 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
-      <ManarahButton systemState={systemState} onClick={() => setManarahOpen(true)} />
+      <ManarahButton systemState={systemState} onClick={() => setManarahOpen(!manarahOpen)} />
       <ManarahPanel
         open={manarahOpen}
-        onClose={() => setManarahOpen(false)}
         systemState={systemState}
         timeToNearest={displayTTL}
         slope={displaySlope}
