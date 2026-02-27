@@ -62,9 +62,17 @@ export default function ManarahButton({ systemState, onClick }) {
   const cfg = STATE_CONFIG[key];
   const animName = `manarah-ring-${key.toLowerCase()}`;
   const size = useBeaconSize();
-  const ringThickness = Math.round(size / 32); // scales proportionally (2px at 64, 2.5 at 80, 3 at 96)
-  const svgSize = Math.round(size * 0.56);     // inner SVG ~56% of circle diameter
+  const ringThickness = Math.round(size / 32);
+  const svgSize = Math.round(size * 0.56);
   const svgHeight = Math.round(svgSize * 1.19);
+  const [vw, setVw] = React.useState(window.innerWidth);
+  const translateYPx = Math.round((cfg.translateY / 100) * vw);
+
+  React.useEffect(() => {
+    const handler = () => setVw(window.innerWidth);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
 
   return (
     <>
@@ -98,7 +106,8 @@ export default function ManarahButton({ systemState, onClick }) {
           justifyContent: "center",
           boxShadow: `0 4px 18px rgba(0,0,0,0.18), 0 0 0 2px rgba(255,255,255,0.04)`,
           outline: "none",
-          transition: "box-shadow 0.4s ease",
+          transform: `translateY(${translateYPx}px)`,
+          transition: "transform 0.3s ease-in-out, box-shadow 0.4s ease",
         }}
       >
         {/* Outer ring — animated */}
