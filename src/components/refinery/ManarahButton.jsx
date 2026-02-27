@@ -66,19 +66,35 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
   const svgSize = Math.round(size * 0.56);
   const svgHeight = Math.round(svgSize * 1.19);
   const [vw, setVw] = React.useState(window.innerWidth);
-  const translateYPx = Math.round((cfg.translateY / 100) * vw);
-
-  // Drawer positioning constants (from ManarahPanel)
-  const basePanelWidth = vw > 3200 ? 760 : vw > 2560 ? 680 : 420;
-  const panelWidth = Math.round(basePanelWidth * 1.08);
-  const adjustedPanelWidth = Math.round(panelWidth * (key === "IMMEDIATE_RISK" ? 1.18 : 1.0));
-  const overlapPx = 20; // Center overlap into drawer
+  const [vh, setVh] = React.useState(window.innerHeight);
+  const [topPx, setTopPx] = React.useState(window.innerHeight - size - 20);
 
   React.useEffect(() => {
-    const handler = () => setVw(window.innerWidth);
+    const handler = () => {
+      setVw(window.innerWidth);
+      setVh(window.innerHeight);
+    };
     window.addEventListener("resize", handler);
     return () => window.removeEventListener("resize", handler);
   }, []);
+
+  React.useEffect(() => {
+    if (!drawerOpen) {
+      setTopPx(vh - size - 20);
+    } else {
+      const panelElement = document.querySelector('[data-manarah-panel]');
+      if (panelElement) {
+        const rect = panelElement.getBoundingClientRect();
+        const panelCenterY = rect.top + rect.height / 2;
+        let calculatedTop = panelCenterY - size / 2;
+        
+        // Clamp to screen bounds
+        calculatedTop = Math.max(12, Math.min(calculatedTop, vh - size - 12));
+        
+        setTopPx(calculatedTop);
+      }
+    }
+  }, [drawerOpen, vh, size]);
 
   return (
     <>
@@ -104,8 +120,8 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
         title="Manarah — Advisory Watchtower"
         style={{
           position: "fixed",
-          bottom: drawerOpen ? Math.round(96 + adjustedPanelWidth / 2 - size / 2 + overlapPx) : 20,
-          right: drawerOpen ? 20 : 20,
+          top: topPx,
+          right: 20,
           zIndex: 9999,
           width: size,
           height: size,
@@ -119,8 +135,7 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
           justifyContent: "center",
           boxShadow: `0 4px 18px rgba(0,0,0,0.18), 0 0 0 2px rgba(255,255,255,0.04)`,
           outline: "none",
-          transform: `translateY(${translateYPx}px)`,
-          transition: "bottom 0.3s cubic-bezier(0.32, 0.72, 0.36, 1), transform 0.3s ease-in-out, box-shadow 0.4s ease",
+          transition: "top 0.3s cubic-bezier(0.32, 0.72, 0.36, 1), box-shadow 0.4s ease",
         }}
       >
         {/* Background glow layer */}
