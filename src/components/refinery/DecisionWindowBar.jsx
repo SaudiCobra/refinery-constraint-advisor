@@ -44,9 +44,9 @@ export default function DecisionWindowBar({
   
   // Determine primary operating limit
   const getPrimaryConstraint = () => {
-    if (demoState === "IMMEDIATE_RISK") return "Primary operating limit: Immediate escalation — reactor approaching trip threshold";
-    if (demoState === "SEVERE_DRIFT")   return "Primary operating limit: Effluent temperature approaching Hi-Hi alarm";
-    if (demoState === "EARLY_DRIFT")    return "Primary operating limit: Reactor outlet temperature drifting toward High alarm";
+    if (timerState === "IMMEDIATE_RISK") return "Primary operating limit: Immediate escalation — reactor approaching trip threshold";
+    if (timerState === "SEVERE_DRIFT")   return "Primary operating limit: Effluent temperature approaching Hi-Hi alarm";
+    if (timerState === "EARLY_DRIFT")    return "Primary operating limit: Reactor outlet temperature drifting toward High alarm";
     if (hotSpotRisk === "HIGH") {
       return "Primary operating limit: Reactor bed temperature imbalance approaching runaway threshold";
     }
