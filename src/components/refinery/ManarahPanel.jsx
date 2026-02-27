@@ -265,7 +265,7 @@ export default function ManarahPanel({
         </div>
 
         {/* Scrollable body */}
-        <div style={{ overflowY: "auto", padding: "12px 16px", flex: 1 }}>
+        <div style={{ overflowY: "auto", padding: panelPadding, flex: 1 }}>
 
           {/* SECTION 1 — LIVE STATUS */}
           <Label fs={fs}>Live Status</Label>
