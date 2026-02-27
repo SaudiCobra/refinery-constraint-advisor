@@ -1,4 +1,16 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+
+function useBeaconSize() {
+  const [vw, setVw] = useState(window.innerWidth);
+  useEffect(() => {
+    const handler = () => setVw(window.innerWidth);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  if (vw > 3200) return 96;
+  if (vw > 2560) return 80;
+  return 64;
+}
 
 const STATE_CONFIG = {
   NORMAL: {
