@@ -289,6 +289,7 @@ export default function ManarahPanel({
   const severityColor = SEVERITY_COLOR[stateKey] || "#0F9F9F";
   const fs = (base) => Math.round(base * fontScale);
   const adjustedPanelWidth = Math.round(panelWidth * (isImmediate ? 1.18 : 1.0));
+  const dividerId = `div-${stateKey.toLowerCase()}`;
 
   const ttlToSevere    = timeToNearest > 13 ? timeToNearest - 13 : 0;
   const ttlToImmediate = timeToNearest > 4  ? timeToNearest - 4  : 0;
