@@ -243,7 +243,7 @@ export default function ManarahPanel({
           position: "fixed",
           bottom: 96,
           right: 20,
-          width: 400,
+          width: panelWidth,
           maxHeight: "70vh",
           zIndex: 9998,
           background: "#0e0e0e",
