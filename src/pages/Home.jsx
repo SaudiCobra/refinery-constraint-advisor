@@ -14,6 +14,7 @@ import DecisionWindowBar from "@/components/refinery/DecisionWindowBar";
 import LeverContext from "@/components/refinery/LeverContext";
 import ProcessMap from "@/components/refinery/ProcessMap";
 import OpsCapacityPanel from "@/components/refinery/OpsCapacityPanel";
+import ManarahButton from "@/components/refinery/ManarahButton";
 import {
   computeRateOfRise,
   computeAllConstraints,
