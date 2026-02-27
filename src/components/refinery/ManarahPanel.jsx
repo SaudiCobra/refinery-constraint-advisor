@@ -280,10 +280,8 @@ export default function ManarahPanel({
 
               {/* SECTION 2 — ESCALATION FORECAST (normal/early only) */}
               <Label>Escalation Forecast</Label>
-              <>
-                <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} />
-                <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} />
-              </>
+              <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} />
+              <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} />
               <p style={{ fontSize: 9, color: "#333", marginTop: 4 }}>Assumes no intervention and constant rate-of-rise.</p>
             </>
           )}
