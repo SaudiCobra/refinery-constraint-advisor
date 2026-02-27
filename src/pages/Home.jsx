@@ -366,8 +366,24 @@ export default function Home() {
   const coolingCapacity = computeCoolingCapacity(activeData.equipment, effectiveSlope, timeToNearest);
   const hotSpotRisk     = computeHotSpotRisk(bedImbalance, activeData.equipment, coolingCapacity, effectiveSlope);
 
+  // ── Derive system state from live TTL ──────────────────────────────────────
+  // derivedSystemState always follows the timer — used when demoActive is true
+  // so the entire UI automatically tracks the countdown across band thresholds.
+  const derivedSystemState = getBandFromTTL(timeToNearest);
+
+  // When the interactive sim is running, auto-steer the scenario band to match
+  // the derived state so steering stays in the right RoR range automatically.
+  useEffect(() => {
+    if (!isInteractive || !simRunning) return;
+    const current = simRoRRef._scenarioBand || "NORMAL";
+    if (current !== derivedSystemState) {
+      simRoRRef._scenarioBand = derivedSystemState;
+    }
+  }, [derivedSystemState, isInteractive, simRunning]);
+
   // Get explicit uiState from scenario (if set)
-  const explicitUiState = activeData.demoScenario || null;
+  // In interactive mode, always follow the live timer — never lock to last click.
+  const explicitUiState = isInteractive ? null : (activeData.demoScenario || null);
 
   // Preheat status - use demonstration stage preheat mode if active
   const ACTIVATION_LOWER = 280;
