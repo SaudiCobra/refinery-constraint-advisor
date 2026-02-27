@@ -117,11 +117,11 @@ function Label({ children }) {
   );
 }
 
-function Row({ label, value, valueColor }) {
+function Row({ label, value, valueColor, emergency }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
-      <span style={{ fontSize: 11, color: "#666" }}>{label}</span>
-      <span style={{ fontSize: 12, fontFamily: "monospace", color: valueColor || "#c0c0c0" }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: emergency ? 8 : 4 }}>
+      <span style={{ fontSize: emergency ? 12 : 11, color: emergency ? "#888" : "#666", fontWeight: emergency ? 500 : 400 }}>{label}</span>
+      <span style={{ fontSize: emergency ? 18 : 12, fontFamily: "monospace", color: valueColor || "#c0c0c0", fontWeight: emergency ? 700 : 400, letterSpacing: emergency ? "0.02em" : "normal" }}>{value}</span>
     </div>
   );
 }
