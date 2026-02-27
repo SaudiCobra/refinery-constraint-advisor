@@ -316,7 +316,7 @@ export default function ManarahPanel({
           {/* SECTION 5 — EVALUATE ADJUSTMENT (hidden in emergency) */}
           {!isEmergency && (
             <>
-              <Divider />
+              <Divider isLargeDisplay={isLargeDisplay} />
               <Label fs={fs}>Evaluate Adjustment</Label>
               <select
                 value={evalScenario}
