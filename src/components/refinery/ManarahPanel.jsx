@@ -173,9 +173,10 @@ function useResponsivePanel() {
     window.addEventListener("resize", handler);
     return () => window.removeEventListener("resize", handler);
   }, []);
-  const panelWidth = vw > 3200 ? 620 : vw > 2560 ? 520 : 420;
-  const fontScale  = vw > 2560 ? 1.08 : 1.0;
-  return { panelWidth, fontScale };
+  const panelWidth  = vw > 3200 ? 620 : vw > 2560 ? 520 : 420;
+  const fontScale   = vw > 2560 ? 1.08 : 1.0;
+  const isLargeDisplay = vw > 2560;
+  return { panelWidth, fontScale, isLargeDisplay };
 }
 
 export default function ManarahPanel({
