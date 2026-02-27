@@ -114,8 +114,8 @@ export default function ManarahButton({ systemState, onClick }) {
 
         {/* Light-beam SVG — bold lighthouse geometry */}
         <svg
-          width="32"
-          height="38"
+          width={svgSize}
+          height={svgHeight}
           viewBox="0 0 32 38"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
