@@ -411,7 +411,8 @@ export default function ManarahPanel({
 
           {!isEmergency && (
             <>
-              <Divider isLargeDisplay={isLargeDisplay} />
+              {/* Subtle divider */}
+              <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: sectionMargin }} />
 
               {/* SECTION 2 — ESCALATION FORECAST (normal/early only) */}
               <Label fs={fs}>Escalation Forecast</Label>
