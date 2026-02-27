@@ -532,7 +532,9 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
-      <ManarahButton systemState={systemState} onClick={() => setManarahOpen(!manarahOpen)} drawerOpen={manarahOpen} />
+      {!manarahOpen && (
+        <ManarahButton systemState={systemState} onClick={() => setManarahOpen(true)} drawerOpen={false} docked={false} />
+      )}
       <ManarahPanel
         open={manarahOpen}
         systemState={systemState}
@@ -545,6 +547,10 @@ export default function Home() {
         quenchBoostActive={quenchBoostActive}
         coolingBoostActive={coolingBoostActive}
         onAutoOpen={handleManarahAutoOpen}
+        onClose={() => setManarahOpen(false)}
+        beacon={manarahOpen ? (
+          <ManarahButton systemState={systemState} onClick={() => setManarahOpen(false)} drawerOpen={true} docked={true} />
+        ) : null}
       />
       <GlobalHeader
         displayMode={displayMode}
