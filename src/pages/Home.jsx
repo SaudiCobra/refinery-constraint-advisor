@@ -232,11 +232,18 @@ export default function Home() {
     const seed = SCENARIO_SEEDS[scenario] || SCENARIO_SEEDS.NORMAL;
     simTempRef.current = seed.temp;
     simRoRRef.current  = seed.ror;
-    // Tag the ref so the tick knows which band config to use for steering
     simRoRRef._scenarioBand = scenario;
     setSimTemp(seed.temp);
     setSimRoR(seed.ror);
-    setSmoothedTTL(null); // reset smoother — snap to new value immediately
+    setSmoothedTTL(null);
+    // Reset all mitigation levers on scenario change
+    feedTsRef.current    = null;
+    h2TsRef.current      = null;
+    coolingTsRef.current = null;
+    setFeedReductionActive(false);
+    setQuenchBoostActive(false);
+    setCoolingBoostActive(false);
+    setMitigationMsg("");
     import("@/components/refinery/calcEngine").then(({ DEMO_SCENARIOS }) => {
       const s = DEMO_SCENARIOS[scenario];
       if (s) {
