@@ -125,32 +125,48 @@ export default function ManarahButton({ systemState, onClick }) {
           transition: "transform 0.3s ease-in-out, box-shadow 0.4s ease",
         }}
       >
-        {/* Outer ring — animated */}
-        <span
-          className={cfg.pulseMs ? "manarah-ring-pulse" : ""}
-          style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "50%",
-            border: `${ringThickness}px solid ${cfg.ringColor}`,
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* Radial glow behind beam */}
+        {/* Background glow layer */}
         <span
           style={{
             position: "absolute",
             inset: 0,
             borderRadius: "50%",
-            background: `radial-gradient(circle at 50% 55%, ${cfg.glowColor} 0%, transparent 72%)`,
+            background: `radial-gradient(circle, ${cfg.glowColor} 0%, transparent 65%)`,
             pointerEvents: "none",
             opacity: cfg.glowIntensity,
             transition: "opacity 0.3s ease-in-out",
           }}
         />
 
-        {/* Light-beam SVG — tower + crown + beam */}
+        {/* Halo ring — larger, subtle */}
+        <span
+          style={{
+            position: "absolute",
+            inset: -6,
+            borderRadius: "50%",
+            border: `1px solid ${cfg.haloColor}`,
+            pointerEvents: "none",
+            opacity: 0.6,
+            transition: "opacity 0.3s ease-in-out, border-color 0.3s ease-in-out",
+          }}
+        />
+
+        {/* Radial sweep effect (Immediate Risk only) */}
+        {cfg.sweepMs && (
+          <span
+            className="manarah-beacon-sweep"
+            style={{
+              position: "absolute",
+              inset: -3,
+              borderRadius: "50%",
+              border: `2px solid ${cfg.coreColor}`,
+              pointerEvents: "none",
+              opacity: 0.4,
+            }}
+          />
+        )}
+
+        {/* Minimal geometric beacon: tower + disc + core */}
         <svg
           width={svgSize}
           height={svgHeight}
@@ -159,42 +175,92 @@ export default function ManarahButton({ systemState, onClick }) {
           xmlns="http://www.w3.org/2000/svg"
           style={{ position: "relative", zIndex: 1 }}
         >
-          <defs>
-            {/* Gradient for beam glow — bright center, fades outward */}
-            <radialGradient id="beamGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor={cfg.beamColor} stopOpacity={cfg.pulseMs ? "0.75" : "0.70"} />
-              <stop offset="100%" stopColor={cfg.beamColor} stopOpacity="0.10" />
-            </radialGradient>
-          </defs>
-
-          {/* Base tower — slim, tapered upward (18% width → narrower at top) */}
+          {/* Vertical tower — simple tapered shape */}
           <path
-            d="M 11 28 L 13 16 L 19 16 L 21 28 Z"
-            fill={cfg.beamColor}
-            opacity="0.85"
+            d="M 12 28 L 14 14 L 18 14 L 20 28 Z"
+            stroke={cfg.coreColor}
+            strokeWidth="1.2"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
 
-          {/* Crown — thin circular disc on top */}
-          <circle cx="16" cy="15" r="10" fill={cfg.beamColor} opacity="0.75" />
+          {/* Flat circular top disc */}
+          <circle cx="16" cy="13" r="8.5" stroke={cfg.coreColor} strokeWidth="1" fill="none" />
 
-          {/* Light beam — upward triangle with gradient, wide base at crown */}
-          <path
-            d="M 5.6 15 L 16 -8 L 26.4 15 Z"
-            fill="url(#beamGlow)"
-            opacity={cfg.pulseMs ? 0.85 : 0.75}
+          {/* Central light core — main visual anchor */}
+          <circle
+            cx="16"
+            cy="15"
+            r="4"
+            fill={cfg.coreColor}
+            opacity={cfg.pulseMs || cfg.sweepMs ? 0.9 : 0.8}
           />
 
-          {/* Soft outer halo glow around beacon */}
+          {/* Subtle outer halo — static reference */}
           <circle
             cx="16"
             cy="16"
-            r="15"
+            r="12"
             fill="none"
-            stroke={cfg.beamColor}
-            strokeWidth="0.8"
-            opacity={cfg.pulseMs ? 0.18 : 0.10}
+            stroke={cfg.coreColor}
+            strokeWidth="0.6"
+            opacity={cfg.sweepMs ? 0.15 : 0.08}
           />
         </svg>
+
+        {/* Breathing animation for Early Drift */}
+        {key === "EARLY_DRIFT" && (
+          <svg
+            className="manarah-beacon-breathe"
+            width={svgSize}
+            height={svgHeight}
+            viewBox="0 0 32 38"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 0,
+              pointerEvents: "none",
+            }}
+          >
+            <circle
+              cx="16"
+              cy="15"
+              r="4"
+              fill={cfg.coreColor}
+              opacity="0.3"
+            />
+          </svg>
+        )}
+
+        {/* Pulse animation for Severe Drift */}
+        {key === "SEVERE_DRIFT" && (
+          <svg
+            className="manarah-beacon-pulse"
+            width={svgSize}
+            height={svgHeight}
+            viewBox="0 0 32 38"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 0,
+              pointerEvents: "none",
+            }}
+          >
+            <circle
+              cx="16"
+              cy="13"
+              r="8.5"
+              stroke={cfg.coreColor}
+              strokeWidth="1"
+              fill="none"
+            />
+          </svg>
+        )}
       </button>
     </>
   );
