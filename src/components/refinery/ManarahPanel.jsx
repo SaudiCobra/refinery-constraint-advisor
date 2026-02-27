@@ -126,6 +126,57 @@ function Row({ label, value, valueColor, emergency, fs }) {
   );
 }
 
+function TrajectoryBar({ slope, fs, isLargeDisplay }) {
+  // Position: 0 = safe (green), 1 = critical (red). Map slope to 0-1 range (0-2.0 slope).
+  const position = Math.min(1, Math.max(0, slope / 2.0));
+  const posPercent = Math.round(position * 100);
+
+  // Direction arrow based on slope magnitude
+  let ArrowIcon = Minus;
+  if (slope > 0.5) ArrowIcon = ArrowUp;
+  else if (slope < -0.5) ArrowIcon = ArrowDown;
+
+  return (
+    <div style={{ marginBottom: isLargeDisplay ? 10 : 8 }}>
+      <p style={{ fontSize: fs(9), letterSpacing: "0.12em", textTransform: "uppercase", color: "#4a4a4a", fontWeight: 600, marginBottom: 4 }}>
+        Risk Trajectory
+      </p>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        {/* Gradient bar */}
+        <div
+          style={{
+            flex: 1,
+            height: 8,
+            borderRadius: 3,
+            background: "linear-gradient(90deg, #0F9F9F 0%, #D4A547 50%, #EF4444 100%)",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {/* Moving indicator */}
+          <div
+            style={{
+              position: "absolute",
+              left: `${posPercent}%`,
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 3,
+              height: 12,
+              background: "#fff",
+              borderRadius: 1,
+              boxShadow: "0 0 4px rgba(0,0,0,0.4)",
+              zIndex: 2,
+            }}
+          />
+        </div>
+
+        {/* Direction arrow */}
+        <ArrowIcon style={{ width: fs(14), height: fs(14), color: "#888", flexShrink: 0 }} />
+      </div>
+    </div>
+  );
+}
+
 function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs, isLargeDisplay }) {
   const TOTAL_BLOCKS = 9;
   const filled = Math.round(barFill * TOTAL_BLOCKS);
