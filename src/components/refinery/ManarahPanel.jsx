@@ -334,6 +334,8 @@ export default function ManarahPanel({
 }) {
   const [evalScenario, setEvalScenario] = useState("");
   const [autoOpenedImmediate, setAutoOpenedImmediate] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const [visible, setVisible] = useState(false);
   const { panelWidth, fontScale, isLargeDisplay, panelPadding, sectionMargin } = useResponsivePanel();
 
   const stateKey = (systemState || "NORMAL").toUpperCase().replace(/\s+/g, "_");
@@ -349,34 +351,6 @@ export default function ManarahPanel({
       setAutoOpenedImmediate(false);
     }
   }, [isImmediate, open, autoOpenedImmediate, onAutoOpen]);
-
-  if (!open) return null;
-
-  const severityColor = SEVERITY_COLOR[stateKey] || "#0F9F9F";
-  const fs = (base) => Math.round(base * fontScale);
-  const adjustedPanelWidth = Math.round(panelWidth * (isImmediate ? 1.18 : 1.0));
-  const dividerId = `div-${stateKey.toLowerCase()}`;
-
-  const ttlToSevere    = timeToNearest > 13 ? timeToNearest - 13 : 0;
-  const ttlToImmediate = timeToNearest > 4  ? timeToNearest - 4  : 0;
-
-  const dominantDriver = getDominantDriver(slope, coolingCapacity, equipment, stateKey);
-  const rankedActions  = getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedReductionActive, quenchBoostActive, coolingBoostActive);
-
-  const ttlColor = timeToNearest <= 4 ? "#E14B3B" : timeToNearest <= 13 ? "#E06A2C" : timeToNearest <= 35 ? "#D9A441" : "#3FC9B0";
-  const isEmergency = stateKey === "SEVERE_DRIFT" || stateKey === "IMMEDIATE_RISK";
-
-  const evalResult = evalScenario
-    ? (() => {
-        const sc = EVAL_SCENARIOS.find(s => s.value === evalScenario);
-        const projected = projectTTL(timeToNearest, slope, sc.rorReduction);
-        const gain = projected - timeToNearest;
-        return { projected, gain };
-      })()
-    : null;
-
-  const [closing, setClosing] = useState(false);
-  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -395,6 +369,28 @@ export default function ManarahPanel({
   };
 
   if (!open && !visible) return null;
+
+  const severityColor = SEVERITY_COLOR[stateKey] || "#0F9F9F";
+  const fs = (base) => Math.round(base * fontScale);
+  const adjustedPanelWidth = Math.round(panelWidth * (isImmediate ? 1.18 : 1.0));
+
+  const ttlToSevere    = timeToNearest > 13 ? timeToNearest - 13 : 0;
+  const ttlToImmediate = timeToNearest > 4  ? timeToNearest - 4  : 0;
+
+  const dominantDriver = getDominantDriver(slope, coolingCapacity, equipment, stateKey);
+  const rankedActions  = getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedReductionActive, quenchBoostActive, coolingBoostActive);
+
+  const ttlColor = timeToNearest <= 4 ? "#E14B3B" : timeToNearest <= 13 ? "#E06A2C" : timeToNearest <= 35 ? "#D9A441" : "#3FC9B0";
+  const isEmergency = stateKey === "SEVERE_DRIFT" || stateKey === "IMMEDIATE_RISK";
+
+  const evalResult = evalScenario
+    ? (() => {
+        const sc = EVAL_SCENARIOS.find(s => s.value === evalScenario);
+        const projected = projectTTL(timeToNearest, slope, sc.rorReduction);
+        const gain = projected - timeToNearest;
+        return { projected, gain };
+      })()
+    : null;
 
   return (
     <>
