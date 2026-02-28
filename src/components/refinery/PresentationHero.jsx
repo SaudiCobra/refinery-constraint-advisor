@@ -12,10 +12,10 @@ import {
 } from "./confidenceEngine";
 
 const LEVEL_CONFIG = {
-  0: { text: "text-[#0F9F9F]" },
-  1: { text: "text-[#D4A547]" },
-  2: { text: "text-[#D4653F]" },
-  3: { text: "text-[#B53F3F]" },
+  0: { text: "text-[#6FD0C7]" },
+  1: { text: "text-[#D6A75F]" },
+  2: { text: "text-[#C8732E]" },
+  3: { text: "text-[#C6452F]" },
 };
 
 function getExecState(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus) {
