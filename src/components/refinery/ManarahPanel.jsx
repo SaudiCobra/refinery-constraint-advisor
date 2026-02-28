@@ -375,6 +375,27 @@ export default function ManarahPanel({
       })()
     : null;
 
+  const [closing, setClosing] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setClosing(false);
+      setVisible(true);
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      setVisible(false);
+      if (onClose) onClose();
+    }, 220);
+  };
+
+  if (!open && !visible) return null;
+
   return (
     <>
       <style>{`
@@ -382,22 +403,29 @@ export default function ManarahPanel({
           from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0);   }
         }
-        @keyframes manarah-content-1 {
+        @keyframes manarah-close {
+          from { opacity: 1; transform: translateY(0);  }
+          to   { opacity: 0; transform: translateY(8px); }
+        }
+        @keyframes manarah-content-fade {
           from { opacity: 0; }
           to   { opacity: 1; }
         }
-        .manarah-panel {
+        .manarah-panel-open {
           animation: manarah-open 280ms cubic-bezier(0.32, 0.72, 0.36, 1) forwards;
         }
-        .manarah-panel > * {
-          opacity: 0;
-          animation: manarah-content-1 160ms ease forwards;
+        .manarah-panel-close {
+          animation: manarah-close 220ms cubic-bezier(0.32, 0.72, 0.36, 1) forwards;
         }
-        .manarah-panel > *:nth-child(1) { animation-delay: 0ms;   }
-        .manarah-panel > *:nth-child(2) { animation-delay: 40ms;  }
-        .manarah-panel > *:nth-child(3) { animation-delay: 60ms;  }
-        .manarah-section-metrics  { opacity: 0; animation: manarah-content-1 160ms ease 60ms forwards; }
-        .manarah-section-actions  { opacity: 0; animation: manarah-content-1 160ms ease 120ms forwards; }
+        .manarah-panel-open > * {
+          opacity: 0;
+          animation: manarah-content-fade 200ms ease forwards;
+        }
+        .manarah-panel-open > *:nth-child(1) { animation-delay: 0ms;  }
+        .manarah-panel-open > *:nth-child(2) { animation-delay: 40ms; }
+        .manarah-panel-open > *:nth-child(3) { animation-delay: 60ms; }
+        .manarah-section-metrics { opacity: 0; animation: manarah-content-fade 200ms ease 60ms forwards; }
+        .manarah-section-actions { opacity: 0; animation: manarah-content-fade 200ms ease 120ms forwards; }
       `}</style>
 
       {/* Light gradient link from beacon to panel (large displays only) */}
