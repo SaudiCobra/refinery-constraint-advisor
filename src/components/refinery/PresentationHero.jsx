@@ -89,14 +89,14 @@ export default function PresentationHero({
               color: colorValue,
             }}
           >
-            {getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus)}
+            {copy.title}
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <p style={{ color: "#ffffff", fontSize: "1.15rem", fontWeight: 600, lineHeight: 1.3, opacity: 0.92, margin: 0 }}>
-              {stable ? "No active constraints." : `${Math.round(timeToNearest)} minutes to ${nearestName}.`}
+              {copy.line1}
             </p>
             <p style={{ color: "#aaa", fontSize: "1rem", fontWeight: 400, lineHeight: 1.35, opacity: 0.75, margin: 0 }}>
-              {stable ? "All parameters within operating limits." : getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance)}
+              {copy.line2}
             </p>
           </div>
         </div>
