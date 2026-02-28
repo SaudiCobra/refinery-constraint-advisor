@@ -10,6 +10,7 @@ import ExecutiveRibbon from "@/components/refinery/ExecutiveRibbon";
 import AlarmsOnlyView from "@/components/refinery/AlarmsOnlyView";
 import ScenarioSelector from "@/components/refinery/ScenarioSelector";
 import PresentationHero from "@/components/refinery/PresentationHero";
+import ScenarioAnnouncer from "@/components/refinery/ScenarioAnnouncer";
 import PresenterControls from "@/components/refinery/PresenterControls";
 import DecisionWindowBar from "@/components/refinery/DecisionWindowBar";
 import LeverContext from "@/components/refinery/LeverContext";
