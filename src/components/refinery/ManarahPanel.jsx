@@ -24,13 +24,15 @@ const SEVERITY_COLOR = {
 // ── Dominant driver ───────────────────────────────────────────────────────────
 
 function getDominantDriver(slope, coolingCapacity, equipment, systemState) {
+  if (systemState === "IMMEDIATE_RISK") {
+    return "Quench valve unresponsive — temperature control authority degraded.";
+  }
   const drivers = [];
   if (slope > 1.0) drivers.push({ label: "rising rate-of-rise", weight: slope });
   if (coolingCapacity === "SEVERELY_LIMITED") drivers.push({ label: "severely limited cooling capacity", weight: 3 });
   else if (coolingCapacity === "REDUCED") drivers.push({ label: "reduced cooling margin", weight: 2 });
-  if (!equipment?.h2Compressor) drivers.push({ label: "hydrogen compressor offline", weight: 2.5 });
   if (!equipment?.effluentCooler) drivers.push({ label: "effluent cooler unavailable", weight: 2 });
-  if ((systemState === "IMMEDIATE_RISK" || systemState === "SEVERE_DRIFT") && !drivers.some(d => d.label.includes("rate"))) {
+  if (systemState === "SEVERE_DRIFT" && !drivers.some(d => d.label.includes("rate"))) {
     drivers.push({ label: "sustained high rate-of-rise", weight: 1.5 });
   }
   if (drivers.length === 0) return "No dominant risk driver identified at current operating point.";
@@ -131,7 +133,7 @@ function Divider({ isLargeDisplay }) {
 
 function Label({ children, fs }) {
   return (
-    <p style={{ fontSize: fs(9), letterSpacing: "0.12em", textTransform: "uppercase", color: "#4a4a4a", fontWeight: 600, marginBottom: 6 }}>
+    <p style={{ fontSize: fs(9), letterSpacing: "0.04em", textTransform: "uppercase", color: "#4a4a4a", fontWeight: 500, marginBottom: 6 }}>
       {children}
     </p>
   );
@@ -141,7 +143,7 @@ function Row({ label, value, valueColor, emergency, fs }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: emergency ? 8 : 4 }}>
       <span style={{ fontSize: emergency ? fs(12) : fs(11), color: emergency ? "#888" : "#666", fontWeight: emergency ? 500 : 400 }}>{label}</span>
-      <span style={{ fontSize: emergency ? fs(18) : fs(12), fontFamily: "monospace", color: valueColor || "#c0c0c0", fontWeight: emergency ? 700 : 400, letterSpacing: emergency ? "0.02em" : "normal" }}>{value}</span>
+      <span style={{ fontSize: emergency ? fs(18) : fs(12), fontFamily: "monospace", color: valueColor || "#c0c0c0", fontWeight: emergency ? 700 : 600, letterSpacing: emergency ? "0.02em" : "normal" }}>{value}</span>
     </div>
   );
 }
@@ -209,8 +211,8 @@ function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs, 
   const labelColor = !available ? "#3a3a3a" : active ? "#ddd" : "#888";
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: isLargeDisplay ? 11 : 7 }}>
-      <span style={{ fontSize: fs(11), color: labelColor, width: 120, flexShrink: 0 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+      <span style={{ fontSize: fs(11), color: labelColor, width: 120, flexShrink: 0, fontWeight: 450, lineHeight: 1.5 }}>
         {label}
         {active && pct !== null && <span style={{ fontSize: fs(9), color: "#555", marginLeft: 4 }}>[{pct}%]</span>}
       </span>
@@ -248,8 +250,8 @@ function useResponsivePanel() {
   const panelWidth = Math.round(basePanelWidth * 1.08);
   const fontScale   = vw > 2560 ? 1.08 : 1.0;
   const isLargeDisplay = vw > 2560;
-  const panelPadding = isLargeDisplay ? "14px 19px" : "13px 17px";
-  const sectionMargin = isLargeDisplay ? "14px 0" : "12px 0";
+  const panelPadding = isLargeDisplay ? "24px 19px 14px" : "24px 17px 13px";
+  const sectionMargin = isLargeDisplay ? "18px 0" : "18px 0";
   return { panelWidth, fontScale, isLargeDisplay, panelPadding, sectionMargin };
 }
 
@@ -422,7 +424,7 @@ export default function ManarahPanel({
               <Label fs={fs}>Escalation Forecast</Label>
               <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} fs={fs} />
               <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} fs={fs} />
-              <p style={{ fontSize: fs(9), color: "#333", marginTop: 4 }}>Assumes no intervention and constant rate-of-rise.</p>
+              <p style={{ fontSize: fs(9), color: "#333", marginTop: 4, opacity: 0.82, fontWeight: 400 }}>Assumes no intervention and constant rate-of-rise.</p>
 
               {/* Subtle divider */}
               <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: sectionMargin }} />
@@ -436,7 +438,7 @@ export default function ManarahPanel({
             )}
 
             {/* Subtle divider */}
-            <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: sectionMargin }} />
+            <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "22px 0" }} />
 
             {/* SECTION 4 — ACTION PRIORITY */}
           <Label fs={fs}>Action Priority</Label>
