@@ -1,99 +1,79 @@
-import React, { useState } from "react";
-import ScenarioSelector from "./ScenarioSelector";
-import { DEMONSTRATION_STAGES } from "./calcEngine";
+import React from "react";
+import { SCENARIOS } from "./calcEngine";
 
-export default function PresenterControls({
-  presScenario,
-  onSelectScenario,
-  autoCycling,
-  onToggleAutoCycle,
-  demonstrationActive,
-  demonstrationStage,
-  onStartDemonstration,
-  onStopDemonstration,
-}) {
-  const [expanded, setExpanded] = useState(false);
+export default function PresenterControls({ presScenario, onSelectScenario }) {
+  const total = SCENARIOS.length;
+  const scenarioName = SCENARIOS[presScenario]?.name || `Scenario ${presScenario + 1}`;
+
+  const prev = () => onSelectScenario((presScenario - 1 + total) % total);
+  const next = () => onSelectScenario((presScenario + 1) % total);
+
+  const btnStyle = (hovered) => ({
+    background: "transparent",
+    border: "none",
+    color: hovered ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.35)",
+    fontSize: 16,
+    cursor: "pointer",
+    padding: "2px 10px",
+    lineHeight: 1,
+    transition: "color 0.15s",
+    userSelect: "none",
+  });
+
+  const [prevHover, setPrevHover] = React.useState(false);
+  const [nextHover, setNextHover] = React.useState(false);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 8 }}>
+    <div
+      style={{
+        position: "fixed",
+        bottom: 28,
+        left: "50%",
+        transform: "translateX(-50%)",
+        display: "flex",
+        alignItems: "center",
+        gap: 0,
+        padding: "10px 18px",
+        borderRadius: 999,
+        background: "rgba(20,24,32,0.85)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        zIndex: 9990,
+        whiteSpace: "nowrap",
+      }}
+    >
       <button
-        onClick={() => setExpanded(p => !p)}
-        style={{
-          background: "transparent",
-          border: "1px solid #2a2a2a",
-          color: "#444",
-          fontSize: 11,
-          letterSpacing: "0.06em",
-          padding: "5px 16px",
-          borderRadius: 6,
-          cursor: "pointer",
-          textTransform: "uppercase",
-          transition: "border-color 0.2s, color 0.2s",
-        }}
-        onMouseEnter={e => { e.target.style.borderColor = "#444"; e.target.style.color = "#888"; }}
-        onMouseLeave={e => { e.target.style.borderColor = "#2a2a2a"; e.target.style.color = "#444"; }}
+        onClick={prev}
+        style={btnStyle(prevHover)}
+        onMouseEnter={() => setPrevHover(true)}
+        onMouseLeave={() => setPrevHover(false)}
       >
-        {expanded ? "▲ Hide controls" : "▼ Presenter controls"}
+        ◀
       </button>
 
-      {expanded && (
-        <div style={{ marginTop: 12, width: "100%", maxWidth: 700 }}>
-          {!demonstrationActive && (
-            <ScenarioSelector
-              activeScenario={presScenario}
-              onSelect={onSelectScenario}
-              autoCycling={autoCycling}
-              onToggleAutoCycle={onToggleAutoCycle}
-            />
-          )}
+      <span
+        style={{
+          fontSize: 13,
+          fontWeight: 500,
+          color: "rgba(255,255,255,0.85)",
+          letterSpacing: "0.01em",
+          padding: "0 12px",
+          minWidth: 160,
+          textAlign: "center",
+        }}
+      >
+        {scenarioName}
+      </span>
 
-          <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 12 }}>
-            {!demonstrationActive ? (
-              <button
-                onClick={onStartDemonstration}
-                style={{
-                  padding: "10px 22px",
-                  background: "#0F5F5F",
-                  border: "1px solid #0F9F9F",
-                  borderRadius: 8,
-                  color: "#fff",
-                  fontWeight: 600,
-                  fontSize: 13,
-                  cursor: "pointer",
-                }}
-              >
-                ▶ Run Full Operational Demonstration
-              </button>
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <div style={{ padding: "10px 18px", background: "#1e1e1e", border: "1px solid #444", borderRadius: 8 }}>
-                  <p style={{ color: "#0F9F9F", fontSize: 13, fontWeight: 600, margin: 0 }}>
-                    Stage {demonstrationStage + 1} of {DEMONSTRATION_STAGES.length}: {DEMONSTRATION_STAGES[demonstrationStage]?.name}
-                  </p>
-                  <p style={{ color: "#888", fontSize: 11, marginTop: 4, fontStyle: "italic", margin: "4px 0 0" }}>
-                    {DEMONSTRATION_STAGES[demonstrationStage]?.message}
-                  </p>
-                </div>
-                <button
-                  onClick={onStopDemonstration}
-                  style={{
-                    padding: "10px 18px",
-                    background: "#3a1010",
-                    border: "1px solid #7A0F0F",
-                    borderRadius: 8,
-                    color: "#fff",
-                    fontWeight: 600,
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  ■ Stop
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <button
+        onClick={next}
+        style={btnStyle(nextHover)}
+        onMouseEnter={() => setNextHover(true)}
+        onMouseLeave={() => setNextHover(false)}
+      >
+        ▶
+      </button>
     </div>
   );
 }
