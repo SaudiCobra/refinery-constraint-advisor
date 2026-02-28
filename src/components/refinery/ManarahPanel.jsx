@@ -551,11 +551,12 @@ export default function ManarahPanel({
                 </div>
               )}
             </>
-          )}
+            )}
 
-        </div>
+            </div>
+            {/* end scrollable body */}
 
-        {/* Footer */}
+            {/* Footer */}
         <div style={{ padding: isLargeDisplay ? "10px 18px" : "8px 16px", borderTop: "1px solid #181818", flexShrink: 0 }}>
           <p style={{ fontSize: fs(9), color: "#2e2e2e" }}>Advisory only — no control actions initiated by this system.</p>
         </div>
