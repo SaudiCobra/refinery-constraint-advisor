@@ -31,6 +31,17 @@ const EXEC_COPY = {
   immediate: { title: "Immediate Constraint Risk", line1: "Limit breach imminent.",          line2: "Corrective action required." },
 };
 
+// Per-scenario impact lines shown only at Severe state (escalationLevel >= 2)
+// Keyed by scenario name substring for loose matching
+const SEVERE_IMPACT_LINES = {
+  "Cooling Compression": "Effluent cooler offline — heat removal authority reduced by ~40%.",
+  "Four-Level Escalation": "Constraint progression through all four severity bands active.",
+  "Hydrogen Moderation": "H₂ quench margin limited — exotherm response capacity reduced.",
+  "False Escalation": "Signal inconsistency detected — confidence qualified.",
+  "True Escalation": "All sensors aligned — trajectory confirmed across instruments.",
+  "default": "Operating margin compressed — corrective window narrowing.",
+};
+
 export default function PresentationHero({ 
   timeToNearest, 
   nearestName, 
