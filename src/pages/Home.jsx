@@ -556,6 +556,7 @@ export default function Home() {
         beacon={manarahOpen ? (
           <ManarahButton systemState={systemState} onClick={() => setManarahOpen(false)} drawerOpen={true} docked={true} />
         ) : null}
+        scenarioName={displayMode === "presentation" ? SCENARIOS[presScenario]?.name : undefined}
       />
       <GlobalHeader
         displayMode={displayMode}
