@@ -44,19 +44,30 @@ export default function MitigationCapacity({ systemState }) {
   const current = config[capacity];
 
   return (
-    <div className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3">
+    <div
+      className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3"
+      style={{ transition: "border-color 400ms ease, background 400ms ease" }}
+    >
       <div className="flex items-center gap-3">
         <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">
           Mitigation Capacity:
         </span>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: current.color }} />
-          <span className="text-sm font-semibold" style={{ color: current.color }}>
+        <div className="flex items-center gap-2" style={{ transition: "opacity 300ms ease" }}>
+          <div
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: current.color, transition: "background-color 400ms ease" }}
+          />
+          <span
+            className="text-sm font-semibold"
+            style={{ color: current.color, transition: "color 400ms ease" }}
+          >
             {current.label}
           </span>
         </div>
       </div>
-      <p className="text-xs italic text-[#888] mt-1">{current.message}</p>
+      <p className="text-xs italic text-[#888] mt-1" style={{ transition: "opacity 300ms ease" }}>
+        {current.message}
+      </p>
     </div>
   );
 }
