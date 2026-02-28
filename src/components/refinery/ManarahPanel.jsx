@@ -353,10 +353,27 @@ export default function ManarahPanel({
 
   return (
     <>
-      {/* Fade-in overlay — no slide */}
       <style>{`
-        @keyframes manarah-fadein { from { opacity: 0; transform: scale(0.97) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .manarah-panel { animation: manarah-fadein 0.3s ease-out forwards; }
+        @keyframes manarah-open {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0);   }
+        }
+        @keyframes manarah-content-1 {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        .manarah-panel {
+          animation: manarah-open 280ms cubic-bezier(0.32, 0.72, 0.36, 1) forwards;
+        }
+        .manarah-panel > * {
+          opacity: 0;
+          animation: manarah-content-1 160ms ease forwards;
+        }
+        .manarah-panel > *:nth-child(1) { animation-delay: 0ms;   }
+        .manarah-panel > *:nth-child(2) { animation-delay: 40ms;  }
+        .manarah-panel > *:nth-child(3) { animation-delay: 60ms;  }
+        .manarah-section-metrics  { opacity: 0; animation: manarah-content-1 160ms ease 60ms forwards; }
+        .manarah-section-actions  { opacity: 0; animation: manarah-content-1 160ms ease 120ms forwards; }
       `}</style>
 
       {/* Light gradient link from beacon to panel (large displays only) */}
