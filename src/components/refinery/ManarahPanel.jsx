@@ -496,7 +496,7 @@ export default function ManarahPanel({
             <p style={{ fontSize: isLargeDisplay ? fs(13) : fs(12), fontWeight: 600, color: isImmediate ? "#E14B3B" : isSevere ? "#E06A2C" : "#e0e0e0", letterSpacing: "0.02em", marginBottom: 3, transition: "color 0.3s ease-in-out" }}>Manarah</p>
             <p style={{ fontSize: isLargeDisplay ? fs(10) : fs(9), color: "#666", fontWeight: 400, letterSpacing: "0.01em", opacity: 0.85 }}>Advisory Watchtower</p>
           </div>
-          {beacon}
+          <div onClick={handleClose} style={{ cursor: "pointer" }}>{beacon}</div>
          </div>
 
         {/* Scrollable body */}
