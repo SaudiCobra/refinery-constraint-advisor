@@ -8,7 +8,7 @@ export default function ScenarioSelector({ activeScenario, onSelect, autoCycling
   const [showDropdown, setShowDropdown] = useState(false);
 
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
+    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4" style={{ opacity: 0.6 }}>
       <div className="flex items-center justify-center gap-3">
         <Button
           onClick={onToggleAutoCycle}
