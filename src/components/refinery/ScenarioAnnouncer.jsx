@@ -38,25 +38,34 @@ export default function ScenarioAnnouncer({ label }) {
     <div
       style={{
         position: "fixed",
-        top: 90,
-        right: 40,
-        padding: "8px 16px",
-        borderRadius: 999,
-        background: "rgba(18,24,32,0.92)",
-        border: "1px solid rgba(255,255,255,0.18)",
-        fontSize: 13,
-        fontWeight: 600,
-        letterSpacing: "0.04em",
-        color: "rgba(255,255,255,0.92)",
-        boxShadow: "0 6px 18px rgba(0,0,0,0.35)",
-        opacity: visible ? 1 : 0,
-        transition: visible ? "opacity 160ms ease" : "opacity 220ms ease",
+        top: 92,
+        right: 44,
+        padding: 0,
+        background: "transparent",
+        border: "none",
+        borderRadius: 0,
+        opacity: visible ? 0.72 : 0,
+        transition: visible ? "opacity 120ms ease" : "opacity 200ms ease",
         pointerEvents: "none",
         zIndex: 9980,
         whiteSpace: "nowrap",
       }}
     >
-      {label}
+      <div style={{
+        fontSize: 12,
+        fontWeight: 500,
+        letterSpacing: "0.06em",
+        color: "rgba(255,255,255,0.72)",
+        lineHeight: 1,
+      }}>
+        {label}
+      </div>
+      <div style={{
+        height: 1,
+        width: "54%",
+        marginTop: 6,
+        background: "rgba(255,255,255,0.12)",
+      }} />
     </div>
   );
 }
