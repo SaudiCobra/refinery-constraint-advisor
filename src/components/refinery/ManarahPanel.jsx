@@ -43,6 +43,10 @@ function getDominantDriver(slope, coolingCapacity, equipment, systemState, scena
     if (systemState === "EARLY_DRIFT") return "Hydrogen moderation limiting — H₂ quench margin reduced.";
     if (systemState === "SEVERE_DRIFT" || systemState === "IMMEDIATE_RISK") return "Stacked constraints: H₂ moderation limited and mitigation headroom constrained.";
   }
+  // Scenario-specific override: Signal Conflict
+  if (scenarioName?.includes("Signal Conflict")) {
+    return "Sensor signal inconsistency detected — dominant driver not confirmed.";
+  }
   if (systemState === "IMMEDIATE_RISK") {
     return "Quench valve unresponsive — temperature control authority degraded.";
   }
