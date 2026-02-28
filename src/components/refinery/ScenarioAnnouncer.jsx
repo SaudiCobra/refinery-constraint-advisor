@@ -1,40 +1,38 @@
 import React, { useState, useEffect, useRef } from "react";
 
 export default function ScenarioAnnouncer({ label }) {
-  const [opacity, setOpacity] = useState(0);
-  const [translateY, setTranslateY] = useState(-6);
-  const holdRef = useRef(null);
-  const fadeRef = useRef(null);
+  const [visible, setVisible] = useState(false);
+  const [rendered, setRendered] = useState(false); // controls display:none
+  const hideTimerRef = useRef(null);
+  const unmountTimerRef = useRef(null);
 
   useEffect(() => {
     if (!label) return;
 
-    // Clear any in-flight timers
-    clearTimeout(holdRef.current);
-    clearTimeout(fadeRef.current);
+    // Cancel any pending timers
+    clearTimeout(hideTimerRef.current);
+    clearTimeout(unmountTimerRef.current);
 
-    // Slide + fade in
-    setOpacity(0);
-    setTranslateY(-6);
+    // Mount + fade in
+    setRendered(true);
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setOpacity(0.85);
-        setTranslateY(0);
-      });
+      requestAnimationFrame(() => setVisible(true));
     });
 
-    // After 2s, reduce to resting opacity
-    holdRef.current = setTimeout(() => {
-      setOpacity(0.35);
-    }, 2200);
+    // After 2s, fade out
+    hideTimerRef.current = setTimeout(() => {
+      setVisible(false);
+      // After fade-out completes, fully unmount
+      unmountTimerRef.current = setTimeout(() => setRendered(false), 260);
+    }, 2000);
 
     return () => {
-      clearTimeout(holdRef.current);
-      clearTimeout(fadeRef.current);
+      clearTimeout(hideTimerRef.current);
+      clearTimeout(unmountTimerRef.current);
     };
   }, [label]);
 
-  if (!label) return null;
+  if (!rendered) return null;
 
   return (
     <div
@@ -50,11 +48,10 @@ export default function ScenarioAnnouncer({ label }) {
         fontWeight: 500,
         letterSpacing: "0.04em",
         color: "rgba(255,255,255,0.9)",
-        opacity,
-        transform: `translateY(${translateY}px)`,
-        transition: "opacity 200ms ease, transform 200ms ease",
-        zIndex: 9980,
+        opacity: visible ? 0.85 : 0,
+        transition: visible ? "opacity 170ms ease" : "opacity 240ms ease",
         pointerEvents: "none",
+        zIndex: 9980,
         whiteSpace: "nowrap",
       }}
     >
