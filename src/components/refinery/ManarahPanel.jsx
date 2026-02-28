@@ -31,7 +31,13 @@ const STATE_GLOW = {
 
 // ── Dominant driver ───────────────────────────────────────────────────────────
 
-function getDominantDriver(slope, coolingCapacity, equipment, systemState) {
+function getDominantDriver(slope, coolingCapacity, equipment, systemState, scenarioName) {
+  // Scenario-specific override: Dominant Driver Isolation
+  if (scenarioName?.includes("Dominant Driver")) {
+    if (systemState === "EARLY_DRIFT" || systemState === "SEVERE_DRIFT" || systemState === "IMMEDIATE_RISK") {
+      return "Quench valve unresponsive.";
+    }
+  }
   if (systemState === "IMMEDIATE_RISK") {
     return "Quench valve unresponsive — temperature control authority degraded.";
   }
