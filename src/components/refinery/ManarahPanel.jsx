@@ -447,7 +447,7 @@ export default function ManarahPanel({
       )}
 
       <div
-        className="manarah-panel"
+        className={closing ? "manarah-panel-close" : "manarah-panel-open"}
         data-manarah-panel
         style={{
           position: "fixed",
