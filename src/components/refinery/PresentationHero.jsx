@@ -73,7 +73,6 @@ export default function PresentationHero({
           style={{
             background: "#0C1117",
             border: "1.5px solid rgba(255,255,255,0.16)",
-            borderLeft: `3px solid ${colorValue}`,
             borderRadius: 14,
             padding: "52px 64px 48px",
             textAlign: "center",
