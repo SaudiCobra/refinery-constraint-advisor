@@ -245,7 +245,7 @@ function TrajectoryBar({ slope, fs, isLargeDisplay, stateKey }) {
   );
 }
 
-function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs, isLargeDisplay }) {
+function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs, isLargeDisplay, rank, severityColor, isImmediate }) {
   const TOTAL_BLOCKS = 9;
   const filled = Math.round(barFill * TOTAL_BLOCKS);
   const barColor = !available ? "#2a2a2a"
@@ -256,29 +256,45 @@ function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs, 
 
   const labelColor = !available ? "#3a3a3a" : active ? "#ddd" : "#888";
 
+  const fontWeight = rank === 0 ? 600 : rank === 1 ? 500 : 450;
+  const opacity    = rank === 0 ? 1.0 : rank === 1 ? 0.9 : 0.75;
+  const scale      = rank === 0 && isImmediate ? 1.02 : 1.0;
+
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-      <span style={{ fontSize: fs(11), color: labelColor, width: 120, flexShrink: 0, fontWeight: 450, lineHeight: 1.5 }}>
-        {label}
-        {active && pct !== null && <span style={{ fontSize: fs(9), color: "#555", marginLeft: 4 }}>[{pct}%]</span>}
-      </span>
-      <div style={{ display: "flex", gap: 2, flex: 1 }}>
-        {Array.from({ length: TOTAL_BLOCKS }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              height: 6,
-              flex: 1,
-              borderRadius: 2,
-              background: i < filled ? barColor : "#1e1e1e",
-              opacity: i < filled ? (active ? 1 : 0.65) : 1,
-            }}
-          />
-        ))}
+    <div style={{ transform: `scale(${scale})`, transformOrigin: "left center", transition: "transform 0.3s ease" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          opacity,
+          paddingLeft: rank === 0 ? 6 : 0,
+          borderLeft: rank === 0 ? `2px solid ${severityColor}` : "2px solid transparent",
+          transition: "border-color 0.3s ease, opacity 0.3s ease",
+        }}
+      >
+        <span style={{ fontSize: fs(11), color: labelColor, width: 120, flexShrink: 0, fontWeight, lineHeight: 1.5 }}>
+          {label}
+          {active && pct !== null && <span style={{ fontSize: fs(9), color: "#555", marginLeft: 4 }}>[{pct}%]</span>}
+        </span>
+        <div style={{ display: "flex", gap: 2, flex: 1 }}>
+          {Array.from({ length: TOTAL_BLOCKS }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                height: 6,
+                flex: 1,
+                borderRadius: 2,
+                background: i < filled ? barColor : "#1e1e1e",
+                opacity: i < filled ? (active ? 1 : 0.65) : 1,
+              }}
+            />
+          ))}
+        </div>
+        <span style={{ fontSize: fs(10), color: !available ? "#3a3a3a" : barColor, width: 62, textAlign: "right", flexShrink: 0 }}>
+          {strengthLabel}
+        </span>
       </div>
-      <span style={{ fontSize: fs(10), color: !available ? "#3a3a3a" : barColor, width: 62, textAlign: "right", flexShrink: 0 }}>
-        {strengthLabel}
-      </span>
     </div>
   );
 }
