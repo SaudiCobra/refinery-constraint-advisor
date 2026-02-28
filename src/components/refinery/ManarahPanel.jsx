@@ -497,8 +497,9 @@ export default function ManarahPanel({
             <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "22px 0" }} />
 
             {/* SECTION 4 — ACTION PRIORITY */}
-          <Label fs={fs}>Action Priority</Label>
-          {rankedActions.map((a, i) => (
+            <div className="manarah-section-actions">
+            <Label fs={fs}>Action Priority</Label>
+            {rankedActions.map((a, i) => (
             <ImpactBar
               key={a.key}
               label={`${i + 1}. ${a.label}`}
