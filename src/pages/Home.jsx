@@ -723,16 +723,10 @@ export default function Home() {
               />
             </div>
 
-            {/* Presenter controls — collapsed by default, discreet */}
+            {/* Fixed bottom presenter strip */}
             <PresenterControls
               presScenario={presScenario}
               onSelectScenario={setPresScenario}
-              autoCycling={autoCycling}
-              onToggleAutoCycle={handleToggleAutoCycle}
-              demonstrationActive={demonstrationActive}
-              demonstrationStage={demonstrationStage}
-              onStartDemonstration={handleStartDemonstration}
-              onStopDemonstration={handleStopDemonstration}
             />
 
             <OpsCapacityPanel
