@@ -704,43 +704,35 @@ export default function Home() {
         {/* PRESENTATION MODE */}
         {!alarmsOnly && displayMode === "presentation" && (
           <>
-            {!demonstrationActive && (
-              <ScenarioSelector
-                activeScenario={presScenario}
-                onSelect={setPresScenario}
-                autoCycling={autoCycling}
-                onToggleAutoCycle={handleToggleAutoCycle}
+            {/* Status block — isolated, 40px vertical breathing room */}
+            <div style={{ paddingTop: 40, paddingBottom: 40 }}>
+              <PresentationHero
+                timeToNearest={displayTTL}
+                nearestName={nearest?.name}
+                escalationLevel={escalationLevel}
+                slope={displaySlope}
+                equipment={activeData.equipment}
+                preheatActive={activePreheatMode}
+                preheatStatus={preheatStatus}
+                coolingCapacity={coolingCapacity}
+                sensorQuality={activeData.sensorQuality}
+                opMode={activeData.opMode}
+                bedImbalance={bedImbalance}
+                hotSpotRisk={hotSpotRisk}
               />
-            )}
-
-            {/* Demonstration Controls */}
-            <div className="flex justify-center gap-4 mb-4">
-              {!demonstrationActive ? (
-                <button
-                  onClick={handleStartDemonstration}
-                  className="px-6 py-3 bg-[#0F5F5F] hover:bg-[#0F7F7F] border border-[#0F9F9F] rounded-lg text-white font-semibold text-sm transition-all duration-300 shadow-lg"
-                >
-                  ▶ Run Full Operational Demonstration
-                </button>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <div className="px-6 py-3 bg-[#1e1e1e] border border-[#444] rounded-lg">
-                    <p className="text-[#0F9F9F] text-sm font-semibold">
-                      Stage {demonstrationStage + 1} of {DEMONSTRATION_STAGES.length}: {DEMONSTRATION_STAGES[demonstrationStage]?.name}
-                    </p>
-                    <p className="text-[#888] text-xs mt-1 italic">
-                      {DEMONSTRATION_STAGES[demonstrationStage]?.message}
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleStopDemonstration}
-                    className="px-5 py-3 bg-[#3a1010] hover:bg-[#4a1515] border border-[#7A0F0F] rounded-lg text-white font-semibold text-sm transition-all duration-300"
-                  >
-                    ■ Stop Demonstration
-                  </button>
-                </div>
-              )}
             </div>
+
+            {/* Presenter controls — collapsed by default, discreet */}
+            <PresenterControls
+              presScenario={presScenario}
+              onSelectScenario={setPresScenario}
+              autoCycling={autoCycling}
+              onToggleAutoCycle={handleToggleAutoCycle}
+              demonstrationActive={demonstrationActive}
+              demonstrationStage={demonstrationStage}
+              onStartDemonstration={handleStartDemonstration}
+              onStopDemonstration={handleStopDemonstration}
+            />
 
             <OpsCapacityPanel
               systemState={systemState}
@@ -771,21 +763,6 @@ export default function Home() {
               />
               <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.08)", pointerEvents: "none" }} />
             </div>
-
-            <PresentationHero
-              timeToNearest={displayTTL}
-              nearestName={nearest?.name}
-              escalationLevel={escalationLevel}
-              slope={displaySlope}
-              equipment={activeData.equipment}
-              preheatActive={activePreheatMode}
-              preheatStatus={preheatStatus}
-              coolingCapacity={coolingCapacity}
-              sensorQuality={activeData.sensorQuality}
-              opMode={activeData.opMode}
-              bedImbalance={bedImbalance}
-              hotSpotRisk={hotSpotRisk}
-            />
           </>
         )}
       </div>
