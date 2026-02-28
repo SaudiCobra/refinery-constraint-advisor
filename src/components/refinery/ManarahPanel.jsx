@@ -241,8 +241,8 @@ function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs, 
   const TOTAL_BLOCKS = 9;
   const filled = Math.round(barFill * TOTAL_BLOCKS);
   const barColor = !available ? "#2a2a2a"
-    : strengthLabel === "Strong"    ? "#0F9F9F"
-    : strengthLabel === "Moderate"  ? "#D4A547"
+    : strengthLabel === "Strong"    ? "#3FC9B0"
+    : strengthLabel === "Moderate"  ? "#D9A441"
     : strengthLabel === "Mild"      ? "#6a6a6a"
     : "#2a2a2a";
 
@@ -339,7 +339,7 @@ export default function ManarahPanel({
   const dominantDriver = getDominantDriver(slope, coolingCapacity, equipment, stateKey);
   const rankedActions  = getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedReductionActive, quenchBoostActive, coolingBoostActive);
 
-  const ttlColor = timeToNearest <= 4 ? "#EF4444" : timeToNearest <= 13 ? "#D4653F" : timeToNearest <= 35 ? "#D4A547" : "#0F9F9F";
+  const ttlColor = timeToNearest <= 4 ? "#E14B3B" : timeToNearest <= 13 ? "#E06A2C" : timeToNearest <= 35 ? "#D9A441" : "#3FC9B0";
   const isEmergency = stateKey === "SEVERE_DRIFT" || stateKey === "IMMEDIATE_RISK";
 
   const evalResult = evalScenario
@@ -391,12 +391,12 @@ export default function ManarahPanel({
           backdropFilter: isLargeDisplay ? "blur(6px)" : "none",
           WebkitBackdropFilter: isLargeDisplay ? "blur(6px)" : "none",
           border: "1px solid #222",
-          borderLeft: isSevere ? "2px solid rgba(212,101,63,0.6)" : isImmediate ? "2px solid rgba(239,68,68,0.7)" : "1px solid #222",
+          borderLeft: isSevere ? "2px solid rgba(224,106,44,0.6)" : isImmediate ? "2px solid rgba(225,75,59,0.7)" : "1px solid #222",
           borderRadius: 10,
           boxShadow: isImmediate
             ? (isLargeDisplay
-              ? "0 32px 80px rgba(0,0,0,0.82), 0 0 0 1px rgba(255,255,255,0.05), 0 0 28px rgba(239,68,68,0.20)"
-              : "0 18px 52px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.03), 0 0 22px rgba(239,68,68,0.16)")
+              ? "0 32px 80px rgba(0,0,0,0.82), 0 0 0 1px rgba(255,255,255,0.05), 0 0 28px rgba(225,75,59,0.18)"
+              : "0 18px 52px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.03), 0 0 22px rgba(225,75,59,0.14)")
             : (isLargeDisplay
               ? "0 20px 60px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.05)"
               : "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)"),
@@ -419,12 +419,12 @@ export default function ManarahPanel({
           alignItems: "flex-start",
           borderTopLeftRadius: 9,
           borderTopRightRadius: 9,
-          background: isImmediate ? "rgba(239,68,68,0.03)" : isSevere ? "rgba(212,101,63,0.02)" : "transparent",
+          background: isImmediate ? "rgba(225,75,59,0.03)" : isSevere ? "rgba(224,106,44,0.02)" : "transparent",
           transition: "background 0.3s ease-in-out",
           position: "relative",
         }}>
           <div>
-            <p style={{ fontSize: isLargeDisplay ? fs(13) : fs(12), fontWeight: 600, color: isImmediate ? "#ff6b6b" : isSevere ? "#D4653F" : "#e0e0e0", letterSpacing: "0.02em", marginBottom: 3, transition: "color 0.3s ease-in-out" }}>Manarah</p>
+            <p style={{ fontSize: isLargeDisplay ? fs(13) : fs(12), fontWeight: 600, color: isImmediate ? "#E14B3B" : isSevere ? "#E06A2C" : "#e0e0e0", letterSpacing: "0.02em", marginBottom: 3, transition: "color 0.3s ease-in-out" }}>Manarah</p>
             <p style={{ fontSize: isLargeDisplay ? fs(10) : fs(9), color: "#666", fontWeight: 400, letterSpacing: "0.01em", opacity: 0.85 }}>Advisory Watchtower</p>
           </div>
           {beacon}
@@ -460,8 +460,8 @@ export default function ManarahPanel({
 
               {/* SECTION 2 — ESCALATION FORECAST (normal/early only) */}
               <Label fs={fs}>Escalation Forecast</Label>
-              <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#D4653F" : "#aaa"} fs={fs} />
-              <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#EF4444" : "#aaa"} fs={fs} />
+              <Row label="Severe threshold in" value={ttlToSevere > 0 ? fmt(ttlToSevere) : "Reached"} valueColor={ttlToSevere <= 5 ? "#E06A2C" : "#aaa"} fs={fs} />
+              <Row label="Immediate Risk in" value={ttlToImmediate > 0 ? fmt(ttlToImmediate) : "Reached"} valueColor={ttlToImmediate <= 5 ? "#E14B3B" : "#aaa"} fs={fs} />
               <p style={{ fontSize: fs(9), color: "#333", marginTop: 4, opacity: 0.82, fontWeight: 400 }}>Assumes no intervention and constant rate-of-rise.</p>
 
               {/* Subtle divider */}
@@ -520,7 +520,7 @@ export default function ManarahPanel({
               </select>
               {evalResult && (
                 <div style={{ background: "#0a0a0a", border: "1px solid #1e1e1e", borderRadius: 6, padding: "8px 10px" }}>
-                  <Row label="Projected TTL if applied" value={fmt(evalResult.projected)} valueColor="#0F9F9F" fs={fs} />
+                  <Row label="Projected TTL if applied" value={fmt(evalResult.projected)} valueColor="#3FC9B0" fs={fs} />
                   <p style={{ fontSize: fs(10), color: "#444", marginTop: 2 }}>
                     {evalResult.gain > 0
                       ? `+${Math.round(evalResult.gain)} min additional margin vs. current trajectory.`
