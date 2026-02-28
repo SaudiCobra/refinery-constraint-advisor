@@ -725,6 +725,7 @@ export default function Home() {
                 opMode={activeData.opMode}
                 bedImbalance={bedImbalance}
                 hotSpotRisk={hotSpotRisk}
+                scenarioName={SCENARIOS[presScenario]?.name}
               />
             </div>
 
