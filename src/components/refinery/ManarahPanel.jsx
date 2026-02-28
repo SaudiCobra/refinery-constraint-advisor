@@ -82,9 +82,13 @@ function getOperatorAdvantage(timeToNearest, slope, coolingCapacity, equipment, 
 
 // ── Ranked actions with bar widths ────────────────────────────────────────────
 
-function getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedActive, h2Active, coolingActive) {
+function getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedActive, h2Active, coolingActive, scenarioName, stateKey) {
   const coolingAvail = coolingCapacity !== "SEVERELY_LIMITED" && equipment?.effluentCooler !== false;
   const h2Avail = equipment?.h2Compressor !== false;
+
+  // Multi-Constraint: at Severe, mitigation shifts to Constrained — H2 shown as Constrained, cooling deprioritised
+  const isMultiConstraintSevere = scenarioName?.includes("Multi-Constraint") &&
+    (stateKey === "SEVERE_DRIFT" || stateKey === "IMMEDIATE_RISK");
 
   const items = [
     {
