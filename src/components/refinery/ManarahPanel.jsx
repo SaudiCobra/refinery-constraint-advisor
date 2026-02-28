@@ -38,6 +38,11 @@ function getDominantDriver(slope, coolingCapacity, equipment, systemState, scena
       return "Quench valve unresponsive.";
     }
   }
+  // Scenario-specific override: Multi-Constraint Interaction
+  if (scenarioName?.includes("Multi-Constraint")) {
+    if (systemState === "EARLY_DRIFT") return "Hydrogen moderation limiting — H₂ quench margin reduced.";
+    if (systemState === "SEVERE_DRIFT" || systemState === "IMMEDIATE_RISK") return "Stacked constraints: H₂ moderation limited and mitigation headroom constrained.";
+  }
   if (systemState === "IMMEDIATE_RISK") {
     return "Quench valve unresponsive — temperature control authority degraded.";
   }
