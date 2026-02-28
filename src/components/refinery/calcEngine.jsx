@@ -278,6 +278,18 @@ export const SCENARIOS = [
     sensorQuality: "good",
     opMode: "transient",
   },
+  {
+    // Stable → Early: h2Compressor false (H2 moderation limiting), cooling normal, mitigation Available
+    // Early → Severe: H2 limited, mitigation shifts to Constrained, action ranking reshuffles
+    // slope ~0.5°C/min → TTL to hi(370) from 358 = 12÷0.5 = 24 min (Early band)
+    name: "8. Multi-Constraint Interaction",
+    samples: [354.0, 355.0, 356.0, 357.0, 358.0],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
+    feedFlow: 87000,
+    sensorQuality: "good",
+    opMode: "steady",
+  },
 ];
 
 // Operational Demonstration (8 stages - keep for full demo)
