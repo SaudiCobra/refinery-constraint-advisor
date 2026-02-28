@@ -43,6 +43,7 @@ const SEVERE_IMPACT_LINES = {
   "True Escalation": "All sensors aligned — trajectory confirmed across instruments.",
   "Multi-Constraint": "Projected impact: Mitigation headroom reduced due to stacked constraints.",
   "Signal Conflict": "Projected impact: No confirmed operational consequence — monitoring signal alignment.",
+  "Escalation Window": "Projected impact: Intervention window narrowing to single-digit minutes.",
   "default": "Operating margin compressed — corrective window narrowing.",
 };
 
