@@ -451,11 +451,12 @@ export default function ManarahPanel({
          <div style={{ overflowY: "auto", padding: panelPadding, flex: 1 }}>
 
            {/* SECTION 1 — LIVE STATUS */}
+           <div className="manarah-section-metrics">
            <Label fs={fs}>Live Status</Label>
            <Row label="Time to constraint" value={fmt(timeToNearest)} valueColor={ttlColor} emergency={isEmergency} fs={fs} />
            <Row label="Rate-of-rise" value={fmtRoR(slope)} valueColor={isEmergency ? severityColor : undefined} emergency={isEmergency} fs={fs} />
-
            <TrajectoryBar slope={slope} fs={fs} isLargeDisplay={isLargeDisplay} stateKey={stateKey} />
+           </div>
 
            {/* Subtle divider */}
            <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: sectionMargin }} />
