@@ -319,6 +319,44 @@ export const SCENARIOS = [
       },
     ]
   },
+  {
+    // Stable → Early: TTL ~30 min (slope ~0.4°C/min), mitigation Available
+    // Early progresses: TTL compresses, mitigation shifts Available → Constrained, cooling strains
+    // Early → Severe: TTL single-digit (slope ~2°C/min), dominant driver confirmed, High confidence
+    // Severe emphasizes cooling chain (effluentCooler offline)
+    name: "10. Escalation Window Compression",
+    isSequence: true,
+    stages: [
+      { 
+        samples: [348.0, 348.0, 348.0, 348.0, 348.0],
+        equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+        feedFlow: 84000,
+        sensorQuality: "good",
+        opMode: "steady",
+      },
+      { 
+        samples: [356.0, 357.0, 358.0, 359.0, 360.0],
+        equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+        feedFlow: 87000,
+        sensorQuality: "good",
+        opMode: "steady",
+      },
+      { 
+        samples: [360.0, 361.5, 363.0, 364.5, 366.0],
+        equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: true },
+        feedFlow: 90000,
+        sensorQuality: "good",
+        opMode: "transient",
+      },
+      { 
+        samples: [366.0, 368.0, 370.0, 372.0, 374.0],
+        equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: false },
+        feedFlow: 94000,
+        sensorQuality: "good",
+        opMode: "transient",
+      },
+    ]
+  },
 ];
 
 // Operational Demonstration (8 stages - keep for full demo)
