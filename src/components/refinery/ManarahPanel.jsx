@@ -416,12 +416,16 @@ export default function ManarahPanel({
           backdropFilter: isLargeDisplay ? "blur(6px)" : "none",
           WebkitBackdropFilter: isLargeDisplay ? "blur(6px)" : "none",
           border: "1px solid #222",
-          borderLeft: isSevere ? "2px solid rgba(224,106,44,0.6)" : isImmediate ? "2px solid rgba(225,75,59,0.7)" : "1px solid #222",
+          borderLeft: isSevere ? "2px solid rgba(224,106,44,0.65)" : isImmediate ? "2px solid rgba(225,75,59,0.75)" : "1px solid #222",
           borderRadius: 10,
           boxShadow: isImmediate
             ? (isLargeDisplay
-              ? "0 32px 80px rgba(0,0,0,0.82), 0 0 0 1px rgba(255,255,255,0.05), 0 0 28px rgba(225,75,59,0.18)"
-              : "0 18px 52px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.03), 0 0 22px rgba(225,75,59,0.14)")
+              ? "0 32px 80px rgba(0,0,0,0.82), 0 0 0 1px rgba(255,255,255,0.05), 0 0 32px rgba(225,75,59,0.22)"
+              : "0 18px 52px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.03), 0 0 24px rgba(225,75,59,0.18)")
+            : isSevere
+            ? (isLargeDisplay
+              ? "0 20px 60px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.05), 0 0 20px rgba(224,106,44,0.14)"
+              : "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(224,106,44,0.10)")
             : (isLargeDisplay
               ? "0 20px 60px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.05)"
               : "0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)"),
