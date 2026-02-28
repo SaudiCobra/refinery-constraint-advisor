@@ -18,25 +18,24 @@ const LEVEL_CONFIG = {
   3: { text: "text-[#B53F3F]" },
 };
 
-function getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus) {
-  if (hotSpotRisk === "HIGH") return "Immediate Risk";
-  if (timeToNearest < 10 && timeToNearest > 0) return "Immediate Risk";
-  if (coolingCapacity === "CONSTRAINED") return "Cooling Constrained";
-  if (!equipment.h2Compressor && escalationLevel >= 1) return "Moderation Limited";
-  if (slope > 1.5 || preheatStatus?.includes("stress")) return "Rapid Temperature Rise";
-  if (escalationLevel >= 1) return "Early Drift Detected";
-  return "System Stable";
+function getExecState(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus) {
+  const isImmediate = hotSpotRisk === "HIGH" || (timeToNearest < 10 && timeToNearest > 0)
+    || coolingCapacity === "CONSTRAINED" || (!equipment.h2Compressor && escalationLevel >= 2);
+  const isSevere = escalationLevel >= 2 || slope > 1.5 || preheatStatus?.includes("stress");
+  const isEarly = escalationLevel >= 1;
+
+  if (isImmediate) return "immediate";
+  if (isSevere) return "severe";
+  if (isEarly) return "early";
+  return "stable";
 }
 
-function getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance) {
-  if (hotSpotRisk === "HIGH") return "Bed hot spot developing";
-  if (timeToNearest < 10 && timeToNearest > 0) return `${Math.round(timeToNearest)} minutes to ${nearestName} at current trend`;
-  if (coolingCapacity === "CONSTRAINED") return "Heat removal capability reduced";
-  if (!equipment.h2Compressor && escalationLevel >= 1) return "Exotherm sensitivity increased";
-  if (slope > 1.5 || preheatStatus?.includes("stress")) return "Rate-of-rise above expected range";
-  if (escalationLevel >= 1 && timeToNearest < Infinity) return `${Math.round(timeToNearest)} minutes to ${nearestName} at current rate`;
-  return "No binding constraints detected";
-}
+const EXEC_COPY = {
+  stable:    { title: "System Stable",             line1: "No active constraints.",         line2: "Operational headroom intact." },
+  early:     { title: "Early Drift Detected",      line1: "Acceleration observed.",          line2: "Intervention window remains open." },
+  severe:    { title: "Constraint Escalating",     line1: "Operating limit approaching.",    line2: "Intervention window narrowing." },
+  immediate: { title: "Immediate Constraint Risk", line1: "Limit breach imminent.",          line2: "Corrective action required." },
+};
 
 export default function PresentationHero({ 
   timeToNearest, 
