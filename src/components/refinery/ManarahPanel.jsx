@@ -383,7 +383,7 @@ export default function ManarahPanel({
   const ttlToSevere    = timeToNearest > 13 ? timeToNearest - 13 : 0;
   const ttlToImmediate = timeToNearest > 4  ? timeToNearest - 4  : 0;
 
-  const dominantDriver = getDominantDriver(slope, coolingCapacity, equipment, stateKey);
+  const dominantDriver = getDominantDriver(slope, coolingCapacity, equipment, stateKey, scenarioName);
   const rankedActions  = getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedReductionActive, quenchBoostActive, coolingBoostActive);
 
   const ttlColor = timeToNearest <= 4 ? "#E14B3B" : timeToNearest <= 13 ? "#E06A2C" : timeToNearest <= 35 ? "#D9A441" : "#3FC9B0";
