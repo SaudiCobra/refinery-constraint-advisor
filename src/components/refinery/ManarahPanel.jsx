@@ -264,9 +264,10 @@ function ImpactBar({ label, barFill, strengthLabel, active, available, pct, fs, 
   const TOTAL_BLOCKS = 9;
   const filled = Math.round(barFill * TOTAL_BLOCKS);
   const barColor = !available ? "#2a2a2a"
-    : strengthLabel === "Strong"    ? "#3FC9B0"
-    : strengthLabel === "Moderate"  ? "#D9A441"
-    : strengthLabel === "Mild"      ? "#6a6a6a"
+    : strengthLabel === "Strong"      ? "#3FC9B0"
+    : strengthLabel === "Moderate"    ? "#D9A441"
+    : strengthLabel === "Constrained" ? "#C8732E"
+    : strengthLabel === "Mild"        ? "#6a6a6a"
     : "#2a2a2a";
 
   const labelColor = !available ? "#3a3a3a" : active ? "#ddd" : "#888";
