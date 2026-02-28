@@ -207,7 +207,7 @@ export const DEMO_SCENARIOS = {
 export const SCENARIOS = [
   {
     name: "1. Stable Baseline",
-    samples: [348, 348.2, 348.1, 348.3, 348.2],
+    samples: [348.0, 348.0, 348.0, 348.0, 348.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
     feedFlow: 84000,
