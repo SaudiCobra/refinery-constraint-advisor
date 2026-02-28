@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SCENARIOS } from "./calcEngine";
 
 // Brief descriptors per scenario index
