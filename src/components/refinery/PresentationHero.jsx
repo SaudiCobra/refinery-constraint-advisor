@@ -1,14 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import DecisionWindowBar from "./DecisionWindowBar";
-import LeverContext from "./LeverContext";
 import {
   computeConfidence,
   computeCorrectiveLevers,
-  getConfidenceLabel,
-  getSituationHeadline,
-  getEscalationCause,
-  getRecommendationWithConfidence,
 } from "./confidenceEngine";
 
 const LEVEL_CONFIG = {
