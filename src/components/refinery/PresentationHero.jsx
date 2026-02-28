@@ -51,7 +51,8 @@ export default function PresentationHero({
   bedImbalance,
   hotSpotRisk,
 }) {
-  const stable = slope <= 0 || timeToNearest === Infinity;
+  const execState = getExecState(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus);
+  const copy = EXEC_COPY[execState];
   const config = LEVEL_CONFIG[escalationLevel] || LEVEL_CONFIG[0];
   
   // Compute corrective levers
