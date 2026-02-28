@@ -142,8 +142,8 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
             border: `1px solid ${cfg.haloColor}`,
             boxShadow: cfg.haloBgShadow,
             pointerEvents: "none",
-            opacity: key === "IMMEDIATE_RISK" ? 0.85 : 0.65,
-            transition: "opacity 0.3s ease-in-out, border-color 0.35s cubic-bezier(0.32, 0.72, 0.36, 1), box-shadow 0.35s cubic-bezier(0.32, 0.72, 0.36, 1)",
+            opacity: key === "IMMEDIATE_RISK" ? cfg.haloColor && 0.92 : 0.80,
+            transition: "opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
           }}
         />
 
