@@ -19,12 +19,12 @@ export default function ScenarioAnnouncer({ label }) {
       requestAnimationFrame(() => setVisible(true));
     });
 
-    // After 2s, fade out
+    // After 1700ms hold, fade out
     hideTimerRef.current = setTimeout(() => {
       setVisible(false);
       // After fade-out completes, fully unmount
-      unmountTimerRef.current = setTimeout(() => setRendered(false), 260);
-    }, 2000);
+      unmountTimerRef.current = setTimeout(() => setRendered(false), 240);
+    }, 1700);
 
     return () => {
       clearTimeout(hideTimerRef.current);
