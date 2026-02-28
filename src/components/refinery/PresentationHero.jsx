@@ -71,12 +71,13 @@ export default function PresentationHero({
       <div style={{ width: "100%", minWidth: "70vw", maxWidth: "85vw" }}>
         <div
           style={{
-            background: "#0E1218",
-            border: `1.5px solid rgba(255,255,255,0.18)`,
+            background: "#0C1117",
+            border: "1.5px solid rgba(255,255,255,0.16)",
             borderLeft: `3px solid ${colorValue}`,
-            borderRadius: 12,
+            borderRadius: 14,
             padding: "52px 64px 48px",
             textAlign: "center",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08)",
           }}
         >
           <p
