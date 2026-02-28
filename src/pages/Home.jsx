@@ -749,25 +749,28 @@ export default function Home() {
               slope={displaySlope}
             />
 
-            <ProcessMap
-              escalationLevel={escalationLevel}
-              slope={displaySlope}
-              currentTemp={currentValue}
-              feedFlow={activeData.feedFlow}
-              equipment={activeData.equipment}
-              preheatActive={activePreheatMode}
-              preheatStatus={preheatStatus}
-              coolingCapacity={coolingCapacity}
-              nearest={nearest}
-              timeToNearest={displayTTL}
-              sensorQuality={activeData.sensorQuality}
-              opMode={activeData.opMode}
-              bedImbalance={bedImbalance}
-              hotSpotRisk={hotSpotRisk}
-              interactive={false}
-              units={activeData.units}
-              systemState={systemState}
-            />
+            <div style={{ position: "relative", opacity: 0.4, transition: "opacity 0.4s ease", pointerEvents: "none" }}>
+              <ProcessMap
+                escalationLevel={escalationLevel}
+                slope={displaySlope}
+                currentTemp={currentValue}
+                feedFlow={activeData.feedFlow}
+                equipment={activeData.equipment}
+                preheatActive={activePreheatMode}
+                preheatStatus={preheatStatus}
+                coolingCapacity={coolingCapacity}
+                nearest={nearest}
+                timeToNearest={displayTTL}
+                sensorQuality={activeData.sensorQuality}
+                opMode={activeData.opMode}
+                bedImbalance={bedImbalance}
+                hotSpotRisk={hotSpotRisk}
+                interactive={false}
+                units={activeData.units}
+                systemState={systemState}
+              />
+              <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)", pointerEvents: "none" }} />
+            </div>
 
             <PresentationHero
               timeToNearest={displayTTL}
