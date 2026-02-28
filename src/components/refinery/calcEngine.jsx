@@ -225,13 +225,15 @@ export const SCENARIOS = [
     opMode: "steady",
   },
   {
-    name: "3. Cooling Compression (Level 2)",
-    samples: [360, 362, 364, 366, 368],
+    name: "3. Dominant Driver Isolation",
+    // slope ~0.5°C/min → TTL to hi(370) from 358 = 12÷0.5 = 24 min (Early on load)
+    // effluentCooler: true but h2Compressor: false → cooling slightly strained at Severe
+    samples: [354.0, 355.0, 356.0, 357.0, 358.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: true },
-    feedFlow: 92000,
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
+    feedFlow: 88000,
     sensorQuality: "good",
-    opMode: "transient",
+    opMode: "steady",
   },
   {
     name: "4. Four-Level Escalation Sequence",
