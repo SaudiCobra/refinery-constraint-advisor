@@ -749,7 +749,7 @@ export default function Home() {
               slope={displaySlope}
             />
 
-            <div style={{ position: "relative", opacity: 0.4, transition: "opacity 0.4s ease", pointerEvents: "none" }}>
+            <div style={{ position: "relative", opacity: 0.72, transition: "opacity 0.4s ease", pointerEvents: "none" }}>
               <ProcessMap
                 escalationLevel={escalationLevel}
                 slope={displaySlope}
