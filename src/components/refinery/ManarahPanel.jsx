@@ -513,6 +513,8 @@ export default function ManarahPanel({
             />
           ))}
 
+          </div>
+
           {/* SECTION 5 — EVALUATE ADJUSTMENT (hidden in emergency) */}
           {!isEmergency && (
             <>
