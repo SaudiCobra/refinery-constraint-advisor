@@ -12,9 +12,60 @@ const SCENARIO_DESCRIPTORS = [
   "All sensors aligned — confirmed escalation trajectory",
 ];
 
+// Proximity zone: bottom center ± 220px wide, within 80px of bottom edge
+function isInProximityZone(e) {
+  const cx = window.innerWidth / 2;
+  const fromBottom = window.innerHeight - e.clientY;
+  return Math.abs(e.clientX - cx) < 220 && fromBottom < 80;
+}
+
 export default function PresenterControls({ presScenario, onSelectScenario }) {
   const [panelOpen, setPanelOpen] = useState(false);
+  const [visible, setVisible] = useState(false);   // controls opacity
+  const hideTimerRef = useRef(null);
   const total = SCENARIOS.length;
+
+  const scheduleHide = useCallback(() => {
+    clearTimeout(hideTimerRef.current);
+    hideTimerRef.current = setTimeout(() => {
+      setVisible(false);
+      setPanelOpen(false);
+    }, 2500);
+  }, []);
+
+  const showStrip = useCallback(() => {
+    setVisible(true);
+    scheduleHide();
+  }, [scheduleHide]);
+
+  // Show on mount (presentation mode first enabled)
+  useEffect(() => {
+    showStrip();
+    return () => clearTimeout(hideTimerRef.current);
+  }, []);
+
+  // Show on scenario change
+  const prevScenarioRef = useRef(presScenario);
+  useEffect(() => {
+    if (prevScenarioRef.current !== presScenario) {
+      prevScenarioRef.current = presScenario;
+      showStrip();
+    }
+  }, [presScenario, showStrip]);
+
+  // Mouse proximity detection
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      if (isInProximityZone(e)) {
+        setVisible(true);
+        clearTimeout(hideTimerRef.current);
+      } else if (visible) {
+        scheduleHide();
+      }
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    return () => window.removeEventListener("mousemove", onMouseMove);
+  }, [visible, scheduleHide]);
 
   const prev = () => onSelectScenario((presScenario - 1 + total) % total);
   const next = () => onSelectScenario((presScenario + 1) % total);
