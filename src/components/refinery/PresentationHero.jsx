@@ -35,6 +35,7 @@ const EXEC_COPY = {
 // Keyed by scenario name substring for loose matching
 const SEVERE_IMPACT_LINES = {
   "Predictive Drift": "Projected impact: Throughput constraint within the active intervention window.",
+  "Dominant Driver": "Projected impact: Product yield deviation likely under sustained acceleration.",
   "Cooling Compression": "Effluent cooler offline — heat removal authority reduced by ~40%.",
   "Four-Level Escalation": "Constraint progression through all four severity bands active.",
   "Hydrogen Moderation": "H₂ quench margin limited — exotherm response capacity reduced.",
