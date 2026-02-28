@@ -1,79 +1,183 @@
-import React from "react";
+import React, { useState } from "react";
 import { SCENARIOS } from "./calcEngine";
 
+// Brief descriptors per scenario index
+const SCENARIO_DESCRIPTORS = [
+  "All equipment available — no constraint pressure",
+  "Temperature accelerating — intervention window open",
+  "Effluent cooler offline — response window compressed",
+  "Full escalation sequence across all four severity levels",
+  "H₂ compressor unavailable — quench margin limited",
+  "Sensor conflict — differentiate noise from true drift",
+  "All sensors aligned — confirmed escalation trajectory",
+];
+
 export default function PresenterControls({ presScenario, onSelectScenario }) {
+  const [panelOpen, setPanelOpen] = useState(false);
   const total = SCENARIOS.length;
-  const scenarioName = SCENARIOS[presScenario]?.name || `Scenario ${presScenario + 1}`;
 
   const prev = () => onSelectScenario((presScenario - 1 + total) % total);
   const next = () => onSelectScenario((presScenario + 1) % total);
 
-  const btnStyle = (hovered) => ({
-    background: "transparent",
-    border: "none",
-    color: hovered ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.35)",
-    fontSize: 16,
-    cursor: "pointer",
-    padding: "2px 10px",
-    lineHeight: 1,
-    transition: "color 0.15s",
-    userSelect: "none",
-  });
-
-  const [prevHover, setPrevHover] = React.useState(false);
-  const [nextHover, setNextHover] = React.useState(false);
+  const scenarioName = SCENARIOS[presScenario]?.name || `Scenario ${presScenario + 1}`;
+  // Strip leading number prefix for strip display (e.g. "1. Stable Baseline" → "Stable Baseline")
+  const shortName = scenarioName.replace(/^\d+\.\s*/, "");
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 28,
-        left: "50%",
-        transform: "translateX(-50%)",
-        display: "flex",
-        alignItems: "center",
-        gap: 0,
-        padding: "10px 18px",
-        borderRadius: 999,
-        background: "rgba(20,24,32,0.85)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-        zIndex: 9990,
-        whiteSpace: "nowrap",
-      }}
-    >
-      <button
-        onClick={prev}
-        style={btnStyle(prevHover)}
-        onMouseEnter={() => setPrevHover(true)}
-        onMouseLeave={() => setPrevHover(false)}
-      >
-        ◀
-      </button>
+    <>
+      {/* Dim backdrop */}
+      {panelOpen && (
+        <div
+          onClick={() => setPanelOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            zIndex: 9991,
+          }}
+        />
+      )}
 
-      <span
+      {/* Scenario jump panel */}
+      {panelOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 520,
+            maxHeight: "70vh",
+            overflowY: "auto",
+            padding: "22px 26px",
+            background: "#0F141B",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 16,
+            boxShadow: "0 30px 80px rgba(0,0,0,0.6)",
+            zIndex: 9992,
+          }}
+        >
+          <p style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: 18 }}>
+            Select Scenario
+          </p>
+          {SCENARIOS.map((s, idx) => {
+            const isActive = idx === presScenario;
+            const label = s.name.replace(/^\d+\.\s*/, "");
+            const descriptor = SCENARIO_DESCRIPTORS[idx] || "";
+            return (
+              <ScenarioRow
+                key={idx}
+                label={label}
+                descriptor={descriptor}
+                active={isActive}
+                onClick={() => { onSelectScenario(idx); setPanelOpen(false); }}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      {/* Fixed bottom strip */}
+      <div
         style={{
-          fontSize: 13,
-          fontWeight: 500,
-          color: "rgba(255,255,255,0.85)",
-          letterSpacing: "0.01em",
-          padding: "0 12px",
-          minWidth: 160,
-          textAlign: "center",
+          position: "fixed",
+          bottom: 28,
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          alignItems: "center",
+          padding: "10px 18px",
+          borderRadius: 999,
+          background: "rgba(20,24,32,0.85)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          zIndex: 9990,
+          whiteSpace: "nowrap",
+          gap: 0,
         }}
       >
-        {scenarioName}
-      </span>
+        <StripButton onClick={prev} label="◀" />
 
-      <button
-        onClick={next}
-        style={btnStyle(nextHover)}
-        onMouseEnter={() => setNextHover(true)}
-        onMouseLeave={() => setNextHover(false)}
-      >
-        ▶
-      </button>
+        <button
+          onClick={() => setPanelOpen(p => !p)}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: "rgba(255,255,255,0.85)",
+            fontSize: 13,
+            fontWeight: 500,
+            letterSpacing: "0.01em",
+            padding: "0 14px",
+            minWidth: 160,
+            textAlign: "center",
+            cursor: "pointer",
+            opacity: panelOpen ? 1 : 0.85,
+            transition: "opacity 0.15s",
+          }}
+        >
+          {shortName}
+        </button>
+
+        <StripButton onClick={next} label="▶" />
+      </div>
+    </>
+  );
+}
+
+function StripButton({ onClick, label }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: "transparent",
+        border: "none",
+        color: hovered ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.35)",
+        fontSize: 16,
+        cursor: "pointer",
+        padding: "2px 10px",
+        lineHeight: 1,
+        transition: "color 0.15s",
+        userSelect: "none",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+function ScenarioRow({ label, descriptor, active, onClick }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        padding: "13px 14px",
+        borderRadius: 10,
+        cursor: "pointer",
+        marginBottom: 4,
+        background: active
+          ? "rgba(255,255,255,0.06)"
+          : hovered
+          ? "rgba(255,255,255,0.04)"
+          : "transparent",
+        borderLeft: active ? "2px solid rgba(255,255,255,0.25)" : "2px solid transparent",
+        transition: "background 0.15s",
+      }}
+    >
+      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: active ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.75)" }}>
+        {label}
+      </p>
+      {descriptor && (
+        <p style={{ margin: "3px 0 0", fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 400 }}>
+          {descriptor}
+        </p>
+      )}
     </div>
   );
 }
