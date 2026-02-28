@@ -215,8 +215,9 @@ export const SCENARIOS = [
     opMode: "steady",
   },
   {
-    name: "2. Early Drift (Level 1)",
-    samples: [350, 352, 354, 356, 358],
+    name: "2. Predictive Drift Detection",
+    // slope ~0.5°C/min → TTL to hi(370) from 358 = 12÷0.5 = 24 min (Early→Severe as drift progresses)
+    samples: [354.0, 355.0, 356.0, 357.0, 358.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
     feedFlow: 88000,
