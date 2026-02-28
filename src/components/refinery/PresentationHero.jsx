@@ -68,14 +68,14 @@ export default function PresentationHero({
       {/* System State - Single Dominant Element */}
       <div className="w-full max-w-6xl">
         <div className={cn("px-12 py-10 rounded-lg border-4 text-center transition-all duration-400", `border-[${config.text.replace('text-', '')}]`)}>
-          <p className={cn("text-6xl font-bold tracking-tight leading-tight mb-6", config.text)}>
+          <p className={cn("text-[4.1rem] font-bold tracking-tight leading-tight mb-6", config.text)}>
             {getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus)}
           </p>
           <div className="space-y-1">
-            <p className="text-[#999] text-base">
+            <p className="text-white text-lg font-semibold">
               {stable ? "No active constraints." : `${Math.round(timeToNearest)} minutes to ${nearestName}.`}
             </p>
-            <p className="text-[#999] text-base">
+            <p className="text-[#aaa] text-base" style={{ opacity: 0.82 }}>
               {stable ? "All parameters within operating limits." : getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance)}
             </p>
           </div>
@@ -83,11 +83,11 @@ export default function PresentationHero({
       </div>
 
       {/* Compact Metrics */}
-      <div className="w-full max-w-4xl space-y-2">
-        <p className="text-[#888] text-sm">
+      <div className="w-full max-w-4xl space-y-2" style={{ opacity: 0.82 }}>
+        <p className="text-[#888] text-sm" style={{ fontWeight: 400 }}>
           <span className="text-[#666]">Assessment Confidence:</span> {confidenceStatus}
         </p>
-        <p className="text-[#888] text-sm">
+        <p className="text-[#888] text-sm" style={{ fontWeight: 400 }}>
           <span className="text-[#666]">Mitigation Capacity:</span> {stable ? "Available" : `${correctiveLevers.available} / ${correctiveLevers.total} active`}
         </p>
       </div>
