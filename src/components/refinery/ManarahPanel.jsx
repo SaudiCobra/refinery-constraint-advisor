@@ -21,6 +21,14 @@ const SEVERITY_COLOR = {
   IMMEDIATE_RISK: "#E14B3B",
 };
 
+// Glow + halo per state (M19)
+const STATE_GLOW = {
+  NORMAL:         { glow: 0.45, halo: 0.35 },
+  EARLY_DRIFT:    { glow: 0.55, halo: 0.45 },
+  SEVERE_DRIFT:   { glow: 0.75, halo: 0.65 },
+  IMMEDIATE_RISK: { glow: 0.90, halo: 0.85 },
+};
+
 // ── Dominant driver ───────────────────────────────────────────────────────────
 
 function getDominantDriver(slope, coolingCapacity, equipment, systemState) {
