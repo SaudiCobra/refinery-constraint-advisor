@@ -528,18 +528,23 @@ export default function ManarahPanel({
             <div className="manarah-section-actions">
             <Label fs={fs}>Action Priority</Label>
             {rankedActions.map((a, i) => (
-            <ImpactBar
-              key={a.key}
-              label={`${i + 1}. ${a.label}`}
-              barFill={a.barFill}
-              strengthLabel={a.strengthLabel}
-              active={a.active}
-              available={a.available}
-              pct={a.pct}
-              fs={fs}
-              isLargeDisplay={isLargeDisplay}
-            />
-          ))}
+              <React.Fragment key={a.key}>
+                {i > 0 && <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "5px 0" }} />}
+                <ImpactBar
+                  label={`${i + 1}. ${a.label}`}
+                  barFill={a.barFill}
+                  strengthLabel={a.strengthLabel}
+                  active={a.active}
+                  available={a.available}
+                  pct={a.pct}
+                  fs={fs}
+                  isLargeDisplay={isLargeDisplay}
+                  rank={i}
+                  severityColor={severityColor}
+                  isImmediate={isImmediate}
+                />
+              </React.Fragment>
+            ))}
 
           </div>
 
