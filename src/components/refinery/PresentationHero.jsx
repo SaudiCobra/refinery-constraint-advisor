@@ -63,33 +63,43 @@ export default function PresentationHero({
     ? "Under Review" 
     : "Normal";
 
+  const colorValue = config.text.replace("text-[", "").replace("]", "");
+
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-12 space-y-8">
-      {/* System State - Single Dominant Element */}
+    <div className="flex flex-col items-center justify-center px-6 py-12">
+      {/* System State — Executive Signal Block */}
       <div className="w-full max-w-6xl">
-        <div className={cn("px-12 py-10 rounded-lg border-4 text-center transition-all duration-400", `border-[${config.text.replace('text-', '')}]`)}>
-          <p className={cn("text-[4.1rem] font-bold tracking-tight leading-tight mb-6", config.text)}>
+        <div
+          style={{
+            background: "#0E1218",
+            border: `1.5px solid rgba(255,255,255,0.18)`,
+            borderLeft: `3px solid ${colorValue}`,
+            borderRadius: 12,
+            padding: "48px 56px",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "4.4rem",
+              fontWeight: 700,
+              letterSpacing: "-0.5px",
+              lineHeight: 1.08,
+              marginBottom: "28px",
+              color: colorValue,
+            }}
+          >
             {getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus)}
           </p>
-          <div className="space-y-1">
-            <p className="text-white text-lg font-semibold">
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <p style={{ color: "#ffffff", fontSize: "1.15rem", fontWeight: 600, lineHeight: 1.3, opacity: 0.92 }}>
               {stable ? "No active constraints." : `${Math.round(timeToNearest)} minutes to ${nearestName}.`}
             </p>
-            <p className="text-[#aaa] text-base" style={{ opacity: 0.82 }}>
+            <p style={{ color: "#aaa", fontSize: "1rem", fontWeight: 400, lineHeight: 1.35, opacity: 0.75 }}>
               {stable ? "All parameters within operating limits." : getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance)}
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Compact Metrics */}
-      <div className="w-full max-w-4xl space-y-2" style={{ opacity: 0.82 }}>
-        <p className="text-[#888] text-sm" style={{ fontWeight: 400 }}>
-          <span className="text-[#666]">Assessment Confidence:</span> {confidenceStatus}
-        </p>
-        <p className="text-[#888] text-sm" style={{ fontWeight: 400 }}>
-          <span className="text-[#666]">Mitigation Capacity:</span> {stable ? "Available" : `${correctiveLevers.available} / ${correctiveLevers.total} active`}
-        </p>
       </div>
     </div>
   );
