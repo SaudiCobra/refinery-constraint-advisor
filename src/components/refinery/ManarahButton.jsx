@@ -129,7 +129,7 @@ export default function ManarahButton({ systemState, onClick, drawerOpen = false
             background: `radial-gradient(circle, ${cfg.glowColor} 0%, transparent 65%)`,
             pointerEvents: "none",
             opacity: docked ? cfg.glowIntensity * 0.8 : cfg.glowIntensity,
-            transition: "opacity 0.25s ease",
+            transition: "opacity 0.3s ease",
           }}
         />
 
