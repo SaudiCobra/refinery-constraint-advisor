@@ -82,34 +82,35 @@ export default function ProcessMap({
   
   // State-driven color palettes (both modes - scenario-driven)
   const getStateColors = () => {
+    // Presentation mode: designated path gets luminance bump (~15-18%), no glow/pulse
     if (effectiveState === "IMMEDIATE_RISK") {
       return {
-        base: interactive ? "#555" : "#7A7A7A",
-        affected: "#C0392B",
-        affectedStroke: "5",
-        pipes: interactive ? "#555" : "#7A7A7A"
+        base: interactive ? "#555" : "#6A6A6A",
+        affected: interactive ? "#C0392B" : "#C8A060", // luminance-raised amber, no glow
+        affectedStroke: "4",
+        pipes: interactive ? "#555" : "#6A6A6A"
       };
     } else if (effectiveState === "SEVERE_DRIFT") {
       return {
-        base: interactive ? "#555" : "#7A7A7A",
-        affected: "#D4653F",
-        affectedStroke: "4.5",
-        pipes: interactive ? "#555" : "#7A7A7A"
+        base: interactive ? "#555" : "#6A6A6A",
+        affected: interactive ? "#D4653F" : "#B89050", // luminance-raised
+        affectedStroke: "4",
+        pipes: interactive ? "#555" : "#6A6A6A"
       };
     } else if (effectiveState === "EARLY_DRIFT") {
       return {
-        base: interactive ? "#555" : "#7A7A7A",
-        affected: "#E67E22",
-        affectedStroke: "4",
-        pipes: interactive ? "#555" : "#7A7A7A"
+        base: interactive ? "#555" : "#6A6A6A",
+        affected: interactive ? "#E67E22" : "#8A8A8A", // mild luminance raise
+        affectedStroke: "3.5",
+        pipes: interactive ? "#555" : "#6A6A6A"
       };
     }
     // NORMAL
     return {
-      base: interactive ? "#555" : "#7A7A7A",
-      affected: interactive ? "#555" : "#7A7A7A",
+      base: interactive ? "#555" : "#6A6A6A",
+      affected: interactive ? "#555" : "#6A6A6A",
       affectedStroke: "3.5",
-      pipes: interactive ? "#555" : "#7A7A7A"
+      pipes: interactive ? "#555" : "#6A6A6A"
     };
   };
   
