@@ -66,16 +66,16 @@ export default function PresentationHero({
   const colorValue = config.text.replace("text-[", "").replace("]", "");
 
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-12">
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "36px 40px 0" }}>
       {/* System State — Executive Signal Block */}
-      <div className="w-full max-w-6xl">
+      <div style={{ width: "100%", minWidth: "70vw", maxWidth: "85vw" }}>
         <div
           style={{
             background: "#0E1218",
             border: `1.5px solid rgba(255,255,255,0.18)`,
             borderLeft: `3px solid ${colorValue}`,
             borderRadius: 12,
-            padding: "48px 56px",
+            padding: "52px 64px 48px",
             textAlign: "center",
           }}
         >
@@ -85,17 +85,17 @@ export default function PresentationHero({
               fontWeight: 700,
               letterSpacing: "-0.5px",
               lineHeight: 1.08,
-              marginBottom: "28px",
+              marginBottom: "36px",
               color: colorValue,
             }}
           >
             {getMainHeadline(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus)}
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <p style={{ color: "#ffffff", fontSize: "1.15rem", fontWeight: 600, lineHeight: 1.3, opacity: 0.92 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <p style={{ color: "#ffffff", fontSize: "1.15rem", fontWeight: 600, lineHeight: 1.3, opacity: 0.92, margin: 0 }}>
               {stable ? "No active constraints." : `${Math.round(timeToNearest)} minutes to ${nearestName}.`}
             </p>
-            <p style={{ color: "#aaa", fontSize: "1rem", fontWeight: 400, lineHeight: 1.35, opacity: 0.75 }}>
+            <p style={{ color: "#aaa", fontSize: "1rem", fontWeight: 400, lineHeight: 1.35, opacity: 0.75, margin: 0 }}>
               {stable ? "All parameters within operating limits." : getSubline(escalationLevel, hotSpotRisk, timeToNearest, nearestName, coolingCapacity, equipment, slope, preheatStatus, bedImbalance)}
             </p>
           </div>
