@@ -706,6 +706,7 @@ export default function Home() {
         {/* PRESENTATION MODE */}
         {!alarmsOnly && displayMode === "presentation" && (
           <>
+            <ScenarioAnnouncer label={SCENARIOS[presScenario]?.name?.replace(/^\d+\.\s*/, "")} />
             {/* Status block — isolated, 40px vertical breathing room */}
             <div style={{ paddingTop: 40, paddingBottom: 40 }}>
               <PresentationHero
