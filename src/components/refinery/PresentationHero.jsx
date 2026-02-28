@@ -55,24 +55,40 @@ export default function PresentationHero({
   opMode,
   bedImbalance,
   hotSpotRisk,
+  scenarioName,
 }) {
   const execState = getExecState(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus);
   const copy = EXEC_COPY[execState];
   const config = LEVEL_CONFIG[escalationLevel] || LEVEL_CONFIG[0];
-  
-  // Compute corrective levers
-  const correctiveLevers = computeCorrectiveLevers(equipment);
-  
-  // Determine confidence status (simplified for Presentation Mode)
-  const confidenceStatus = (sensorQuality === "degraded" || sensorQuality === "poor") 
-    ? "Under Review" 
-    : "Normal";
-
   const colorValue = config.text.replace("text-[", "").replace("]", "");
+
+  const isSevere = escalationLevel >= 2;
+
+  // Impact line: appears only at Severe, fades in
+  const [impactVisible, setImpactVisible] = useState(false);
+  useEffect(() => {
+    if (isSevere) {
+      const t = setTimeout(() => setImpactVisible(true), 40);
+      return () => clearTimeout(t);
+    } else {
+      setImpactVisible(false);
+    }
+  }, [isSevere]);
+
+  // Resolve impact line for this scenario
+  const getImpactLine = () => {
+    if (!scenarioName) return SEVERE_IMPACT_LINES.default;
+    const key = Object.keys(SEVERE_IMPACT_LINES).find(k => scenarioName.includes(k));
+    return key ? SEVERE_IMPACT_LINES[key] : SEVERE_IMPACT_LINES.default;
+  };
+
+  // Confidence: Moderate only for False Escalation, High otherwise
+  const isFalseEscalation = scenarioName?.includes("False Escalation");
+  const confidenceLabel = isFalseEscalation ? "MODERATE" : "HIGH";
+  const confidenceColor = isFalseEscalation ? "#B47A1F" : "#6FD0C7";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "36px 40px 0" }}>
-      {/* System State — Executive Signal Block */}
       <div style={{ width: "100%", minWidth: "70vw", maxWidth: "85vw" }}>
         <div
           style={{
@@ -103,6 +119,38 @@ export default function PresentationHero({
             <p style={{ color: "#aaa", fontSize: "1rem", fontWeight: 400, lineHeight: 1.35, opacity: 0.75, margin: 0 }}>
               {copy.line2}
             </p>
+          </div>
+
+          {/* Impact Line — Severe only, 260ms fade-in */}
+          {isSevere && (
+            <div style={{
+              marginTop: 32,
+              opacity: impactVisible ? 1 : 0,
+              transition: "opacity 260ms ease",
+            }}>
+              <div style={{
+                display: "inline-block",
+                padding: "9px 20px",
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.10)",
+                borderRadius: 6,
+              }}>
+                <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.9rem", fontWeight: 400, margin: 0, letterSpacing: "0.01em" }}>
+                  {getImpactLine()}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Confidence indicator */}
+          <div style={{ marginTop: 28, display: "flex", justifyContent: "center", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", fontWeight: 500 }}>
+              Confidence
+            </span>
+            <div style={{ width: 5, height: 5, borderRadius: "50%", background: confidenceColor }} />
+            <span style={{ fontSize: "0.72rem", letterSpacing: "0.08em", fontWeight: 600, color: confidenceColor }}>
+              {confidenceLabel}
+            </span>
           </div>
         </div>
       </div>
