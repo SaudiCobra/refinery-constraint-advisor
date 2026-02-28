@@ -114,11 +114,11 @@ function getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedA
     {
       key: "h2",
       label: "Hydrogen quench",
-      score: h2Avail ? 18 : 3,
-      strengthLabel: h2Avail ? "Mild" : "Unavailable",
-      barFill: h2Avail ? 0.38 : 0.08,
+      score: isMultiConstraintSevere ? 8 : (h2Avail ? 18 : 3),
+      strengthLabel: isMultiConstraintSevere ? "Constrained" : (h2Avail ? "Mild" : "Unavailable"),
+      barFill: isMultiConstraintSevere ? 0.22 : (h2Avail ? 0.38 : 0.08),
       active: h2Active,
-      available: h2Avail,
+      available: !isMultiConstraintSevere && h2Avail,
       pct: h2Active ? Math.round(rampProgress?.h2 ?? 0) : null,
     },
   ];
