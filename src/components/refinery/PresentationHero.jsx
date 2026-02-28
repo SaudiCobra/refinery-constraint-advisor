@@ -34,6 +34,7 @@ const EXEC_COPY = {
 // Per-scenario impact lines shown only at Severe state (escalationLevel >= 2)
 // Keyed by scenario name substring for loose matching
 const SEVERE_IMPACT_LINES = {
+  "Predictive Drift": "Projected impact: Throughput constraint within the active intervention window.",
   "Cooling Compression": "Effluent cooler offline — heat removal authority reduced by ~40%.",
   "Four-Level Escalation": "Constraint progression through all four severity bands active.",
   "Hydrogen Moderation": "H₂ quench margin limited — exotherm response capacity reduced.",
