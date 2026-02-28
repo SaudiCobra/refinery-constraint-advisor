@@ -337,6 +337,7 @@ export default function ManarahPanel({
   onAutoOpen,
   onClose,
   beacon,
+  scenarioName,
 }) {
   const [evalScenario, setEvalScenario] = useState("");
   const [autoOpenedImmediate, setAutoOpenedImmediate] = useState(false);
