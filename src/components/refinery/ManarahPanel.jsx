@@ -15,10 +15,10 @@ function fmtRoR(ror) {
 }
 
 const SEVERITY_COLOR = {
-  NORMAL:         "#0F9F9F",
-  EARLY_DRIFT:    "#D4A547",
-  SEVERE_DRIFT:   "#D4653F",
-  IMMEDIATE_RISK: "#EF4444",
+  NORMAL:         "#3FC9B0",
+  EARLY_DRIFT:    "#D9A441",
+  SEVERE_DRIFT:   "#E06A2C",
+  IMMEDIATE_RISK: "#E14B3B",
 };
 
 // ── Dominant driver ───────────────────────────────────────────────────────────
@@ -148,34 +148,74 @@ function Row({ label, value, valueColor, emergency, fs }) {
   );
 }
 
-function TrajectoryBar({ slope, fs, isLargeDisplay }) {
-  // Position: 0 = safe (green), 1 = critical (red). Map slope to 0-1 range (0-2.0 slope).
+function TrajectoryBar({ slope, fs, isLargeDisplay, stateKey }) {
   const position = Math.min(1, Math.max(0, slope / 2.0));
   const posPercent = Math.round(position * 100);
 
-  // Direction arrow based on slope magnitude
   let ArrowIcon = Minus;
   if (slope > 0.5) ArrowIcon = ArrowUp;
   else if (slope < -0.5) ArrowIcon = ArrowDown;
 
+  const isImmediate = stateKey === "IMMEDIATE_RISK";
+  const isSevere    = stateKey === "SEVERE_DRIFT";
+  const isEarly     = stateKey === "EARLY_DRIFT";
+
+  // Shimmer opacity by state
+  const shimmerOpacity = isImmediate ? 0.12 : isSevere ? 0.12 : isEarly ? 0.06 : 0;
+  const shimmerActive  = shimmerOpacity > 0;
+
+  // Gradient contrast boost for Immediate
+  const barGradient = isImmediate
+    ? "linear-gradient(90deg, #1fc4a8 0%, #e0a030 45%, #E14B3B 100%)"
+    : "linear-gradient(90deg, #3FC9B0 0%, #D9A441 50%, #E06A2C 100%)";
+
+  const shimmerAnimId = `traj-shimmer-${stateKey.toLowerCase()}`;
+
   return (
     <div style={{ marginBottom: isLargeDisplay ? 10 : 8 }}>
-      <p style={{ fontSize: fs(9), letterSpacing: "0.12em", textTransform: "uppercase", color: "#4a4a4a", fontWeight: 600, marginBottom: 4 }}>
+      {shimmerActive && (
+        <style>{`
+          @keyframes ${shimmerAnimId} {
+            0%   { transform: translateX(-100%); }
+            100% { transform: translateX(400%); }
+          }
+          .traj-shimmer-${stateKey.toLowerCase()} {
+            animation: ${shimmerAnimId} 4s linear infinite;
+          }
+        `}</style>
+      )}
+      <p style={{ fontSize: fs(9), letterSpacing: "0.04em", textTransform: "uppercase", color: "#4a4a4a", fontWeight: 500, marginBottom: 4 }}>
         Risk Trajectory
       </p>
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        {/* Gradient bar */}
         <div
           style={{
             flex: 1,
             height: 8,
             borderRadius: 3,
-            background: "linear-gradient(90deg, #0F9F9F 0%, #D4A547 50%, #EF4444 100%)",
+            background: barGradient,
             position: "relative",
             overflow: "hidden",
+            transition: "background 0.3s ease",
           }}
         >
-          {/* Moving indicator */}
+          {/* Directional shimmer layer */}
+          {shimmerActive && (
+            <div
+              className={`traj-shimmer-${stateKey.toLowerCase()}`}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "25%",
+                height: "100%",
+                background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,1) 50%, transparent 100%)",
+                opacity: shimmerOpacity,
+                pointerEvents: "none",
+              }}
+            />
+          )}
+          {/* Position indicator */}
           <div
             style={{
               position: "absolute",
@@ -191,8 +231,6 @@ function TrajectoryBar({ slope, fs, isLargeDisplay }) {
             }}
           />
         </div>
-
-        {/* Direction arrow */}
         <ArrowIcon style={{ width: fs(14), height: fs(14), color: "#888", flexShrink: 0 }} />
       </div>
     </div>
