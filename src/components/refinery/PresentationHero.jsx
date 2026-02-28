@@ -72,8 +72,8 @@ export default function PresentationHero({
         <div
           style={{
             background: "#0C1117",
-            border: "1.5px solid rgba(255,255,255,0.16)",
-            borderRadius: 14,
+            border: "1.5px solid rgba(255,255,255,0.14)",
+            borderRadius: 12,
             padding: "52px 64px 48px",
             textAlign: "center",
             boxShadow: "0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08)",
