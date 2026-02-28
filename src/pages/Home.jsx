@@ -769,7 +769,7 @@ export default function Home() {
                 units={activeData.units}
                 systemState={systemState}
               />
-              <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.08)", pointerEvents: "none" }} />
             </div>
 
             <PresentationHero
