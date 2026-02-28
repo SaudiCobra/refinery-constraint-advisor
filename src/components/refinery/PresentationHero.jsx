@@ -41,6 +41,7 @@ const SEVERE_IMPACT_LINES = {
   "Hydrogen Moderation": "H₂ quench margin limited — exotherm response capacity reduced.",
   "False Escalation": "Signal inconsistency detected — confidence qualified.",
   "True Escalation": "All sensors aligned — trajectory confirmed across instruments.",
+  "Multi-Constraint": "Projected impact: Mitigation headroom reduced due to stacked constraints.",
   "default": "Operating margin compressed — corrective window narrowing.",
 };
 
