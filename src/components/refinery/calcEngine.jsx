@@ -299,21 +299,25 @@ export const SCENARIOS = [
     stages: [
       { 
         samples: [348.0, 348.0, 348.0, 348.0, 348.0],
+        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
         equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
         sensorQuality: "good",
       },
       { 
         samples: [348.0, 352.0, 356.0, 360.0, 363.0],
+        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
         equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
         sensorQuality: "suspect",
       },
       { 
         samples: [363.0, 363.5, 363.2, 363.6, 363.3],
+        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
         equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
         sensorQuality: "suspect",
       },
       { 
         samples: [363.3, 360.0, 356.0, 352.0, 348.0],
+        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
         equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
         sensorQuality: "good",
       },
