@@ -362,22 +362,26 @@ export default function Home() {
         }
         
         const scenario = SCENARIOS[presScenario];
+        if (!scenario) {
+          console.warn(`[Manarah] Scenario at index ${presScenario} is undefined — falling back to defaults.`);
+          return { ...DEFAULTS };
+        }
         if (scenario.isSequence && scenario.stages) {
           const stage = scenario.stages[sequenceStage] || scenario.stages[0];
           return {
             ...DEFAULTS,
             samples: stage.samples,
-            limits: scenario.limits,
-            equipment: stage.equipment,
-            feedFlow: scenario.feedFlow,
-            sensorQuality: scenario.sensorQuality,
-            opMode: scenario.opMode,
+            limits: stage.limits || scenario.limits || DEFAULTS.limits,
+            equipment: stage.equipment || scenario.equipment || DEFAULTS.equipment,
+            feedFlow: stage.feedFlow || scenario.feedFlow || DEFAULTS.feedFlow,
+            sensorQuality: stage.sensorQuality || scenario.sensorQuality || DEFAULTS.sensorQuality,
+            opMode: stage.opMode || scenario.opMode || DEFAULTS.opMode,
           };
         }
         return {
           ...DEFAULTS,
           samples: scenario.samples,
-          limits: scenario.limits,
+          limits: scenario.limits || DEFAULTS.limits,
           equipment: scenario.equipment,
           feedFlow: scenario.feedFlow,
           sensorQuality: scenario.sensorQuality,
