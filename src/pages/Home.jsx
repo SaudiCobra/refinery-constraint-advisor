@@ -470,7 +470,7 @@ export default function Home() {
   const computedState = getSystemState(timeToNearest);
   const systemState   = isInteractive ? derivedSystemState : (explicitUiState || computedState);
   const demoState     = isInteractive ? derivedSystemState : computedState;
-  const alarmState    = getAlarmState(currentValue, activeData.limits);
+  const alarmState    = getAlarmState(currentValue, safeLimits);
 
   // displayTTL and displaySlope feed every consumer
   const displayTTL   = timeToNearest;
