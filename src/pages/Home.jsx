@@ -748,7 +748,8 @@ export default function Home() {
             {/* Fixed bottom presenter strip */}
             <PresenterControls
               presScenario={presScenario}
-              onSelectScenario={setPresScenario}
+              onSelectScenario={(idx) => { setPresScenario(idx); setSequenceStage(0); }}
+              onReset={handleResetPresentation}
             />
 
             <OpsCapacityPanel
