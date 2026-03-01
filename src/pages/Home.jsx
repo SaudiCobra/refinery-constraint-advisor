@@ -354,7 +354,7 @@ export default function Home() {
           return {
             ...DEFAULTS,
             samples: stage.samples,
-            limits: stage.limits,
+            limits: normalizeLimits(stage.limits),
             equipment: stage.equipment,
             feedFlow: stage.feedFlow,
             sensorQuality: stage.sensorQuality,
@@ -365,14 +365,14 @@ export default function Home() {
         const scenario = SCENARIOS[presScenario];
         if (!scenario) {
           console.warn(`[Manarah] Scenario at index ${presScenario} is undefined — falling back to defaults.`);
-          return { ...DEFAULTS };
+          return { ...DEFAULTS, limits: normalizeLimits(DEFAULTS.limits) };
         }
         if (scenario.isSequence && scenario.stages) {
           const stage = scenario.stages[sequenceStage] || scenario.stages[0];
           return {
             ...DEFAULTS,
             samples: stage.samples,
-            limits: stage.limits || scenario.limits || DEFAULTS.limits,
+            limits: normalizeLimits(stage.limits ?? scenario.limits),
             equipment: stage.equipment || scenario.equipment || DEFAULTS.equipment,
             feedFlow: stage.feedFlow || scenario.feedFlow || DEFAULTS.feedFlow,
             sensorQuality: stage.sensorQuality || scenario.sensorQuality || DEFAULTS.sensorQuality,
@@ -382,7 +382,7 @@ export default function Home() {
         return {
           ...DEFAULTS,
           samples: scenario.samples,
-          limits: scenario.limits || DEFAULTS.limits,
+          limits: normalizeLimits(scenario.limits),
           equipment: scenario.equipment,
           feedFlow: scenario.feedFlow,
           sensorQuality: scenario.sensorQuality,
