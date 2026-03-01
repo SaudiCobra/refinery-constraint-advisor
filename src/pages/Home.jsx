@@ -400,8 +400,8 @@ export default function Home() {
 
   // ── Compute TTL (single source of truth) ────────────────────────────────────
   // Interactive: use smoothed physics TTL | Presentation: derive from samples
-  const highLimit = Number(activeData.limits?.hi || 370);
-  const rawPhysicsTTL = getSimTTL(currentValue, effectiveSlope, activeData.limits);
+  const highLimit = Number(safeLimits.hi || 370);
+  const rawPhysicsTTL = getSimTTL(currentValue, effectiveSlope, safeLimits);
   const physicsTTL   = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
 
   const safeLimits  = normalizeLimits(activeData.limits); // final guard before any calc
