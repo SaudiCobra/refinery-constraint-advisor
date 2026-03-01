@@ -22,7 +22,7 @@ function isInProximityZone(e) {
   return Math.abs(e.clientX - cx) < 220 && fromBottom < 80;
 }
 
-export default function PresenterControls({ presScenario, onSelectScenario }) {
+export default function PresenterControls({ presScenario, onSelectScenario, onReset }) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [visible, setVisible] = useState(false);   // controls opacity
   const hideTimerRef = useRef(null);
