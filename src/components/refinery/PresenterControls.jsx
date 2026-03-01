@@ -70,8 +70,30 @@ export default function PresenterControls({ presScenario, onSelectScenario, onRe
     return () => window.removeEventListener("mousemove", onMouseMove);
   }, [visible, scheduleHide]);
 
-  const prev = () => onSelectScenario((presScenario - 1 + total) % total);
-  const next = () => onSelectScenario((presScenario + 1) % total);
+  const prev = useCallback(() => {
+    if (!total) return;
+    onSelectScenario(Math.max(0, (presScenario - 1 + total) % total));
+  }, [presScenario, total, onSelectScenario]);
+
+  const next = useCallback(() => {
+    if (!total) return;
+    onSelectScenario(Math.min(total - 1, (presScenario + 1) % total));
+  }, [presScenario, total, onSelectScenario]);
+
+  // Keyboard navigation — only in presentation mode (this component is mounted only then)
+  useEffect(() => {
+    const ARROW_KEYS = new Set(["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"]);
+    const onKeyDown = (e) => {
+      if (!ARROW_KEYS.has(e.key)) return;
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea" || document.activeElement?.isContentEditable) return;
+      e.preventDefault();
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") next();
+      else prev();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [prev, next]);
 
   const scenarioName = SCENARIOS[presScenario]?.name || `Scenario ${presScenario + 1}`;
   // Strip leading number prefix for strip display (e.g. "1. Stable Baseline" → "Stable Baseline")
