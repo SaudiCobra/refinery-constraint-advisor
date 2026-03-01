@@ -148,6 +148,14 @@ export default function ProcessMap({
   const tOutlet = Math.round(reactorOutletTemp);
   const tQuench = Math.round(currentTemp - 8);
   const tCoolerOutlet = Math.round(coolerOutletTemp);
+
+  // Tag color based on escalation state
+  const tagColors = (() => {
+    if (effectiveState === "IMMEDIATE_RISK") return { text: "#D97B6C", border: "rgba(201,70,47,0.45)" };
+    if (effectiveState === "SEVERE_DRIFT")   return { text: "#D4A060", border: "rgba(180,122,31,0.40)" };
+    if (effectiveState === "EARLY_DRIFT")    return { text: "#C8983A", border: "rgba(180,122,31,0.22)" };
+    return { text: "#bbb", border: "rgba(255,255,255,0.11)" };
+  })();
   
   const getThermalColor = (temp) => {
     if (temp < 300) return "#0F5F5F";
