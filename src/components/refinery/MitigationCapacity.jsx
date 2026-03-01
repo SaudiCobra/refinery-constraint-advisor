@@ -1,72 +1,74 @@
-import React from "react";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect, useRef } from "react";
+
+// Control margin percentage targets per state
+const MARGIN_TARGETS = {
+  NORMAL:         95,
+  EARLY_DRIFT:    77,
+  SEVERE_DRIFT:   50,
+  IMMEDIATE_RISK: 18,
+};
+
+const CONFIG = {
+  NORMAL:         { color: "#2F5D80", label: "Wide",          message: "Full range of corrective actions available." },
+  EARLY_DRIFT:    { color: "#B47A1F", label: "Tightening",    message: "Some corrective flexibility remains." },
+  SEVERE_DRIFT:   { color: "#A13A1F", label: "Limited",       message: "Only high-impact interventions remain." },
+  IMMEDIATE_RISK: { color: "#7A0F0F", label: "Critically Low", message: "Control margin nearly exhausted." },
+};
 
 export default function MitigationCapacity({ systemState }) {
-  // Derive mitigation capacity from system state
-  const getMitigationCapacity = () => {
-    if (systemState === "IMMEDIATE_RISK") {
-      return "CRITICAL";
-    }
-    if (systemState === "SEVERE_DRIFT") {
-      return "SEVERELY_LIMITED";
-    }
-    if (systemState === "EARLY_DRIFT") {
-      return "LIMITED";
-    }
-    return "AVAILABLE";
-  };
+  const state = systemState || "NORMAL";
+  const cfg = CONFIG[state] || CONFIG.NORMAL;
+  const target = MARGIN_TARGETS[state] ?? 95;
 
-  const capacity = getMitigationCapacity();
+  // Smoothly interpolate margin value
+  const [margin, setMargin] = useState(target);
+  const rafRef = useRef(null);
 
-  const config = {
-    AVAILABLE: {
-      color: "#2F5D80",
-      label: "AVAILABLE",
-      message: "Multiple corrective levers effective.",
-    },
-    LIMITED: {
-      color: "#B47A1F",
-      label: "LIMITED",
-      message: "Some corrective flexibility remains.",
-    },
-    SEVERELY_LIMITED: {
-      color: "#A13A1F",
-      label: "SEVERELY LIMITED",
-      message: "Only high-impact interventions remain.",
-    },
-    CRITICAL: {
-      color: "#7A0F0F",
-      label: "CRITICAL",
-      message: "Mitigation capacity nearly exhausted.",
-    },
-  };
-
-  const current = config[capacity];
+  useEffect(() => {
+    const step = () => {
+      setMargin(prev => {
+        const diff = target - prev;
+        if (Math.abs(diff) < 0.5) return target;
+        return prev + diff * 0.04; // smooth interpolation
+      });
+      rafRef.current = requestAnimationFrame(step);
+    };
+    rafRef.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [target]);
 
   return (
     <div
       className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3"
-      style={{ transition: "border-color 400ms ease, background 400ms ease" }}
+      style={{ transition: "border-color 400ms ease" }}
     >
-      <div className="flex items-center gap-3">
-        <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">
-          Mitigation Capacity:
-        </span>
-        <div className="flex items-center gap-2" style={{ transition: "opacity 300ms ease" }}>
-          <div
-            className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: current.color, transition: "background-color 400ms ease" }}
-          />
-          <span
-            className="text-sm font-semibold"
-            style={{ color: current.color, transition: "color 400ms ease" }}
-          >
-            {current.label}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">
+            Control Margin:
           </span>
+          <div className="flex items-center gap-2">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: cfg.color, transition: "background-color 400ms ease" }}
+            />
+            <span
+              className="text-sm font-semibold"
+              style={{ color: cfg.color, transition: "color 400ms ease" }}
+            >
+              {cfg.label}
+            </span>
+          </div>
         </div>
+        <span
+          className="text-xs font-mono tabular-nums"
+          style={{ color: cfg.color, opacity: 0.8, transition: "color 400ms ease" }}
+        >
+          {Math.round(margin)}%
+        </span>
       </div>
-      <p className="text-xs italic text-[#888] mt-1" style={{ transition: "opacity 300ms ease" }}>
-        {current.message}
+      <p className="text-xs italic text-[#888] mt-1">
+        {cfg.message}
       </p>
     </div>
   );
