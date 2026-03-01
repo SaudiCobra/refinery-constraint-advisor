@@ -531,6 +531,17 @@ export default function Home() {
     setDemonstrationStage(0);
   };
 
+  const handleResetPresentation = useCallback(() => {
+    setPresScenario(0);
+    setSequenceStage(0);
+    setAutoCycling(false);
+    setDemonstrationActive(false);
+    setDemonstrationStage(0);
+    if (cycleRef.current) clearInterval(cycleRef.current);
+    if (sequenceRef.current) clearTimeout(sequenceRef.current);
+    if (demoRef.current) clearInterval(demoRef.current);
+  }, []);
+
   const bgDimming = escalationLevel >= 2 ? "bg-[#0b1220]" : escalationLevel >= 1 ? "bg-[#0b1324]" : "bg-[#0b1220]";
 
   const [manarahOpen, setManarahOpen] = useState(false);
