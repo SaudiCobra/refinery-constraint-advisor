@@ -199,6 +199,13 @@ export default function PresenterControls({ presScenario, onSelectScenario, onRe
         </button>
 
         <StripButton onClick={next} label="▶" />
+
+        {onReset && (
+          <>
+            <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.1)", margin: "0 8px" }} />
+            <StripButton onClick={onReset} label="↺" title="Reset to Stable Baseline" />
+          </>
+        )}
       </div>
     </>
   );
