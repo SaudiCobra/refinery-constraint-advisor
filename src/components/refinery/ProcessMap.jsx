@@ -141,7 +141,20 @@ export default function ProcessMap({
   const reactorOutletTemp = currentTemp + 15;
   const tubeSideOutletTemp = valveStates.tcv01a === "OPEN" ? currentTemp * 0.85 : currentTemp;
   const shellSideOutletTemp = valveStates.tcv02b === "OPEN" ? reactorOutletTemp * 0.95 : Math.max(reactorOutletTemp - 50, 280);
-  const coolerOutletTemp = valveStates.tcv03a === "OPEN" ? shellSideOutletTemp : Math.max(shellSideOutletTemp - 40, 240);
+
+  // Realistic post-cooler temperature — based on escalation state, NOT reactor temp
+  const coolerOutTargets = {
+    IMMEDIATE_RISK: 100,
+    SEVERE_DRIFT:   80,
+    EARLY_DRIFT:    60,
+    NORMAL:         45,
+  };
+  const coolerOutTarget = coolerOutTargets[effectiveState] ?? 45;
+  // Apply cooler bypass penalty: if bypassed, temperature rises toward shell-side outlet
+  const coolerOutletTemp = valveStates.tcv03a === "OPEN"
+    ? Math.min(coolerOutTarget + 40, shellSideOutletTemp * 0.35)
+    : coolerOutTarget;
+  const separatorInletTemp = coolerOutletTemp;
 
   // Live temperature indicator values
   const tBed = Math.round(currentTemp);
