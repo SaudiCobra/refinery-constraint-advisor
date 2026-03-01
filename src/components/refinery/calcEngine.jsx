@@ -48,6 +48,45 @@ export function getNearestConstraint(constraints) {
   return positive.length > 0 ? positive[0] : null;
 }
 
+// ── Structured escalation band — requires BOTH slope AND absolute temps ────────
+// Single source of truth for band classification. Returns:
+// "NORMAL" | "EARLY_DRIFT" | "SEVERE_DRIFT" | "IMMEDIATE_RISK"
+export function getEscalationBand(slopeCpm, reactorOutC, coolerOutC) {
+  const s = slopeCpm   ?? 0;
+  const r = reactorOutC ?? 0;
+  const c = coolerOutC  ?? 0;
+
+  // IMMEDIATE_RISK: all three must reach the band
+  if (s > 1.2 && r >= 380 && c >= 95) return "IMMEDIATE_RISK";
+
+  // SEVERE_DRIFT: slope in range AND at least one absolute temp in band
+  if (s >= 0.7 && s <= 1.1 && r >= 372 && c >= 75) return "SEVERE_DRIFT";
+
+  // EARLY_DRIFT
+  if (s >= 0.3 && s <= 0.6 && r >= 365 && c >= 55) return "EARLY_DRIFT";
+
+  // STABLE: slope low AND both temps below drift onset
+  if (s <= 0.25 && r < 370 && c < 55) return "NORMAL";
+
+  // Partial-match fallback: take highest band only if absolute temps qualify
+  if (s > 1.2) {
+    if (r >= 380 && c >= 95) return "IMMEDIATE_RISK";
+    if (r >= 372 && c >= 75) return "SEVERE_DRIFT";
+    if (r >= 365 && c >= 55) return "EARLY_DRIFT";
+    return "NORMAL";
+  }
+  if (s >= 0.7) {
+    if (r >= 372 && c >= 75) return "SEVERE_DRIFT";
+    if (r >= 365 && c >= 55) return "EARLY_DRIFT";
+    return "NORMAL";
+  }
+  if (s >= 0.3) {
+    if (r >= 365 && c >= 55) return "EARLY_DRIFT";
+    return "NORMAL";
+  }
+  return "NORMAL";
+}
+
 // NEW 4-band model — single source of truth for all state derivation
 // NORMAL: > 35 min | EARLY_DRIFT: 10–35 | SEVERE_DRIFT: 5–10 | IMMEDIATE_RISK: ≤ 5
 export function getSystemState(timeMinutes) {
