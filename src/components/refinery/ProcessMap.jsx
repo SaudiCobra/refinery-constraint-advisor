@@ -696,6 +696,35 @@ export default function ProcessMap({
         </g>
 
 
+        {/* === STATIC TEMPERATURE INDICATORS === */}
+        {/* T-bed: Upper bed area, left of reactor */}
+        <g transform="translate(1075, 590)">
+          <rect x="-52" y="-20" width="104" height="40" rx="5" fill="#0D1117" stroke="rgba(255,255,255,0.11)" strokeWidth="1.5" />
+          <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">T-BED</text>
+          <text x="0" y="13" fill="#bbb" fontSize="17" textAnchor="middle" fontWeight="600">350°C</text>
+        </g>
+
+        {/* Reactor Outlet Temp: right of reactor outlet nozzle */}
+        <g transform="translate(1390, 835)">
+          <rect x="-64" y="-20" width="128" height="40" rx="5" fill="#0D1117" stroke="rgba(255,255,255,0.11)" strokeWidth="1.5" />
+          <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">RXT OUTLET</text>
+          <text x="0" y="13" fill="#bbb" fontSize="17" textAnchor="middle" fontWeight="600">350°C</text>
+        </g>
+
+        {/* Quench Zone Temp: right of reactor mid-section (inter-bed quench zone) */}
+        <g transform="translate(1460, 660)">
+          <rect x="-60" y="-20" width="120" height="40" rx="5" fill="#0D1117" stroke="rgba(255,255,255,0.11)" strokeWidth="1.5" />
+          <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">QUENCH ZONE</text>
+          <text x="0" y="13" fill="#bbb" fontSize="17" textAnchor="middle" fontWeight="600">350°C</text>
+        </g>
+
+        {/* Feed Cooler Outlet Temp: above spine between E-2 and D-1 */}
+        <g transform="translate(2080, 614)">
+          <rect x="-66" y="-20" width="132" height="40" rx="5" fill="#0D1117" stroke="rgba(255,255,255,0.11)" strokeWidth="1.5" />
+          <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">COOLER OUTLET</text>
+          <text x="0" y="13" fill="#bbb" fontSize="17" textAnchor="middle" fontWeight="600">350°C</text>
+        </g>
+
       </svg>
 
       {/* Interactive detail panel */}
