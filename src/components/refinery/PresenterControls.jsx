@@ -10,6 +10,9 @@ const SCENARIO_DESCRIPTORS = [
   "H₂ compressor unavailable — quench margin limited",
   "Sensor conflict — differentiate noise from true drift",
   "All sensors aligned — confirmed escalation trajectory",
+  "Stacked constraints — mitigation headroom reduced",
+  "Signal misalignment — no confirmed operational consequence",
+  "Rapid TTL compression — intervention window narrowing",
 ];
 
 // Proximity zone: bottom center ± 220px wide, within 80px of bottom edge
