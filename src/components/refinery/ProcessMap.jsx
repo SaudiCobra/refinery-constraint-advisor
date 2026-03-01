@@ -160,7 +160,7 @@ export default function ProcessMap({
   const tBed = Math.round(currentTemp);
   const tOutlet = Math.round(reactorOutletTemp);
   const tQuench = Math.round(currentTemp - 8);
-  const tCoolerOutlet = Math.round(coolerOutletTemp);
+  const tCoolerOutlet = Math.round(separatorInletTemp);
 
   // Tag color based on escalation state
   const tagColors = (() => {
