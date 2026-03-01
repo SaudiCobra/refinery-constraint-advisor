@@ -404,7 +404,8 @@ export default function Home() {
   const rawPhysicsTTL = getSimTTL(currentValue, effectiveSlope, activeData.limits);
   const physicsTTL   = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
 
-  const constraints = computeAllConstraints(currentValue, activeData.limits, effectiveSlope);
+  const safeLimits  = normalizeLimits(activeData.limits); // final guard before any calc
+  const constraints = computeAllConstraints(currentValue, safeLimits, effectiveSlope);
   const nearest     = getNearestConstraint(constraints);
 
   // timeToNearest is THE single source for all state derivation
