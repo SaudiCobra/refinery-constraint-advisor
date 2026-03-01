@@ -70,8 +70,12 @@ export default function PresenterControls({ presScenario, onSelectScenario }) {
     return () => window.removeEventListener("mousemove", onMouseMove);
   }, [visible, scheduleHide]);
 
-  const prev = () => onSelectScenario((presScenario - 1 + total) % total);
-  const next = () => onSelectScenario((presScenario + 1) % total);
+  const prev = () => onSelectScenario(Math.max(0, presScenario - 1));
+  const next = () => {
+    const nextIdx = presScenario + 1;
+    if (nextIdx >= total) return; // already at last — do nothing
+    onSelectScenario(nextIdx);
+  };
 
   const scenarioName = SCENARIOS[presScenario]?.name || `Scenario ${presScenario + 1}`;
   // Strip leading number prefix for strip display (e.g. "1. Stable Baseline" → "Stable Baseline")
