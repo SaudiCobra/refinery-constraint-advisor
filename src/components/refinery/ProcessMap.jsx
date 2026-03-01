@@ -142,6 +142,12 @@ export default function ProcessMap({
   const tubeSideOutletTemp = valveStates.tcv01a === "OPEN" ? currentTemp * 0.85 : currentTemp;
   const shellSideOutletTemp = valveStates.tcv02b === "OPEN" ? reactorOutletTemp * 0.95 : Math.max(reactorOutletTemp - 50, 280);
   const coolerOutletTemp = valveStates.tcv03a === "OPEN" ? shellSideOutletTemp : Math.max(shellSideOutletTemp - 40, 240);
+
+  // Live temperature indicator values
+  const tBed = Math.round(currentTemp);
+  const tOutlet = Math.round(reactorOutletTemp);
+  const tQuench = Math.round(currentTemp - 8);
+  const tCoolerOutlet = Math.round(coolerOutletTemp);
   
   const getThermalColor = (temp) => {
     if (temp < 300) return "#0F5F5F";
