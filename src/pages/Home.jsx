@@ -557,16 +557,38 @@ export default function Home() {
   };
 
   const handleResetPresentation = useCallback(() => {
+    if (cycleRef.current)    clearInterval(cycleRef.current);
+    if (sequenceRef.current) clearTimeout(sequenceRef.current);
+    if (demoRef.current)     clearInterval(demoRef.current);
     setPresScenario(0);
     setSequenceStage(0);
     setAutoCycling(false);
     setDemonstrationActive(false);
     setDemonstrationStage(0);
     setSmoothedTTL(null);
-    if (cycleRef.current) clearInterval(cycleRef.current);
-    if (sequenceRef.current) clearTimeout(sequenceRef.current);
-    if (demoRef.current) clearInterval(demoRef.current);
   }, []);
+
+  // ── Keyboard navigation — Presentation Mode only ─────────────────────────────
+  useEffect(() => {
+    if (displayMode !== "presentation") return;
+    const ARROW_KEYS = new Set(["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"]);
+    const onKeyDown = (e) => {
+      if (!ARROW_KEYS.has(e.key)) return;
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea" || document.activeElement?.isContentEditable) return;
+      e.preventDefault();
+      const total = SCENARIOS.length;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        setPresScenario(prev => safeScenarioIndex(prev + 1 >= total ? total - 1 : prev + 1, total));
+        setSequenceStage(0);
+      } else {
+        setPresScenario(prev => safeScenarioIndex(prev - 1 < 0 ? 0 : prev - 1, total));
+        setSequenceStage(0);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [displayMode]);
 
   const bgDimming = escalationLevel >= 2 ? "bg-[#0b1220]" : escalationLevel >= 1 ? "bg-[#0b1324]" : "bg-[#0b1220]";
 
