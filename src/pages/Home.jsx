@@ -132,24 +132,24 @@ export default function Home() {
   const sequenceRef = useRef(null);
   const demoRef = useRef(null);
 
-  // ── Real-time physics tick (1 000 ms = 1/90 of a demo-minute) ───────────────
-  // DT = 1/90 min per real second — slower than before so the countdown feels
-  // realistic rather than "fast AF". Band steering keeps TTL in the named band.
+  // ── Real-time physics tick ──────────────────────────────────────────────────
+  // DT = 1/60 min per real second. Band steering nudges RoR to keep TTL drifting
+  // through each named band without getting stuck or skipping.
   useEffect(() => {
     if (!simRunning || displayMode !== "interactive") return;
-    const DT = 1 / 90; // real seconds → demo minutes (slowed from 1/60)
+    const DT = 1 / 60; // demo-minutes per real second
 
     const tick = setInterval(() => {
       let temp = simTempRef.current;
       let ror  = simRoRRef.current;
       const limits = state.limits;
 
-      // Current TTL and which named scenario band was selected
-      const currentTTL  = getSimTTL(temp, ror, limits);
+      // Current raw TTL (reactor only — cooler TTL is computed later for display)
+      const currentTTL   = getSimTTL(temp, ror, limits);
       const scenarioBand = simRoRRef._scenarioBand || "NORMAL";
       const cfg = BAND_CONFIG[scenarioBand] || BAND_CONFIG.NORMAL;
 
-      // Check if all 3 levers are ON and each has completed its full ramp
+      // Check if all 3 levers are ON and fully ramped
       const checkFullRamp = (tsMs, action) => {
         if (tsMs === null) return false;
         const { delaySec, rampSec } = ACTION_PARAMS[action];
@@ -160,30 +160,30 @@ export default function Home() {
         checkFullRamp(h2TsRef.current,      'h2')      &&
         checkFullRamp(coolingTsRef.current, 'cooling');
 
-      // Count active levers for decay scaling
-      const activeLeverCount = [feedTsRef.current, h2TsRef.current, coolingTsRef.current].filter(ts => ts !== null).length;
-      // decayScale reduces worsening forces (band steering + noise) per active lever count
-      const decayScaleByCount = [1.00, 0.75, 0.35, 0.15];
-      const decayScale = decayScaleByCount[activeLeverCount] ?? 1.00;
+      const activeLeverCount = [feedTsRef.current, h2TsRef.current, coolingTsRef.current]
+        .filter(ts => ts !== null).length;
+      // Levers reduce worsening forces; 3 active levers nearly silence drift
+      const decayScale = [1.00, 0.70, 0.30, 0.10][activeLeverCount] ?? 1.00;
 
-      // 1. Random RoR wander — scaled down when levers are active
-      const rorNoise = (Math.random() - 0.5) * 2 * cfg.noise * decayScale;
-      ror = ror + rorNoise;
+      // 1. Random RoR wander (small, unbiased)
+      ror += (Math.random() - 0.5) * 2 * cfg.noise * decayScale;
 
-      // 2. Soft band-steering — DISABLED during full recovery to avoid fighting it
-      if (!allFullMitigation) {
+      // 2. Soft band-steering — keeps TTL drifting through the selected band
+      //    When mitigating fully, allow steering to fight back toward recovery instead
+      if (allFullMitigation) {
+        // Pull RoR down aggressively during full recovery
+        ror -= 0.04;
+      } else {
         if (currentTTL > cfg.ttlHi) {
-          // TTL too high → nudge RoR up (more worsening) — scale down when mitigating
-          const excess = currentTTL - cfg.ttlHi;
-          ror += cfg.steerK * excess * decayScale;
+          // TTL too high — RoR too low — push RoR up so TTL drifts down
+          ror += cfg.steerK * (currentTTL - cfg.ttlHi) * decayScale;
         } else if (currentTTL < cfg.ttlLo) {
-          // TTL too low → nudge RoR down (toward recovery) — always apply this beneficial direction
-          const deficit = cfg.ttlLo - currentTTL;
-          ror -= cfg.steerK * deficit;
+          // TTL too low — overshoot — bring RoR down
+          ror -= cfg.steerK * (cfg.ttlLo - currentTTL);
         }
       }
 
-      // 3. Apply ramped mitigation — reads live timestamps from refs
+      // 3. Apply ramped mitigation
       const { effectiveRoR } = computeMitigatedRoR(ror, {
         feedTs:    feedTsRef.current,
         h2Ts:      h2TsRef.current,
@@ -191,80 +191,31 @@ export default function Home() {
       });
       ror = effectiveRoR;
 
-      // 4. Hard-clamp RoR
-      const anyMitig = feedTsRef.current !== null || h2TsRef.current !== null || coolingTsRef.current !== null;
-      // During full recovery, allow RoR to drop below band min (don't fight it)
-      const rorFloor = anyMitig ? 0.03 : cfg.rorMin;
-      const rorCeil  = allFullMitigation ? cfg.rorMax : cfg.rorMax;
-      ror = Math.max(rorFloor, Math.min(rorCeil, ror));
+      // 4. Hard-clamp RoR (allow below band floor during active mitigation)
+      const anyMitig = activeLeverCount > 0;
+      const rorFloor = anyMitig ? 0.02 : cfg.rorMin;
+      ror = Math.max(rorFloor, Math.min(cfg.rorMax, ror));
 
-      // 4b. Full-mitigation thermal recovery assist
-      // Pulls temperature down each tick — makes TTL climb across all bands toward NORMAL
-      // Rate tuned so ~10 ticks (10 s) moves ~0.6°C → ~5+ min TTL gain at SEVERE RoR
-      const TTL_RECOVERY_CAP = 58; // minutes — NORMAL ceiling
-      const currentRawTTL = getSimTTL(temp, ror, limits);
-      if (allFullMitigation && currentRawTTL < TTL_RECOVERY_CAP) {
-        // 0.06°C/tick thermal pullback — enough to outpace even SEVERE RoR drift
-        temp -= 0.06;
+      // 4b. Thermal recovery assist when all 3 levers fully ramped
+      if (allFullMitigation && getSimTTL(temp, ror, limits) < 58) {
+        temp -= 0.05; // pull temp down, makes TTL climb
       }
 
       // 5. Advance temperature
-      const tempNoise = (Math.random() - 0.5) * 0.04;
-      temp = temp + ror * DT + tempNoise * DT;
+      temp += ror * DT + (Math.random() - 0.5) * 0.03 * DT;
 
-      // Write back to refs
       simTempRef.current = temp;
       simRoRRef.current  = ror;
 
-      // Compute new raw TTL — multi-variable: min(reactor TTL, cooler TTL)
+      // Compute raw TTL from multi-variable model (reactor + cooler min)
       const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
 
-      // State-aware smoothing: calm in NORMAL unless real drift detected
+      // Simple asymmetric EMA: TTL drops faster than it rises (no dip guards)
       setSmoothedTTL(prev => {
         if (prev === null) return rawTTL;
-        const band = getSystemState(prev);
-        const realDrift = simRoRRef.current >= 0.35 || rawTTL <= prev - 3;
-        let next = rawTTL;
-        if (band === "NORMAL") {
-          if (realDrift) {
-            const alpha = next < prev ? 0.22 : 0.20;
-            next = prev + alpha * (next - prev);
-          } else {
-            if (next < prev) next = Math.max(next, prev - 1.5);
-            const alpha = next < prev ? 0.10 : 0.25;
-            next = prev + alpha * (next - prev);
-          }
-        } else {
-          const alpha = next < prev ? 0.22 : 0.18;
-          next = prev + alpha * (next - prev);
-        }
-        return Math.max(0, next);
+        const alpha = rawTTL < prev ? 0.28 : 0.16; // drop faster than recover
+        return Math.max(0, prev + alpha * (rawTTL - prev));
       });
-
-      // Hysteresis + min dwell: update hysteresisState with one-step transitions + 2s dwell
-      const nowMs = Date.now();
-      const prevHysteresisState = hysteresisRef.current;
-      const candidateState = getSystemStateWithHysteresis(rawTTL, prevHysteresisState);
-      const STATE_ORDER_LOCAL = ["NORMAL", "EARLY_DRIFT", "SEVERE_DRIFT", "IMMEDIATE_RISK"];
-      const prevIdx = STATE_ORDER_LOCAL.indexOf(prevHysteresisState);
-      const candIdx = STATE_ORDER_LOCAL.indexOf(candidateState);
-      let nextHysteresis = prevHysteresisState;
-      if (candIdx > prevIdx) {
-        // Downgrade (worse): enforce 2s min dwell
-        const elapsed = nowMs - stateEnteredAtRef.current;
-        if (elapsed >= 2000) {
-          nextHysteresis = candidateState;
-        }
-      } else if (candIdx < prevIdx) {
-        // Upgrade (better): allow immediately
-        nextHysteresis = candidateState;
-      }
-      if (nextHysteresis !== prevHysteresisState) {
-        hysteresisRef.current = nextHysteresis;
-        stateEnteredAtRef.current = nowMs;
-        setHysteresisState(nextHysteresis);
-        setStateEnteredAt(nowMs);
-      }
 
       setSimTemp(temp);
       setSimRoR(ror);
