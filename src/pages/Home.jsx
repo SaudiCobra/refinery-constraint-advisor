@@ -115,6 +115,12 @@ export default function Home() {
     return margin / Math.max(ror, 0.05);
   };
 
+  // ── Safe scenario index helper ────────────────────────────────────────────
+  const safeScenarioIndex = (index, len) => {
+    if (!len || len <= 0) return 0;
+    return Math.max(0, Math.min(index, len - 1));
+  };
+
   // Presentation mode state
   const [presScenario, setPresScenario] = useState(0);
   const [autoCycling, setAutoCycling] = useState(false);
