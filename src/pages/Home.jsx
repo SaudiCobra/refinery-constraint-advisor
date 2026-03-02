@@ -230,27 +230,33 @@ export default function Home() {
     setTimeout(() => setMitigationMsg(""), 6000);
   };
 
-  // ── Scenario seeds: (temp, ror) chosen so TTL starts mid-band ──────────────
-  // limit = 370; TTL_target = mid-band centre; temp = limit - ror * TTL_target
-  // NORMAL:         ror=0.20, TTL≈47 → temp = 370 - 0.20*47 = 360.6  (band 35–60, mid=47)
-  // EARLY_DRIFT:    ror=0.45, TTL≈22 → temp = 370 - 0.45*22 = 360.1  (band 10–35, mid=22)
-  // SEVERE_DRIFT:   ror=0.85, TTL≈7  → temp = 370 - 0.85*7  = 364.1  (band 4–10,  mid=7)
-  // IMMEDIATE_RISK: ror=1.50, TTL≈2  → temp = 370 - 1.50*2  = 367.0  (band 0.5–4, mid=2)
+  // ── Scenario seeds: (temp, ror) mid-band starting points ──────────────────
+  // Seeds place the simulation at the centre of each named band so the operator
+  // can immediately see the correct state without waiting for the physics to ramp.
+  // limit=370; temp = limit - desiredRoR * midBandTTL
+  // NORMAL:         desiredRoR=0.18, TTL≈100 → temp=352 (huge margin, calm)
+  // EARLY_DRIFT:    desiredRoR=0.42, TTL≈22  → temp=370-0.42*22=360.8
+  // SEVERE_DRIFT:   desiredRoR=0.95, TTL≈7   → temp=370-0.95*7=363.4
+  // IMMEDIATE_RISK: desiredRoR=1.45, TTL≈2   → temp=370-1.45*2=367.1
   const SCENARIO_SEEDS = {
-    NORMAL:         { temp: 360.6, ror: 0.20, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    EARLY_DRIFT:    { temp: 360.1, ror: 0.45, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    SEVERE_DRIFT:   { temp: 364.1, ror: 0.85, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    IMMEDIATE_RISK: { temp: 367.0, ror: 1.50, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    NORMAL:         { temp: 352.0, ror: 0.18, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    EARLY_DRIFT:    { temp: 360.8, ror: 0.42, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    SEVERE_DRIFT:   { temp: 363.4, ror: 0.95, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    IMMEDIATE_RISK: { temp: 367.1, ror: 1.45, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
   };
+
   const handleSelectScenario = (scenario) => {
     const seed = SCENARIO_SEEDS[scenario] || SCENARIO_SEEDS.NORMAL;
-    simTempRef.current = seed.temp;
-    simRoRRef.current  = seed.ror;
-    simRoRRef._scenarioBand = scenario;
+    simTempRef.current   = seed.temp;
+    simRoRRef.current    = seed.ror;
+    scenarioBandRef.current = scenario;
+    // Reset action ramp effects so new scenario starts clean
+    feedEffectRef.current    = 0;
+    h2EffectRef.current      = 0;
+    coolingEffectRef.current = 0;
     setSimTemp(seed.temp);
     setSimRoR(seed.ror);
     setSmoothedTTL(null);
-    // Reset all mitigation levers on scenario change
     feedTsRef.current    = null;
     h2TsRef.current      = null;
     coolingTsRef.current = null;
@@ -265,7 +271,6 @@ export default function Home() {
       }
     });
     setSimRunning(true);
-    setMitigationMsg("");
   };
 
   // Auto-cycle logic
