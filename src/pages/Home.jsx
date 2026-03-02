@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { initInteractiveState, stepInteractiveState } from "@/components/refinery/interactiveEngine";
 import GlobalHeader from "@/components/refinery/GlobalHeader";
 import AlarmBanner from "@/components/refinery/AlarmBanner";
 import HeroMetric from "@/components/refinery/HeroMetric";
