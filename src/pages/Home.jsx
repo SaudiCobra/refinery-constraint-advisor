@@ -115,12 +115,6 @@ export default function Home() {
     return margin / Math.max(ror, 0.05);
   };
 
-  // ── Safe scenario index helper ────────────────────────────────────────────
-  const safeScenarioIndex = (index, len) => {
-    if (!len || len <= 0) return 0;
-    return Math.max(0, Math.min(index, len - 1));
-  };
-
   // Presentation mode state
   const [presScenario, setPresScenario] = useState(0);
   const [autoCycling, setAutoCycling] = useState(false);
@@ -303,7 +297,7 @@ export default function Home() {
   useEffect(() => {
     if (autoCycling && displayMode === "presentation") {
       cycleRef.current = setInterval(() => {
-        setPresScenario(prev => safeScenarioIndex((prev + 1) % Math.max(1, SCENARIOS.length), SCENARIOS.length));
+        setPresScenario(prev => (prev + 1) % SCENARIOS.length);
         setSequenceStage(0);
       }, 5000);
     }
@@ -317,15 +311,14 @@ export default function Home() {
   const SEQUENCE_STAGE_DURATIONS = [4500, 3000, 5000, null]; // null = hold indefinitely
 
   useEffect(() => {
-    const safeIdx = safeScenarioIndex(presScenario, SCENARIOS.length);
-    const currentScenario = SCENARIOS[safeIdx];
+    const currentScenario = SCENARIOS[presScenario];
     if (displayMode === "presentation" && currentScenario?.isSequence && !autoCycling && !demonstrationActive) {
       const duration = SEQUENCE_STAGE_DURATIONS[sequenceStage];
       if (duration === null) return; // Severe — manual advance only
       sequenceRef.current = setTimeout(() => {
         setSequenceStage(prev => {
           const nextStage = prev + 1;
-          if (nextStage >= (currentScenario.stages?.length ?? 1)) return 0;
+          if (nextStage >= currentScenario.stages.length) return 0;
           return nextStage;
         });
       }, duration);
@@ -370,15 +363,14 @@ export default function Home() {
             opMode: stage.opMode,
           };
         }
-
-        const safeIdx = safeScenarioIndex(presScenario, SCENARIOS.length);
-        const scenario = SCENARIOS[safeIdx];
+        
+        const scenario = SCENARIOS[presScenario];
         if (!scenario) {
-          console.warn(`[Manarah] Scenario at index ${safeIdx} is undefined — falling back to stable baseline.`);
+          console.warn(`[Manarah] Scenario at index ${presScenario} is undefined — falling back to defaults.`);
           return { ...DEFAULTS };
         }
         if (scenario.isSequence && scenario.stages) {
-          const stage = scenario.stages[safeScenarioIndex(sequenceStage, scenario.stages.length)] || scenario.stages[0];
+          const stage = scenario.stages[sequenceStage] || scenario.stages[0];
           return {
             ...DEFAULTS,
             samples: stage.samples,
@@ -748,7 +740,7 @@ export default function Home() {
         {/* PRESENTATION MODE */}
         {!alarmsOnly && displayMode === "presentation" && (
           <>
-            <ScenarioAnnouncer label={SCENARIOS[safeScenarioIndex(presScenario, SCENARIOS.length)]?.name?.replace(/^\d+\.\s*/, "")} />
+            <ScenarioAnnouncer label={SCENARIOS[presScenario]?.name?.replace(/^\d+\.\s*/, "")} />
             {/* Status block — isolated, 40px vertical breathing room */}
             <div style={{ paddingTop: 40, paddingBottom: 40 }}>
               <PresentationHero
