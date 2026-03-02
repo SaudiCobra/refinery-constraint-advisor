@@ -31,7 +31,6 @@ import {
   adjustTimeToConstraint,
   normalizeLimits,
   computeMultiVarTTL,
-  getDominantDriver,
   SCENARIOS,
   DEMONSTRATION_STAGES,
   HOT_SPOT_SCENARIO,
@@ -210,7 +209,7 @@ export default function Home() {
       simRoRRef.current  = ror;
 
       // Compute new raw TTL — multi-variable: min(reactor TTL, cooler TTL)
-      const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
+      const rawTTL = computeMultiVarTTL(temp, limits, ror);
 
       // Smooth: cap gain to +0.8 min/sec (anti-teleport), allow drops freely
       setSmoothedTTL(prev => {
@@ -403,25 +402,17 @@ export default function Home() {
   // ── Compute TTL (single source of truth — multi-variable: reactor + cooler) ──
   // Interactive: use smoothed physics TTL | Presentation: derive from samples
   // Both use computeMultiVarTTL to ensure min(TTL_reactor, TTL_cooler) drives escalation.
-  const rawMultiVar   = computeMultiVarTTL(currentValue, activeData.limits, effectiveSlope);
-  const { finalTTL: rawPhysicsTTL, ttlReactor, ttlCooler } = rawMultiVar;
+  const rawPhysicsTTL = computeMultiVarTTL(currentValue, activeData.limits, effectiveSlope);
   const physicsTTL    = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
 
   const constraints = computeAllConstraints(currentValue, activeData.limits, effectiveSlope);
   const nearest     = getNearestConstraint(constraints);
 
-  // timeToNearest is THE single source for all state derivation
-  const timeToNearest = isInteractive ? physicsTTL : rawPhysicsTTL;
+  // Multi-var TTL for presentation mode: min of reactor and cooler TTLs
+  const presMultiTTL = computeMultiVarTTL(currentValue, activeData.limits, effectiveSlope);
 
-  // ── Dominant driver — derived from TTL breakdown ─────────────────────────────
-  const { driver: dominantDriver, driverLine: dominantDriverLine } = getDominantDriver({
-    ttlReactor,
-    ttlCooler,
-    finalTTL: timeToNearest,
-    slopeCpm: effectiveSlope,
-    equipment: activeData.equipment,
-    sensorQuality: activeData.sensorQuality,
-  });
+  // timeToNearest is THE single source for all state derivation
+  const timeToNearest = isInteractive ? physicsTTL : presMultiTTL;
 
   // ── Ancillary calculations (all derived, never override timeToNearest) ───────
   const beds = simulateBedTemperatures(currentValue, effectiveSlope, activeData.equipment, 0);
@@ -510,7 +501,7 @@ export default function Home() {
 
   // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL, multi-var)
   const baselineTTL = isInteractive
-    ? computeMultiVarTTL(currentValue, activeData.limits, simRoRRef.current).finalTTL  // unmitigated
+    ? computeMultiVarTTL(currentValue, activeData.limits, simRoRRef.current)  // unmitigated
     : null;
   const mitigatedTTL = isInteractive ? displayTTL : null;
   const minutesRecovered = (baselineTTL !== null && mitigatedTTL !== null)
@@ -580,13 +571,12 @@ export default function Home() {
         feedReductionActive={feedReductionActive}
         quenchBoostActive={quenchBoostActive}
         coolingBoostActive={coolingBoostActive}
-        dominantDriver={dominantDriver}
-        dominantDriverLine={dominantDriverLine}
         onAutoOpen={handleManarahAutoOpen}
         onClose={() => setManarahOpen(false)}
         beacon={manarahOpen ? (
           <ManarahButton systemState={systemState} onClick={() => setManarahOpen(false)} drawerOpen={true} docked={true} />
         ) : null}
+        scenarioName={displayMode === "presentation" ? SCENARIOS[presScenario]?.name : undefined}
       />
       <GlobalHeader
         displayMode={displayMode}

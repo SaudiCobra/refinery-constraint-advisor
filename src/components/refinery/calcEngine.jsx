@@ -218,8 +218,8 @@ export function deriveCoolerOutC(reactorOutC) {
 }
 
 // ── Compute combined (multi-variable) TTL ─────────────────────────────────────
-// Returns { finalTTL, ttlReactor, ttlCooler, reactorOutC, coolerOutC } so
-// callers can inspect which constraint is tightest for driver attribution.
+// Returns the MINIMUM of reactor-TTL and cooler-TTL.
+// slope is in the same units for both (°C/min for reactor; cooler tracks proportionally).
 export function computeMultiVarTTL(reactorOutC, reactorLimits, slope) {
   const rLimits = normalizeLimits(reactorLimits);
   const reactorConstraints = computeAllConstraints(reactorOutC, rLimits, slope);
@@ -233,70 +233,7 @@ export function computeMultiVarTTL(reactorOutC, reactorLimits, slope) {
   const coolerNearest = getNearestConstraint(coolerConstraints);
   const ttlCooler = coolerNearest ? coolerNearest.time : Infinity;
 
-  const finalTTL = Math.min(ttlReactor, ttlCooler);
-  return { finalTTL, ttlReactor, ttlCooler, reactorOutC, coolerOutC };
-}
-
-// ── Dominant Driver — single source of truth ──────────────────────────────────
-// Deterministic, auditable. Driven by which constraint is actually tightening TTL.
-// Returns { driver, driverLine }
-export function getDominantDriver({
-  ttlReactor,
-  ttlCooler,
-  finalTTL,
-  slopeCpm,
-  equipment = {},
-  sensorQuality = "good",
-}) {
-  // 1. Sensor conflict overrides everything — cannot confirm physical driver
-  if (sensorQuality === "suspect") {
-    return {
-      driver: "Sensor conflict",
-      driverLine: "Signal inconsistency detected — dominant driver not confirmed.",
-    };
-  }
-
-  // 2. H₂ compressor unavailable AND slope high → quench limitation
-  if (!equipment.h2Compressor && slopeCpm > 0.8) {
-    return {
-      driver: "H₂ quench limitation",
-      driverLine: "Hydrogen moderation unavailable — quench margin eliminated.",
-    };
-  }
-
-  // 3. Cooler is the binding constraint
-  if (ttlCooler <= ttlReactor) {
-    if (!equipment.effluentCooler) {
-      return {
-        driver: "Effluent cooling constrained",
-        driverLine: "Effluent cooler offline — cooling path eliminated.",
-      };
-    }
-    return {
-      driver: "Effluent cooling constrained",
-      driverLine: "Cooler outlet temperature is the binding limit.",
-    };
-  }
-
-  // 4. Reactor temperature acceleration is the binding constraint
-  if (slopeCpm > 1.2) {
-    return {
-      driver: "Reactor temperature acceleration",
-      driverLine: "High rate-of-rise is compressing the response window.",
-    };
-  }
-  if (slopeCpm > 0.5) {
-    return {
-      driver: "Reactor temperature acceleration",
-      driverLine: "Sustained temperature rise reducing margin to operating limit.",
-    };
-  }
-
-  // 5. No dominant driver — system stable
-  return {
-    driver: "No dominant driver",
-    driverLine: "No dominant risk driver identified at current operating point.",
-  };
+  return Math.min(ttlReactor, ttlCooler);
 }
 
 // Interactive Mode Demo Scenarios (4 only - scenario-driven with explicit uiState)

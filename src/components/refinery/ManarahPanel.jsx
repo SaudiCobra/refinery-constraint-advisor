@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { ArrowUp, ArrowDown, Minus } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { X, ArrowUp, ArrowDown, Minus } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -29,7 +29,40 @@ const STATE_GLOW = {
   IMMEDIATE_RISK: { glow: 0.90, halo: 0.85 },
 };
 
+// ── Dominant driver ───────────────────────────────────────────────────────────
 
+function getDominantDriver(slope, coolingCapacity, equipment, systemState, scenarioName) {
+  // Scenario-specific override: Dominant Driver Isolation
+  if (scenarioName?.includes("Dominant Driver")) {
+    if (systemState === "EARLY_DRIFT" || systemState === "SEVERE_DRIFT" || systemState === "IMMEDIATE_RISK") {
+      return "Quench valve unresponsive.";
+    }
+  }
+  // Scenario-specific override: Multi-Constraint Interaction
+  if (scenarioName?.includes("Multi-Constraint")) {
+    if (systemState === "EARLY_DRIFT") return "Hydrogen moderation limiting — H₂ quench margin reduced.";
+    if (systemState === "SEVERE_DRIFT" || systemState === "IMMEDIATE_RISK") return "Stacked constraints: H₂ moderation limited and mitigation headroom constrained.";
+  }
+  // Scenario-specific override: Signal Conflict
+  if (scenarioName?.includes("Signal Conflict")) {
+    return "Sensor signal inconsistency detected — dominant driver not confirmed.";
+  }
+  if (systemState === "IMMEDIATE_RISK") {
+    return "Quench valve unresponsive — temperature control authority degraded.";
+  }
+  const drivers = [];
+  if (slope > 1.0) drivers.push({ label: "rising rate-of-rise", weight: slope });
+  if (coolingCapacity === "SEVERELY_LIMITED") drivers.push({ label: "severely limited cooling capacity", weight: 3 });
+  else if (coolingCapacity === "REDUCED") drivers.push({ label: "reduced cooling margin", weight: 2 });
+  if (!equipment?.effluentCooler) drivers.push({ label: "effluent cooler unavailable", weight: 2 });
+  if (systemState === "SEVERE_DRIFT" && !drivers.some(d => d.label.includes("rate"))) {
+    drivers.push({ label: "sustained high rate-of-rise", weight: 1.5 });
+  }
+  if (drivers.length === 0) return "No dominant risk driver identified at current operating point.";
+  drivers.sort((a, b) => b.weight - a.weight);
+  if (drivers.length === 1) return `Risk driven primarily by ${drivers[0].label}.`;
+  return `Risk driven primarily by ${drivers[0].label} and ${drivers[1].label}.`;
+}
 
 // ── Operator advantage insight ────────────────────────────────────────────────
 
@@ -315,11 +348,10 @@ export default function ManarahPanel({
   feedReductionActive,
   quenchBoostActive,
   coolingBoostActive,
-  dominantDriver,
-  dominantDriverLine,
   onAutoOpen,
   onClose,
   beacon,
+  scenarioName,
 }) {
   const [evalScenario, setEvalScenario] = useState("");
   const [autoOpenedImmediate, setAutoOpenedImmediate] = useState(false);
@@ -366,8 +398,8 @@ export default function ManarahPanel({
   const ttlToSevere    = timeToNearest > 13 ? timeToNearest - 13 : 0;
   const ttlToImmediate = timeToNearest > 4  ? timeToNearest - 4  : 0;
 
-  // dominantDriver + dominantDriverLine come from props (computed in calcEngine via Home.jsx)
-  const rankedActions = getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedReductionActive, quenchBoostActive, coolingBoostActive, undefined, stateKey);
+  const dominantDriver = getDominantDriver(slope, coolingCapacity, equipment, stateKey, scenarioName);
+  const rankedActions  = getRankedActions(slope, coolingCapacity, equipment, rampProgress, feedReductionActive, quenchBoostActive, coolingBoostActive, scenarioName, stateKey);
 
   const ttlColor = timeToNearest <= 4 ? "#E14B3B" : timeToNearest <= 13 ? "#E06A2C" : timeToNearest <= 35 ? "#D9A441" : "#3FC9B0";
   const isEmergency = stateKey === "SEVERE_DRIFT" || stateKey === "IMMEDIATE_RISK";
@@ -510,11 +542,7 @@ export default function ManarahPanel({
             color: isEmergency ? severityColor : "#999",
             fontWeight: isEmergency ? 600 : 400,
             lineHeight: 1.5,
-            marginBottom: dominantDriverLine ? 4 : 0,
-          }}>{dominantDriver || "No dominant driver identified."}</p>
-          {dominantDriverLine && (
-            <p style={{ fontSize: fs(10), color: "#555", lineHeight: 1.4 }}>{dominantDriverLine}</p>
-          )}
+          }}>{dominantDriver}</p>
 
           {!isEmergency && (
             <>
