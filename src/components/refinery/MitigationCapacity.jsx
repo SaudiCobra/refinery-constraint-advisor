@@ -45,7 +45,7 @@ export default function MitigationCapacity({ systemState }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">
-            Control Margin:
+            Response Capacity:
           </span>
           <div className="flex items-center gap-2">
             <div
