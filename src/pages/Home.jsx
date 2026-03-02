@@ -33,6 +33,7 @@ import {
   SCENARIOS,
   DEMONSTRATION_STAGES,
   HOT_SPOT_SCENARIO,
+  DEMO_SCENARIOS,
 } from "@/components/refinery/calcEngine";
 import {
   computeMitigatedRoR,
