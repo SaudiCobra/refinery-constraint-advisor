@@ -108,8 +108,8 @@ export default function Home() {
   // ── Derive named state from a TTL value — single source of truth ────────────
   const getBandFromTTL = (ttlMin) => {
     if (ttlMin <= 4)  return "IMMEDIATE_RISK";
-    if (ttlMin <= 13) return "SEVERE_DRIFT";
-    if (ttlMin <= 35) return "EARLY_DRIFT";
+    if (ttlMin <= 12) return "SEVERE_DRIFT";
+    if (ttlMin <= 30) return "EARLY_DRIFT";
     return "NORMAL";
   };
 
