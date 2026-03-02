@@ -170,33 +170,36 @@ export default function Home() {
     setTimeout(() => setMitigationMsg(""), 6000);
   };
 
-  // ── Scenario seeds: (temp, ror) mid-band starting points ──────────────────
-  // Seeds place the simulation at the centre of each named band so the operator
-  // can immediately see the correct state without waiting for the physics to ramp.
+  // ── Scenario seeds: pre-warm engine to mid-band so operator sees correct state ──
   // limit=370; temp = limit - desiredRoR * midBandTTL
-  // NORMAL:         desiredRoR=0.18, TTL≈100 → temp=352 (huge margin, calm)
-  // EARLY_DRIFT:    desiredRoR=0.42, TTL≈22  → temp=370-0.42*22=360.8
-  // SEVERE_DRIFT:   desiredRoR=0.95, TTL≈7   → temp=370-0.95*7=363.4
-  // IMMEDIATE_RISK: desiredRoR=1.45, TTL≈2   → temp=370-1.45*2=367.1
   const SCENARIO_SEEDS = {
-    NORMAL:         { temp: 352.0, ror: 0.18, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    EARLY_DRIFT:    { temp: 360.8, ror: 0.42, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    SEVERE_DRIFT:   { temp: 363.4, ror: 0.95, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    IMMEDIATE_RISK: { temp: 367.1, ror: 1.45, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    NORMAL:         { temp: 352.0, ror: 0.18 },
+    EARLY_DRIFT:    { temp: 360.8, ror: 0.42 },
+    SEVERE_DRIFT:   { temp: 363.4, ror: 0.95 },
+    IMMEDIATE_RISK: { temp: 367.1, ror: 1.45 },
   };
+
+  const SCENARIO_LIMITS = { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" };
 
   const handleSelectScenario = (scenario) => {
     const seed = SCENARIO_SEEDS[scenario] || SCENARIO_SEEDS.NORMAL;
-    simTempRef.current   = seed.temp;
-    simRoRRef.current    = seed.ror;
-    scenarioBandRef.current = scenario;
-    // Reset action ramp effects so new scenario starts clean
-    feedEffectRef.current    = 0;
-    h2EffectRef.current      = 0;
-    coolingEffectRef.current = 0;
-    setSimTemp(seed.temp);
-    setSimRoR(seed.ror);
-    setSmoothedTTL(null);
+    driftModeRef.current = scenario;
+
+    // Seed the engine at the correct mid-band position
+    const seedState = initInteractiveState(SCENARIO_LIMITS);
+    seedState.tempReactorOutC = seed.temp;
+    seedState.rorCpm          = seed.ror;
+    seedState.actionEffects   = { feed: 0, quench: 0, cooling: 0 };
+    // Recompute TTL from seed
+    const { finalTTL } = computeMultiVarTTL(seed.temp, SCENARIO_LIMITS, seed.ror);
+    seedState.ttlMin      = finalTTL;
+    seedState.ttlShownMin = finalTTL;
+    seedState.systemState = getSystemState(finalTTL);
+
+    engineStateRef.current = seedState;
+    setEngineState({ ...seedState });
+
+    // Reset lever timestamps (UI)
     feedTsRef.current    = null;
     h2TsRef.current      = null;
     coolingTsRef.current = null;
@@ -204,10 +207,11 @@ export default function Home() {
     setQuenchBoostActive(false);
     setCoolingBoostActive(false);
     setMitigationMsg("");
+
     import("@/components/refinery/calcEngine").then(({ DEMO_SCENARIOS }) => {
       const s = DEMO_SCENARIOS[scenario];
       if (s) {
-        setState(prev => ({ ...prev, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario, limits: seed.limits }));
+        setState(prev => ({ ...prev, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario, limits: SCENARIO_LIMITS }));
       }
     });
     setSimRunning(true);
