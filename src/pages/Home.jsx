@@ -218,23 +218,12 @@ export default function Home() {
       // Compute new raw TTL — multi-variable: min(reactor TTL, cooler TTL)
       const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
 
-      // State-aware smoothing: calm in NORMAL, responsive in drift states
+      // Smooth: cap gain to +0.8 min/sec (anti-teleport), allow drops freely
       setSmoothedTTL(prev => {
         if (prev === null) return rawTTL;
-        const band = getSystemState(prev);
-        let next = rawTTL;
-        if (band === "NORMAL") {
-          // Dip guard: clamp transient noise drops to max 2 min in NORMAL
-          if (next < prev && (prev - next) < 10) {
-            next = Math.max(next, prev - 2.0);
-          }
-          const alpha = next < prev ? 0.08 : 0.25;
-          next = prev + alpha * (next - prev);
-        } else {
-          const alpha = next < prev ? 0.22 : 0.18;
-          next = prev + alpha * (next - prev);
-        }
-        return Math.max(0, next);
+        const delta = rawTTL - prev;
+        const capped = prev + Math.max(-3, Math.min(0.8, delta));
+        return Math.max(0, capped);
       });
 
       setSimTemp(temp);
