@@ -315,10 +315,11 @@ export default function ManarahPanel({
   feedReductionActive,
   quenchBoostActive,
   coolingBoostActive,
+  dominantDriver,
+  dominantDriverLine,
   onAutoOpen,
   onClose,
   beacon,
-  scenarioName,
 }) {
   const [evalScenario, setEvalScenario] = useState("");
   const [autoOpenedImmediate, setAutoOpenedImmediate] = useState(false);
