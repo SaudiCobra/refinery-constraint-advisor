@@ -34,6 +34,8 @@ export const computeTimeToConstraint = computeTimeToLimit;
 
 export function computeAllConstraints(currentValue, limits, slope) {
   const constraints = [];
+  // Guard: never let undefined limits reach this function
+  limits = normalizeLimits(limits);
   
   if (limits.hi != null && limits.hi !== "") {
     const t = computeTimeToConstraint(currentValue, Number(limits.hi), slope);
