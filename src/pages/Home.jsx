@@ -31,6 +31,7 @@ import {
   adjustTimeToConstraint,
   normalizeLimits,
   computeMultiVarTTL,
+  getDominantDriver,
   SCENARIOS,
   DEMONSTRATION_STAGES,
   HOT_SPOT_SCENARIO,
