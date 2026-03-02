@@ -140,20 +140,56 @@ export default function PresenterControls({ presScenario, onSelectScenario, onRe
           <p style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: 18 }}>
             Select Scenario
           </p>
-          {SCENARIOS.map((s, idx) => {
-            const isActive = idx === presScenario;
-            const label = s.name.replace(/^\d+\.\s*/, "");
-            const descriptor = SCENARIO_DESCRIPTORS[idx] || "";
-            return (
-              <ScenarioRow
-                key={idx}
-                label={label}
-                descriptor={descriptor}
-                active={isActive}
-                onClick={() => { onSelectScenario(idx); setPanelOpen(false); }}
-              />
-            );
-          })}
+
+          {/* Main scenarios */}
+          {SCENARIOS.slice(0, MAIN_SCENARIO_COUNT).map((s, idx) => (
+            <ScenarioRow
+              key={idx}
+              label={s.name.replace(/^\d+\.\s*/, "")}
+              descriptor={SCENARIO_DESCRIPTORS[idx] || ""}
+              active={idx === presScenario}
+              onClick={() => { onSelectScenario(idx); setPanelOpen(false); }}
+            />
+          ))}
+
+          {/* Advanced collapsible */}
+          {SCENARIOS.length > MAIN_SCENARIO_COUNT && (
+            <>
+              <div
+                onClick={() => setAdvancedOpen(o => !o)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "10px 14px",
+                  marginTop: 6,
+                  cursor: "pointer",
+                  borderRadius: 8,
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                }}
+              >
+                <span style={{ fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", fontWeight: 500 }}>
+                  Advanced (Operator)
+                </span>
+                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", marginLeft: "auto" }}>
+                  {advancedOpen ? "▲" : "▼"}
+                </span>
+              </div>
+              {advancedOpen && SCENARIOS.slice(MAIN_SCENARIO_COUNT).map((s, i) => {
+                const idx = MAIN_SCENARIO_COUNT + i;
+                return (
+                  <ScenarioRow
+                    key={idx}
+                    label={s.name.replace(/^\d+\.\s*/, "")}
+                    descriptor={SCENARIO_DESCRIPTORS[idx] || ""}
+                    active={idx === presScenario}
+                    onClick={() => { onSelectScenario(idx); setPanelOpen(false); }}
+                  />
+                );
+              })}
+            </>
+          )}
         </div>
       )}
 
