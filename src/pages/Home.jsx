@@ -580,12 +580,13 @@ export default function Home() {
         feedReductionActive={feedReductionActive}
         quenchBoostActive={quenchBoostActive}
         coolingBoostActive={coolingBoostActive}
+        dominantDriver={dominantDriver}
+        dominantDriverLine={dominantDriverLine}
         onAutoOpen={handleManarahAutoOpen}
         onClose={() => setManarahOpen(false)}
         beacon={manarahOpen ? (
           <ManarahButton systemState={systemState} onClick={() => setManarahOpen(false)} drawerOpen={true} docked={true} />
         ) : null}
-        scenarioName={displayMode === "presentation" ? SCENARIOS[presScenario]?.name : undefined}
       />
       <GlobalHeader
         displayMode={displayMode}
