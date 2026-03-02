@@ -282,12 +282,10 @@ export default function Home() {
     setQuenchBoostActive(false);
     setCoolingBoostActive(false);
     setMitigationMsg("");
-    import("@/components/refinery/calcEngine").then(({ DEMO_SCENARIOS }) => {
-      const s = DEMO_SCENARIOS[scenario];
-      if (s) {
-        setState(prev => ({ ...prev, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario, limits: seed.limits }));
-      }
-    });
+    const s = DEMO_SCENARIOS[scenario];
+    if (s) {
+      setState(prev => ({ ...prev, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario, limits: seed.limits }));
+    }
     setSimRunning(true);
     setMitigationMsg("");
   };
