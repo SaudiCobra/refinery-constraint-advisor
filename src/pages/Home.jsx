@@ -111,73 +111,32 @@ export default function Home() {
   const sequenceRef = useRef(null);
   const demoRef = useRef(null);
 
-  // ── Real-time physics tick ──────────────────────────────────────────────────
-  // Models real DCS behavior: RoR has inertia (first-order lag toward desiredRoR),
-  // corrective actions ramp in gradually, temperature integrates from RoR.
+  // ── Interactive engine tick ───────────────────────────────────────────────
   useEffect(() => {
     if (!simRunning || displayMode !== "interactive") return;
-    const DT = 1 / 60; // demo-minutes per real second (1 tick/second)
-    const ROR_LAG = 0.06; // how fast simRoR tracks desiredRoR (per tick)
-
-    // Per-action effect lag constants (effectLag = 1 - exp(-dt/tau))
-    // feed: ramps in ~7s → lag ≈ 0.13, quench: ~15s → lag ≈ 0.065, cooling: ~25s → lag ≈ 0.04
-    const ACTION_LAG = { feed: 0.13, h2: 0.065, cooling: 0.04 };
-    // Max fractional RoR reduction per action
-    const ACTION_MAX = { feed: 0.35, h2: 0.25, cooling: 0.20 };
+    let lastTs = Date.now();
 
     const tick = setInterval(() => {
-      let temp = simTempRef.current;
-      let ror  = simRoRRef.current;
-      const limits = state.limits;
-      const band = scenarioBandRef.current || "NORMAL";
+      const now   = Date.now();
+      const dtMs  = now - lastTs;
+      lastTs = now;
 
-      // 1. Ramp per-action effect scalars toward target (0 when OFF, 1 when fully ON)
-      const rampEffect = (ref, key) => {
-        const target = (key === 'feed' ? feedTsRef.current : key === 'h2' ? h2TsRef.current : coolingTsRef.current) !== null ? 1 : 0;
-        ref.current = ref.current + (target - ref.current) * ACTION_LAG[key];
-      };
-      rampEffect(feedEffectRef,    'feed');
-      rampEffect(h2EffectRef,      'h2');
-      rampEffect(coolingEffectRef, 'cooling');
-
-      // 2. Combined mitigation effect on desiredRoR (capped at 65%)
-      const totalEffect = Math.min(0.65,
-        feedEffectRef.current    * ACTION_MAX.feed +
-        h2EffectRef.current      * ACTION_MAX.h2 +
-        coolingEffectRef.current * ACTION_MAX.cooling
+      const next = stepInteractiveState(
+        engineStateRef.current,
+        {
+          driftMode: driftModeRef.current,
+          limits:    state.limits,
+          actions: {
+            feedReduction: feedTsRef.current !== null,
+            quenchBoost:   h2TsRef.current   !== null,
+            coolingBoost:  coolingTsRef.current !== null,
+          },
+        },
+        dtMs
       );
 
-      // 3. desiredRoR from scenario band, reduced by active mitigations
-      const baseDesired = DESIRED_ROR[band] ?? DESIRED_ROR.NORMAL;
-      const desiredRoR  = baseDesired * (1 - totalEffect);
-
-      // 4. First-order lag: simRoR moves slowly toward desiredRoR (inertia)
-      ror = ror + (desiredRoR - ror) * ROR_LAG;
-
-      // 5. Small jitter on RoR only (process noise, not on TTL)
-      ror += (Math.random() - 0.5) * 0.06;
-
-      // 6. Hard clamp RoR to physically plausible range
-      ror = Math.max(0.08, Math.min(1.70, ror));
-
-      // 7. Integrate temperature
-      temp = temp + ror * DT;
-
-      simTempRef.current = temp;
-      simRoRRef.current  = ror;
-
-      // 8. Compute raw TTL from multi-variable model (reactor + cooler min)
-      const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
-
-      // 9. Asymmetric EMA smoothing — no pinning or dip guards
-      setSmoothedTTL(prev => {
-        if (prev === null) return rawTTL;
-        const alpha = rawTTL < prev ? 0.22 : 0.16;
-        return Math.max(0, prev + alpha * (rawTTL - prev));
-      });
-
-      setSimTemp(temp);
-      setSimRoR(ror);
+      engineStateRef.current = next;
+      setEngineState({ ...next });
     }, 1000);
 
     return () => clearInterval(tick);
