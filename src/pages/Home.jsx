@@ -521,7 +521,7 @@ export default function Home() {
 
   // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL, multi-var)
   const baselineTTL = isInteractive
-    ? computeMultiVarTTL(currentValue, activeData.limits, simRoRRef.current).finalTTL  // unmitigated
+    ? computeMultiVarTTL(currentValue, safeLimits, simRoRRef.current).finalTTL  // unmitigated
     : null;
   const mitigatedTTL = isInteractive ? displayTTL : null;
   const minutesRecovered = (baselineTTL !== null && mitigatedTTL !== null)
