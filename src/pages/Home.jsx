@@ -210,7 +210,7 @@ export default function Home() {
       simRoRRef.current  = ror;
 
       // Compute new raw TTL — multi-variable: min(reactor TTL, cooler TTL)
-      const rawTTL = computeMultiVarTTL(temp, limits, ror);
+      const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
 
       // Smooth: cap gain to +0.8 min/sec (anti-teleport), allow drops freely
       setSmoothedTTL(prev => {
