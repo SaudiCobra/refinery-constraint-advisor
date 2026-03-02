@@ -420,12 +420,11 @@ export default function Home() {
   // Both modes: pure TTL-driven, stateless. getSystemState(TTL) is single source of truth.
   const derivedSystemState = getBandFromTTL(timeToNearest);
 
-  // Auto-steer scenario band so physics keeps TTL in the right range
+  // Auto-update scenario band as TTL crosses thresholds — this is what drives staged progression
   useEffect(() => {
     if (!isInteractive || !simRunning) return;
-    const current = simRoRRef._scenarioBand || "NORMAL";
-    if (current !== derivedSystemState) {
-      simRoRRef._scenarioBand = derivedSystemState;
+    if (scenarioBandRef.current !== derivedSystemState) {
+      scenarioBandRef.current = derivedSystemState;
     }
   }, [derivedSystemState, isInteractive, simRunning]);
 
