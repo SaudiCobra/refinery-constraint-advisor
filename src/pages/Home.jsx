@@ -99,9 +99,9 @@ export default function Home() {
   // ── Band definitions: TTL [lo, hi] in minutes, RoR clamps, and noise ───────
   // These drive both seeding and continuous soft-steering.
   const BAND_CONFIG = {
-    NORMAL:         { ttlLo: 35, ttlHi: 60, rorMin: 0.10, rorMax: 0.40, noise: 0.025, steerK: 0.012 },
-    EARLY_DRIFT:    { ttlLo: 10, ttlHi: 35, rorMin: 0.28, rorMax: 0.75, noise: 0.035, steerK: 0.018 },
-    SEVERE_DRIFT:   { ttlLo:  4, ttlHi: 13, rorMin: 0.60, rorMax: 1.30, noise: 0.045, steerK: 0.030 },
+    NORMAL:         { ttlLo: 30, ttlHi: 58, rorMin: 0.10, rorMax: 0.40, noise: 0.025, steerK: 0.012 },
+    EARLY_DRIFT:    { ttlLo: 12, ttlHi: 30, rorMin: 0.28, rorMax: 0.75, noise: 0.035, steerK: 0.018 },
+    SEVERE_DRIFT:   { ttlLo:  4, ttlHi: 12, rorMin: 0.60, rorMax: 1.30, noise: 0.045, steerK: 0.030 },
     IMMEDIATE_RISK: { ttlLo:  0.2, ttlHi: 4, rorMin: 1.00, rorMax: 2.20, noise: 0.055, steerK: 0.060 },
   };
 
