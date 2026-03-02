@@ -66,7 +66,7 @@ export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, on
                   alarmsOnly && "translate-x-5"
                 )} />
               </div>
-              <span className="text-[#888] text-xs">Alarms-only View</span>
+              <span className="text-[#888] text-xs">DCS Alarm View</span>
             </label>
           </div>
 
