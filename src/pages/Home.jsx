@@ -131,80 +131,64 @@ export default function Home() {
   const demoRef = useRef(null);
 
   // ── Real-time physics tick ──────────────────────────────────────────────────
-  // DT = 1/60 min per real second. Band steering nudges RoR to keep TTL drifting
-  // through each named band without getting stuck or skipping.
+  // Models real DCS behavior: RoR has inertia (first-order lag toward desiredRoR),
+  // corrective actions ramp in gradually, temperature integrates from RoR.
   useEffect(() => {
     if (!simRunning || displayMode !== "interactive") return;
-    const DT = 1 / 60; // demo-minutes per real second
+    const DT = 1 / 60; // demo-minutes per real second (1 tick/second)
+    const ROR_LAG = 0.06; // how fast simRoR tracks desiredRoR (per tick)
+
+    // Per-action effect lag constants (effectLag = 1 - exp(-dt/tau))
+    // feed: ramps in ~7s → lag ≈ 0.13, quench: ~15s → lag ≈ 0.065, cooling: ~25s → lag ≈ 0.04
+    const ACTION_LAG = { feed: 0.13, h2: 0.065, cooling: 0.04 };
+    // Max fractional RoR reduction per action
+    const ACTION_MAX = { feed: 0.35, h2: 0.25, cooling: 0.20 };
 
     const tick = setInterval(() => {
       let temp = simTempRef.current;
       let ror  = simRoRRef.current;
       const limits = state.limits;
+      const band = scenarioBandRef.current || "NORMAL";
 
-      // Current raw TTL (reactor only — cooler TTL is computed later for display)
-      const currentTTL   = getSimTTL(temp, ror, limits);
-      const scenarioBand = simRoRRef._scenarioBand || "NORMAL";
-      const cfg = BAND_CONFIG[scenarioBand] || BAND_CONFIG.NORMAL;
-
-      // Check if all 3 levers are ON and fully ramped
-      const checkFullRamp = (tsMs, action) => {
-        if (tsMs === null) return false;
-        const { delaySec, rampSec } = ACTION_PARAMS[action];
-        return (Date.now() - tsMs) / 1000 >= delaySec + rampSec;
+      // 1. Ramp per-action effect scalars toward target (0 when OFF, 1 when fully ON)
+      const rampEffect = (ref, key) => {
+        const target = (key === 'feed' ? feedTsRef.current : key === 'h2' ? h2TsRef.current : coolingTsRef.current) !== null ? 1 : 0;
+        ref.current = ref.current + (target - ref.current) * ACTION_LAG[key];
       };
-      const allFullMitigation =
-        checkFullRamp(feedTsRef.current,    'feed')    &&
-        checkFullRamp(h2TsRef.current,      'h2')      &&
-        checkFullRamp(coolingTsRef.current, 'cooling');
+      rampEffect(feedEffectRef,    'feed');
+      rampEffect(h2EffectRef,      'h2');
+      rampEffect(coolingEffectRef, 'cooling');
 
-      const activeLeverCount = [feedTsRef.current, h2TsRef.current, coolingTsRef.current]
-        .filter(ts => ts !== null).length;
-      // Levers reduce worsening forces; 3 active levers nearly silence drift
-      const decayScale = [1.00, 0.70, 0.30, 0.10][activeLeverCount] ?? 1.00;
+      // 2. Combined mitigation effect on desiredRoR (capped at 65%)
+      const totalEffect = Math.min(0.65,
+        feedEffectRef.current    * ACTION_MAX.feed +
+        h2EffectRef.current      * ACTION_MAX.h2 +
+        coolingEffectRef.current * ACTION_MAX.cooling
+      );
 
-      // 1. Random RoR wander (small, unbiased)
-      ror += (Math.random() - 0.5) * 2 * cfg.noise * decayScale;
+      // 3. desiredRoR from scenario band, reduced by active mitigations
+      const baseDesired = DESIRED_ROR[band] ?? DESIRED_ROR.NORMAL;
+      const desiredRoR  = baseDesired * (1 - totalEffect);
 
-      // 2. Closed-loop TTL steering: proportional controller drives TTL toward targetTTL
-      //    error > 0 → TTL above target → increase RoR to bring TTL down
-      //    error < 0 → TTL below target → decrease RoR to let TTL recover
-      if (allFullMitigation) {
-        // Full mitigation: pull RoR down aggressively to drive recovery
-        ror -= 0.06;
-      } else if (cfg.k > 0) {
-        const error = currentTTL - cfg.targetTTL;
-        ror += error * cfg.k * decayScale;
-      }
+      // 4. First-order lag: simRoR moves slowly toward desiredRoR (inertia)
+      ror = ror + (desiredRoR - ror) * ROR_LAG;
 
-      // 3. Apply ramped mitigation
-      const { effectiveRoR } = computeMitigatedRoR(ror, {
-        feedTs:    feedTsRef.current,
-        h2Ts:      h2TsRef.current,
-        coolingTs: coolingTsRef.current,
-      });
-      ror = effectiveRoR;
+      // 5. Small jitter on RoR only (process noise, not on TTL)
+      ror += (Math.random() - 0.5) * 0.06;
 
-      // 4. Hard-clamp RoR (allow below band floor during active mitigation)
-      const anyMitig = activeLeverCount > 0;
-      const rorFloor = anyMitig ? 0.02 : cfg.rorMin;
-      ror = Math.max(rorFloor, Math.min(cfg.rorMax, ror));
+      // 6. Hard clamp RoR to physically plausible range
+      ror = Math.max(0.08, Math.min(1.70, ror));
 
-      // 4b. Thermal recovery assist when all 3 levers fully ramped
-      if (allFullMitigation && getSimTTL(temp, ror, limits) < 58) {
-        temp -= 0.05; // pull temp down, makes TTL climb
-      }
-
-      // 5. Advance temperature
-      temp += ror * DT + (Math.random() - 0.5) * 0.03 * DT;
+      // 7. Integrate temperature
+      temp = temp + ror * DT;
 
       simTempRef.current = temp;
       simRoRRef.current  = ror;
 
-      // Compute raw TTL from multi-variable model (reactor + cooler min)
+      // 8. Compute raw TTL from multi-variable model (reactor + cooler min)
       const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
 
-      // Asymmetric EMA: drops at 0.22 (responsive), rises at 0.16 (gradual recovery)
+      // 9. Asymmetric EMA smoothing — no pinning or dip guards
       setSmoothedTTL(prev => {
         if (prev === null) return rawTTL;
         const alpha = rawTTL < prev ? 0.22 : 0.16;
