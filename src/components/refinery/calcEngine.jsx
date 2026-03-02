@@ -1,28 +1,5 @@
 // Calculation engine for rate-of-rise and time-to-constraint projections
 
-// ── normalizeLimits ───────────────────────────────────────────────────────────
-// Single source of truth for ensuring a complete, safe limits object.
-// Merges caller-supplied limits over defaults; fills any missing key with the default.
-const DEFAULT_LIMITS = {
-  hi:       370,
-  hihi:     380,
-  trip:     390,
-  spec:     "",
-  rampRate: "",
-};
-
-export function normalizeLimits(limits, customDefaults) {
-  const base = { ...DEFAULT_LIMITS, ...(customDefaults || {}) };
-  if (!limits) return base;
-  return {
-    hi:       limits.hi       != null ? limits.hi       : base.hi,
-    hihi:     limits.hihi     != null ? limits.hihi     : base.hihi,
-    trip:     limits.trip     != null ? limits.trip     : base.trip,
-    spec:     limits.spec     != null ? limits.spec     : base.spec,
-    rampRate: limits.rampRate != null ? limits.rampRate : base.rampRate,
-  };
-}
-
 export function computeRateOfRise(samples, interval) {
   const now = samples[samples.length - 1];
   const prev = samples[samples.length - 2];
@@ -41,10 +18,7 @@ export function computeTimeToLimit(currentValue, limitValue, slope) {
 export const computeTimeToConstraint = computeTimeToLimit;
 
 export function computeAllConstraints(currentValue, limits, slope) {
-  const limits_ = normalizeLimits(limits); // guard: never receive undefined
   const constraints = [];
-  // shadow the param for the rest of the function
-  limits = limits_;
   
   if (limits.hi != null && limits.hi !== "") {
     const t = computeTimeToConstraint(currentValue, Number(limits.hi), slope);

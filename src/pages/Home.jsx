@@ -29,7 +29,6 @@ import {
   formatTime,
   computeCoolingCapacity,
   adjustTimeToConstraint,
-  normalizeLimits,
   SCENARIOS,
   DEMONSTRATION_STAGES,
   HOT_SPOT_SCENARIO,
@@ -354,7 +353,7 @@ export default function Home() {
           return {
             ...DEFAULTS,
             samples: stage.samples,
-            limits: normalizeLimits(stage.limits),
+            limits: stage.limits,
             equipment: stage.equipment,
             feedFlow: stage.feedFlow,
             sensorQuality: stage.sensorQuality,
@@ -365,14 +364,14 @@ export default function Home() {
         const scenario = SCENARIOS[presScenario];
         if (!scenario) {
           console.warn(`[Manarah] Scenario at index ${presScenario} is undefined — falling back to defaults.`);
-          return { ...DEFAULTS, limits: normalizeLimits(DEFAULTS.limits) };
+          return { ...DEFAULTS };
         }
         if (scenario.isSequence && scenario.stages) {
           const stage = scenario.stages[sequenceStage] || scenario.stages[0];
           return {
             ...DEFAULTS,
             samples: stage.samples,
-            limits: normalizeLimits(stage.limits ?? scenario.limits),
+            limits: stage.limits || scenario.limits || DEFAULTS.limits,
             equipment: stage.equipment || scenario.equipment || DEFAULTS.equipment,
             feedFlow: stage.feedFlow || scenario.feedFlow || DEFAULTS.feedFlow,
             sensorQuality: stage.sensorQuality || scenario.sensorQuality || DEFAULTS.sensorQuality,
@@ -382,7 +381,7 @@ export default function Home() {
         return {
           ...DEFAULTS,
           samples: scenario.samples,
-          limits: normalizeLimits(scenario.limits),
+          limits: scenario.limits || DEFAULTS.limits,
           equipment: scenario.equipment,
           feedFlow: scenario.feedFlow,
           sensorQuality: scenario.sensorQuality,
@@ -400,12 +399,11 @@ export default function Home() {
 
   // ── Compute TTL (single source of truth) ────────────────────────────────────
   // Interactive: use smoothed physics TTL | Presentation: derive from samples
-  const highLimit = Number(safeLimits.hi || 370);
-  const rawPhysicsTTL = getSimTTL(currentValue, effectiveSlope, safeLimits);
+  const highLimit = Number(activeData.limits?.hi || 370);
+  const rawPhysicsTTL = getSimTTL(currentValue, effectiveSlope, activeData.limits);
   const physicsTTL   = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
 
-  const safeLimits  = normalizeLimits(activeData.limits); // final guard before any calc
-  const constraints = computeAllConstraints(currentValue, safeLimits, effectiveSlope);
+  const constraints = computeAllConstraints(currentValue, activeData.limits, effectiveSlope);
   const nearest     = getNearestConstraint(constraints);
 
   // timeToNearest is THE single source for all state derivation
@@ -470,7 +468,7 @@ export default function Home() {
   const computedState = getSystemState(timeToNearest);
   const systemState   = isInteractive ? derivedSystemState : (explicitUiState || computedState);
   const demoState     = isInteractive ? derivedSystemState : computedState;
-  const alarmState    = getAlarmState(currentValue, safeLimits);
+  const alarmState    = getAlarmState(currentValue, activeData.limits);
 
   // displayTTL and displaySlope feed every consumer
   const displayTTL   = timeToNearest;
