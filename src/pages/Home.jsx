@@ -92,19 +92,19 @@ export default function Home() {
   simRoRRef._scenarioBand = simRoRRef._scenarioBand || "NORMAL";
 
   // ── Band definitions: TTL [lo, hi] in minutes, RoR clamps, and noise ───────
-  // These drive both seeding and continuous soft-steering.
+  // These drive seeding and continuous soft-steering only. NOT used for state derivation.
   const BAND_CONFIG = {
-    NORMAL:         { ttlLo: 30, ttlHi: 58, rorMin: 0.10, rorMax: 0.40, noise: 0.025, steerK: 0.012 },
-    EARLY_DRIFT:    { ttlLo: 12, ttlHi: 30, rorMin: 0.28, rorMax: 0.75, noise: 0.035, steerK: 0.018 },
-    SEVERE_DRIFT:   { ttlLo:  4, ttlHi: 12, rorMin: 0.60, rorMax: 1.30, noise: 0.045, steerK: 0.030 },
-    IMMEDIATE_RISK: { ttlLo:  0.2, ttlHi: 4, rorMin: 1.00, rorMax: 2.20, noise: 0.055, steerK: 0.060 },
+    NORMAL:         { ttlLo: 35, ttlHi: 60, rorMin: 0.08, rorMax: 0.35, noise: 0.02,  steerK: 0.008 },
+    EARLY_DRIFT:    { ttlLo: 10, ttlHi: 35, rorMin: 0.30, rorMax: 0.70, noise: 0.03,  steerK: 0.015 },
+    SEVERE_DRIFT:   { ttlLo:  4, ttlHi: 10, rorMin: 0.65, rorMax: 1.20, noise: 0.04,  steerK: 0.025 },
+    IMMEDIATE_RISK: { ttlLo:  0.5, ttlHi: 4, rorMin: 1.00, rorMax: 2.00, noise: 0.05, steerK: 0.050 },
   };
 
-  // ── Derive named state from a TTL value — single source of truth ────────────
+  // ── Derive named state from a TTL value — matches getSystemState in calcEngine ──
   const getBandFromTTL = (ttlMin) => {
     if (ttlMin <= 4)  return "IMMEDIATE_RISK";
-    if (ttlMin <= 12) return "SEVERE_DRIFT";
-    if (ttlMin <= 30) return "EARLY_DRIFT";
+    if (ttlMin <= 10) return "SEVERE_DRIFT";
+    if (ttlMin <= 35) return "EARLY_DRIFT";
     return "NORMAL";
   };
 
