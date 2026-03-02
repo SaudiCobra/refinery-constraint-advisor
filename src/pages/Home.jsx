@@ -481,8 +481,8 @@ export default function Home() {
   // All state derived from timeToNearest — single source of truth
   // In interactive mode, systemState always == derivedSystemState (timer-driven).
   const computedState = getSystemState(timeToNearest);
-  const systemState   = isInteractive ? derivedSystemState : (explicitUiState || computedState);
-  const demoState     = isInteractive ? derivedSystemState : computedState;
+  const systemState   = explicitUiState || computedState;
+  const demoState     = computedState;
   const alarmState    = getAlarmState(currentValue, safeLimits);
 
   // displayTTL and displaySlope feed every consumer
