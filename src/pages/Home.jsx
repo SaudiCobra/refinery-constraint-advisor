@@ -252,17 +252,17 @@ export default function Home() {
     setTimeout(() => setMitigationMsg(""), 6000);
   };
 
-  // ── Scenario seeds: initial (temp, ror) chosen so TTL starts mid-band ───────
-  // limit = 370; TTL_target = mid-band; temp = limit - ror * TTL_target
-  // NORMAL:         ror=0.25, TTL≈48 → temp = 370 - 0.25*48 = 358.0
-  // EARLY_DRIFT:    ror=0.45, TTL≈22 → temp = 370 - 0.45*22 = 360.1
-  // SEVERE_DRIFT:   ror=0.85, TTL≈7.5→ temp = 370 - 0.85*7.5 = 363.6
-  // IMMEDIATE_RISK: ror=1.50, TTL≈2.6→ temp = 370 - 1.50*2.6 = 366.1
+  // ── Scenario seeds: (temp, ror) chosen so TTL starts mid-band ──────────────
+  // limit = 370; TTL_target = mid-band centre; temp = limit - ror * TTL_target
+  // NORMAL:         ror=0.20, TTL≈47 → temp = 370 - 0.20*47 = 360.6  (band 35–60, mid=47)
+  // EARLY_DRIFT:    ror=0.45, TTL≈22 → temp = 370 - 0.45*22 = 360.1  (band 10–35, mid=22)
+  // SEVERE_DRIFT:   ror=0.85, TTL≈7  → temp = 370 - 0.85*7  = 364.1  (band 4–10,  mid=7)
+  // IMMEDIATE_RISK: ror=1.50, TTL≈2  → temp = 370 - 1.50*2  = 367.0  (band 0.5–4, mid=2)
   const SCENARIO_SEEDS = {
-    NORMAL:         { temp: 358.0, ror: 0.25, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    NORMAL:         { temp: 360.6, ror: 0.20, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
     EARLY_DRIFT:    { temp: 360.1, ror: 0.45, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    SEVERE_DRIFT:   { temp: 363.6, ror: 0.85, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    IMMEDIATE_RISK: { temp: 366.1, ror: 1.50, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    SEVERE_DRIFT:   { temp: 364.1, ror: 0.85, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    IMMEDIATE_RISK: { temp: 367.0, ror: 1.50, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
   };
   const handleSelectScenario = (scenario) => {
     const seed = SCENARIO_SEEDS[scenario] || SCENARIO_SEEDS.NORMAL;
