@@ -87,6 +87,11 @@ export default function Home() {
 
   // Smoothed TTL for display (prevents jumps > 3 min per tick)
   const [smoothedTTL, setSmoothedTTL] = useState(null);
+  // Hysteresis state tracking: stablizes band transitions
+  const [hysteresisState, setHysteresisState] = useState("NORMAL");
+  const [stateEnteredAt, setStateEnteredAt] = useState(Date.now());
+  const hysteresisRef = useRef("NORMAL");
+  const stateEnteredAtRef = useRef(Date.now());
   const simTempRef = useRef(358.0);
   const simRoRRef  = useRef(0.25);
   simRoRRef._scenarioBand = simRoRRef._scenarioBand || "NORMAL";
