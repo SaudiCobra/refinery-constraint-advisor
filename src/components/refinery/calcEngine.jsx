@@ -104,11 +104,11 @@ export function getEscalationBand(slopeCpm, reactorOutC, coolerOutC) {
   return "NORMAL";
 }
 
-// NEW 4-band model — single source of truth for all state derivation
-// NORMAL: > 30 min | EARLY_DRIFT: 12–30 | SEVERE_DRIFT: 4–12 | IMMEDIATE_RISK: ≤ 4
+// 4-band model — single source of truth for all state derivation
+// NORMAL: > 35 min | EARLY_DRIFT: 10–35 | SEVERE_DRIFT: 4–10 | IMMEDIATE_RISK: ≤ 4
 export function getSystemState(timeMinutes) {
-  if (timeMinutes === Infinity || timeMinutes == null || timeMinutes > 30) return "NORMAL";
-  if (timeMinutes > 12) return "EARLY_DRIFT";
+  if (timeMinutes === Infinity || timeMinutes == null || timeMinutes > 35) return "NORMAL";
+  if (timeMinutes > 10) return "EARLY_DRIFT";
   if (timeMinutes > 4)  return "SEVERE_DRIFT";
   return "IMMEDIATE_RISK";
 }
