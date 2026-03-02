@@ -241,17 +241,13 @@ export function getRecommendation(level, nearest, equipment, coolingCapacity, pr
 export const COOLER_LIMITS = { hi: 90, hihi: 100, trip: 110, spec: "", rampRate: "" };
 
 // ── Derive cooler outlet temperature from reactor outlet temperature ───────────
-// Stable reactor (≤360°C) → coolerOut stays 45–55°C (well below hi=90).
-// Stressed reactor (360–390°C) → coolerOut rises steeply into alarm territory.
-// This prevents the cooler from becoming the binding TTL constraint during NORMAL operation.
+// Realistic ratio: cooler outlet tracks reactor at ~25% of absolute value above a base of ~40°C.
+// e.g. reactorOut=370 → coolerOut ≈ 40 + (370-280)*0.6 = 94°C
+// This keeps cooler temps in a realistic 55–110°C band across the full reactor range (280–390°C).
 export function deriveCoolerOutC(reactorOutC) {
-  if (reactorOutC <= 360) {
-    // Stable baseline: cooler stays cool, linear from 45°C at 280°C to 55°C at 360°C
-    return 45 + Math.max(0, reactorOutC - 280) * (10 / 80);
-  }
-  // Drift zone: rises more steeply above 360°C
-  const delta = reactorOutC - 360;
-  return Math.min(115, 55 + delta * 2.0);
+  const base = 45;
+  const delta = Math.max(0, reactorOutC - 360);
+  return Math.min(110, base + delta * 2.75);
 }
 
 // ── Compute combined (multi-variable) TTL ─────────────────────────────────────
