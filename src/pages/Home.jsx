@@ -30,7 +30,6 @@ import {
   computeCoolingCapacity,
   adjustTimeToConstraint,
   normalizeLimits,
-  computeMultiVarTTL,
   SCENARIOS,
   DEMONSTRATION_STAGES,
   HOT_SPOT_SCENARIO,
@@ -208,8 +207,8 @@ export default function Home() {
       simTempRef.current = temp;
       simRoRRef.current  = ror;
 
-      // Compute new raw TTL — multi-variable: min(reactor TTL, cooler TTL)
-      const rawTTL = computeMultiVarTTL(temp, limits, ror);
+      // Compute new raw TTL
+      const rawTTL = getSimTTL(temp, ror, limits);
 
       // Smooth: cap gain to +0.8 min/sec (anti-teleport), allow drops freely
       setSmoothedTTL(prev => {
@@ -399,20 +398,17 @@ export default function Home() {
   const currentValue  = isInteractive ? simTemp   : activeData.samples[activeData.samples.length - 1];
   const effectiveSlope = isInteractive ? simRoR   : computeRateOfRise(activeData.samples, activeData.interval);
 
-  // ── Compute TTL (single source of truth — multi-variable: reactor + cooler) ──
+  // ── Compute TTL (single source of truth) ────────────────────────────────────
   // Interactive: use smoothed physics TTL | Presentation: derive from samples
-  // Both use computeMultiVarTTL to ensure min(TTL_reactor, TTL_cooler) drives escalation.
-  const rawPhysicsTTL = computeMultiVarTTL(currentValue, activeData.limits, effectiveSlope);
-  const physicsTTL    = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
+  const highLimit = Number(activeData.limits?.hi || 370);
+  const rawPhysicsTTL = getSimTTL(currentValue, effectiveSlope, activeData.limits);
+  const physicsTTL   = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
 
   const constraints = computeAllConstraints(currentValue, activeData.limits, effectiveSlope);
   const nearest     = getNearestConstraint(constraints);
 
-  // Multi-var TTL for presentation mode: min of reactor and cooler TTLs
-  const presMultiTTL = computeMultiVarTTL(currentValue, activeData.limits, effectiveSlope);
-
   // timeToNearest is THE single source for all state derivation
-  const timeToNearest = isInteractive ? physicsTTL : presMultiTTL;
+  const timeToNearest = isInteractive ? physicsTTL : (nearest ? nearest.time : Infinity);
 
   // ── Ancillary calculations (all derived, never override timeToNearest) ───────
   const beds = simulateBedTemperatures(currentValue, effectiveSlope, activeData.equipment, 0);
@@ -499,9 +495,9 @@ export default function Home() {
     cooling: getRampPct(coolingTsRef, 'cooling'),
   };
 
-  // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL, multi-var)
+  // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL)
   const baselineTTL = isInteractive
-    ? computeMultiVarTTL(currentValue, activeData.limits, simRoRRef.current)  // unmitigated
+    ? getSimTTL(currentValue, simRoRRef.current, activeData.limits)  // unmitigated
     : null;
   const mitigatedTTL = isInteractive ? displayTTL : null;
   const minutesRecovered = (baselineTTL !== null && mitigatedTTL !== null)
