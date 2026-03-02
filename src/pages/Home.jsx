@@ -340,6 +340,11 @@ export default function Home() {
         setState(prev => ({ ...prev, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario, limits: seed.limits }));
       }
     });
+    // Reset hysteresis on scenario change
+    hysteresisRef.current = scenario;
+    stateEnteredAtRef.current = Date.now();
+    setHysteresisState(scenario);
+    setStateEnteredAt(Date.now());
     setSimRunning(true);
     setMitigationMsg("");
   };
