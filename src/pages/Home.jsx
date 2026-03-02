@@ -213,10 +213,10 @@ export default function Home() {
       // Compute raw TTL from multi-variable model (reactor + cooler min)
       const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
 
-      // Simple asymmetric EMA: TTL drops faster than it rises (no dip guards)
+      // Asymmetric EMA: TTL drops at alpha=0.35 (responsive), rises at alpha=0.12 (gradual recovery)
       setSmoothedTTL(prev => {
         if (prev === null) return rawTTL;
-        const alpha = rawTTL < prev ? 0.28 : 0.16; // drop faster than recover
+        const alpha = rawTTL < prev ? 0.35 : 0.12;
         return Math.max(0, prev + alpha * (rawTTL - prev));
       });
 
