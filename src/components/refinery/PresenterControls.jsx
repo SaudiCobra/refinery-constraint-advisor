@@ -101,7 +101,7 @@ export default function PresenterControls({ presScenario, onSelectScenario, onRe
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [prev, next]);
 
-  const scenarioName = SCENARIOS[presScenario]?.name || `Scenario ${presScenario + 1}`;
+  const scenarioName = (total > 0 ? SCENARIOS[safeIdx(presScenario)] : null)?.name || `Scenario ${presScenario + 1}`;
   // Strip leading number prefix for strip display (e.g. "1. Stable Baseline" → "Stable Baseline")
   const shortName = scenarioName.replace(/^\d+\.\s*/, "");
 
