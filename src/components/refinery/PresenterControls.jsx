@@ -27,6 +27,7 @@ function isInProximityZone(e) {
 
 export default function PresenterControls({ presScenario, onSelectScenario, onReset }) {
   const [panelOpen, setPanelOpen] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [visible, setVisible] = useState(false);   // controls opacity
   const hideTimerRef = useRef(null);
   const total = SCENARIOS.length;
