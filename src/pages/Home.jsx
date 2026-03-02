@@ -475,7 +475,6 @@ export default function Home() {
     setAutoCycling(false);
     setDemonstrationActive(false);
     setDemonstrationStage(0);
-    setSmoothedTTL(null);
   }, []);
 
   // ── Keyboard navigation — Presentation Mode only ─────────────────────────────
