@@ -551,7 +551,6 @@ export default function Home() {
     setAutoCycling(false);
     setDemonstrationActive(false);
     setDemonstrationStage(0);
-    setSmoothedTTL(null);
     if (cycleRef.current) clearInterval(cycleRef.current);
     if (sequenceRef.current) clearTimeout(sequenceRef.current);
     if (demoRef.current) clearInterval(demoRef.current);
