@@ -15,6 +15,9 @@ const SCENARIO_DESCRIPTORS = [
   "Rapid TTL compression — intervention window narrowing",
 ];
 
+// First N scenarios shown in main list; the rest go under "Advanced"
+const MAIN_SCENARIO_COUNT = 7;
+
 // Proximity zone: bottom center ± 220px wide, within 80px of bottom edge
 function isInProximityZone(e) {
   const cx = window.innerWidth / 2;
