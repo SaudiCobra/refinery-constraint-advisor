@@ -232,11 +232,9 @@ export default function Home() {
         let next = rawTTL;
         if (band === "NORMAL") {
           if (realDrift) {
-            // Real drift: respond quickly, no dip guard
             const alpha = next < prev ? 0.22 : 0.20;
             next = prev + alpha * (next - prev);
           } else {
-            // Noise: stay calm, small dip guard (1.5 min)
             if (next < prev) next = Math.max(next, prev - 1.5);
             const alpha = next < prev ? 0.10 : 0.25;
             next = prev + alpha * (next - prev);
@@ -247,6 +245,31 @@ export default function Home() {
         }
         return Math.max(0, next);
       });
+
+      // Hysteresis + min dwell: update hysteresisState with one-step transitions + 2s dwell
+      const nowMs = Date.now();
+      const prevHysteresisState = hysteresisRef.current;
+      const candidateState = getSystemStateWithHysteresis(rawTTL, prevHysteresisState);
+      const STATE_ORDER_LOCAL = ["NORMAL", "EARLY_DRIFT", "SEVERE_DRIFT", "IMMEDIATE_RISK"];
+      const prevIdx = STATE_ORDER_LOCAL.indexOf(prevHysteresisState);
+      const candIdx = STATE_ORDER_LOCAL.indexOf(candidateState);
+      let nextHysteresis = prevHysteresisState;
+      if (candIdx > prevIdx) {
+        // Downgrade (worse): enforce 2s min dwell
+        const elapsed = nowMs - stateEnteredAtRef.current;
+        if (elapsed >= 2000) {
+          nextHysteresis = candidateState;
+        }
+      } else if (candIdx < prevIdx) {
+        // Upgrade (better): allow immediately
+        nextHysteresis = candidateState;
+      }
+      if (nextHysteresis !== prevHysteresisState) {
+        hysteresisRef.current = nextHysteresis;
+        stateEnteredAtRef.current = nowMs;
+        setHysteresisState(nextHysteresis);
+        setStateEnteredAt(nowMs);
+      }
 
       setSimTemp(temp);
       setSimRoR(ror);
