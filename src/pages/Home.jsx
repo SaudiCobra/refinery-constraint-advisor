@@ -169,22 +169,15 @@ export default function Home() {
       // 1. Random RoR wander (small, unbiased)
       ror += (Math.random() - 0.5) * 2 * cfg.noise * decayScale;
 
-      // 2. Constant drift bias — ensures TTL bleeds downward within the band
-      //    Reduced proportionally when levers are active
-      if (!allFullMitigation) {
-        ror += cfg.drift * decayScale;
-      }
-
-      // 3. Soft band-steering — corrects overshoots only
-      //    When mitigating fully, pull RoR down to drive recovery
+      // 2. Closed-loop TTL steering: proportional controller drives TTL toward targetTTL
+      //    error > 0 → TTL above target → increase RoR to bring TTL down
+      //    error < 0 → TTL below target → decrease RoR to let TTL recover
       if (allFullMitigation) {
+        // Full mitigation: pull RoR down aggressively to drive recovery
         ror -= 0.06;
-      } else {
-        if (currentTTL < cfg.ttlLo) {
-          // TTL too low — overshoot prevention — bring RoR down
-          ror -= cfg.steerK * (cfg.ttlLo - currentTTL);
-        }
-        // No upper clamp needed — drift bias handles downward pressure naturally
+      } else if (cfg.k > 0) {
+        const error = currentTTL - cfg.targetTTL;
+        ror += error * cfg.k * decayScale;
       }
 
       // 3. Apply ramped mitigation
