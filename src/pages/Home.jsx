@@ -24,7 +24,6 @@ import {
   computeAllConstraints,
   getNearestConstraint,
   getSystemState,
-  computeMultiVarTTL as computeMultiVarTTLEngine,
   getEscalationLevel,
   getAlarmState,
   getRecommendation,
