@@ -218,23 +218,18 @@ export default function Home() {
       // Compute new raw TTL — multi-variable: min(reactor TTL, cooler TTL)
       const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
 
-      // State-aware smoothing: calm in NORMAL unless real drift detected
+      // State-aware smoothing: calm in NORMAL, responsive in drift states
       setSmoothedTTL(prev => {
         if (prev === null) return rawTTL;
         const band = getSystemState(prev);
-        const realDrift = simRoRRef.current >= 0.35 || rawTTL <= prev - 3;
         let next = rawTTL;
         if (band === "NORMAL") {
-          if (realDrift) {
-            // Real drift: respond quickly, no dip guard
-            const alpha = next < prev ? 0.22 : 0.20;
-            next = prev + alpha * (next - prev);
-          } else {
-            // Noise: stay calm, small dip guard (1.5 min)
-            if (next < prev) next = Math.max(next, prev - 1.5);
-            const alpha = next < prev ? 0.10 : 0.25;
-            next = prev + alpha * (next - prev);
+          // Dip guard: clamp transient noise drops to max 2 min in NORMAL
+          if (next < prev && (prev - next) < 10) {
+            next = Math.max(next, prev - 2.0);
           }
+          const alpha = next < prev ? 0.08 : 0.25;
+          next = prev + alpha * (next - prev);
         } else {
           const alpha = next < prev ? 0.22 : 0.18;
           next = prev + alpha * (next - prev);
