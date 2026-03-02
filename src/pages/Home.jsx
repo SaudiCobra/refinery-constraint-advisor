@@ -37,6 +37,7 @@ import {
   HOT_SPOT_SCENARIO,
 } from "@/components/refinery/calcEngine";
 import {
+  computeMitigatedRoR,
   computeMitigatedTimeToLimit,
   clampTimeToBaseline,
   getLeverEffect,
@@ -68,8 +69,9 @@ export default function Home() {
   const [preheatActive, setPreheatActive] = useState(false);
 
   // ── Physics simulation state (interactive mode only) ────────────────────────
-  const [simTemp,    setSimTemp]    = useState(352.0); // seeds NORMAL — good margin
-  const [simRoR,     setSimRoR]     = useState(0.18);  // seeds NORMAL desired RoR
+  // These are the raw physics variables; all display values derive from them.
+  const [simTemp,   setSimTemp]   = useState(358.0); // currentOutletTempC — seeds NORMAL mid-band
+  const [simRoR,    setSimRoR]    = useState(0.25);  // rateOfRiseC_per_min — seeds NORMAL
   const [simRunning, setSimRunning] = useState(true);
   const [mitigationMsg, setMitigationMsg] = useState("");
 
@@ -82,27 +84,21 @@ export default function Home() {
   const h2TsRef      = useRef(null);
   const coolingTsRef = useRef(null);
 
-  // Smoothed TTL for display — asymmetric EMA only
+  // Smoothed TTL for display — simple asymmetric EMA, no dip guards
   const [smoothedTTL, setSmoothedTTL] = useState(null);
+  const simTempRef = useRef(358.0);
+  const simRoRRef  = useRef(0.25);
+  simRoRRef._scenarioBand = simRoRRef._scenarioBand || "NORMAL";
 
-  // Physics refs — single source of truth inside the tick closure
-  const simTempRef = useRef(352.0);
-  const simRoRRef  = useRef(0.18);
-
-  // Per-action ramped effect scalars [0..1], updated each tick via first-order lag
-  const feedEffectRef    = useRef(0);
-  const h2EffectRef      = useRef(0);
-  const coolingEffectRef = useRef(0);
-
-  // Which scenario band is active (drives desiredRoR)
-  const scenarioBandRef = useRef("NORMAL");
-
-  // desiredRoR per scenario band — reflects "what the process wants" without forcing TTL
-  const DESIRED_ROR = {
-    NORMAL:         0.18,
-    EARLY_DRIFT:    0.42,
-    SEVERE_DRIFT:   0.95,
-    IMMEDIATE_RISK: 1.45,
+  // ── Band config: TTL targets, RoR clamps, noise, proportional steering gains ──
+  // targetTTL: where the closed-loop controller drives TTL within the band.
+  // k: proportional gain; error = (currentTTL - targetTTL); ror += error * k.
+  // IMMEDIATE_RISK k=0: no steering at the edge — just hold whatever RoR the scenario set.
+  const BAND_CONFIG = {
+    NORMAL:         { targetTTL: 45, rorMin: 0.10, rorMax: 0.30, noise: 0.012, k: 0.010 },
+    EARLY_DRIFT:    { targetTTL: 22, rorMin: 0.30, rorMax: 0.65, noise: 0.020, k: 0.016 },
+    SEVERE_DRIFT:   { targetTTL:  8, rorMin: 0.65, rorMax: 1.10, noise: 0.030, k: 0.020 },
+    IMMEDIATE_RISK: { targetTTL:  3, rorMin: 1.10, rorMax: 1.70, noise: 0.040, k: 0.000 },
   };
 
   // ── Derive named state from a TTL value — matches getSystemState in calcEngine ──
@@ -111,6 +107,14 @@ export default function Home() {
     if (ttlMin <= 10) return "SEVERE_DRIFT";
     if (ttlMin <= 35) return "EARLY_DRIFT";
     return "NORMAL";
+  };
+
+  // Derive computed TTL + state from sim vars (pure function, no state)
+  const getSimTTL = (temp, ror, limits) => {
+    const limitVal = Number(limits?.hi || 370);
+    const margin   = limitVal - temp;
+    if (margin <= 0) return 0;
+    return margin / Math.max(ror, 0.05);
   };
 
   // ── Safe scenario index helper ────────────────────────────────────────────
@@ -130,64 +134,80 @@ export default function Home() {
   const demoRef = useRef(null);
 
   // ── Real-time physics tick ──────────────────────────────────────────────────
-  // Models real DCS behavior: RoR has inertia (first-order lag toward desiredRoR),
-  // corrective actions ramp in gradually, temperature integrates from RoR.
+  // DT = 1/60 min per real second. Band steering nudges RoR to keep TTL drifting
+  // through each named band without getting stuck or skipping.
   useEffect(() => {
     if (!simRunning || displayMode !== "interactive") return;
-    const DT = 1 / 60; // demo-minutes per real second (1 tick/second)
-    const ROR_LAG = 0.06; // how fast simRoR tracks desiredRoR (per tick)
-
-    // Per-action effect lag constants (effectLag = 1 - exp(-dt/tau))
-    // feed: ramps in ~7s → lag ≈ 0.13, quench: ~15s → lag ≈ 0.065, cooling: ~25s → lag ≈ 0.04
-    const ACTION_LAG = { feed: 0.13, h2: 0.065, cooling: 0.04 };
-    // Max fractional RoR reduction per action
-    const ACTION_MAX = { feed: 0.35, h2: 0.25, cooling: 0.20 };
+    const DT = 1 / 60; // demo-minutes per real second
 
     const tick = setInterval(() => {
       let temp = simTempRef.current;
       let ror  = simRoRRef.current;
       const limits = state.limits;
-      const band = scenarioBandRef.current || "NORMAL";
 
-      // 1. Ramp per-action effect scalars toward target (0 when OFF, 1 when fully ON)
-      const rampEffect = (ref, key) => {
-        const target = (key === 'feed' ? feedTsRef.current : key === 'h2' ? h2TsRef.current : coolingTsRef.current) !== null ? 1 : 0;
-        ref.current = ref.current + (target - ref.current) * ACTION_LAG[key];
+      // Current raw TTL (reactor only — cooler TTL is computed later for display)
+      const currentTTL   = getSimTTL(temp, ror, limits);
+      const scenarioBand = simRoRRef._scenarioBand || "NORMAL";
+      const cfg = BAND_CONFIG[scenarioBand] || BAND_CONFIG.NORMAL;
+
+      // Check if all 3 levers are ON and fully ramped
+      const checkFullRamp = (tsMs, action) => {
+        if (tsMs === null) return false;
+        const { delaySec, rampSec } = ACTION_PARAMS[action];
+        return (Date.now() - tsMs) / 1000 >= delaySec + rampSec;
       };
-      rampEffect(feedEffectRef,    'feed');
-      rampEffect(h2EffectRef,      'h2');
-      rampEffect(coolingEffectRef, 'cooling');
+      const allFullMitigation =
+        checkFullRamp(feedTsRef.current,    'feed')    &&
+        checkFullRamp(h2TsRef.current,      'h2')      &&
+        checkFullRamp(coolingTsRef.current, 'cooling');
 
-      // 2. Combined mitigation effect on desiredRoR (capped at 65%)
-      const totalEffect = Math.min(0.65,
-        feedEffectRef.current    * ACTION_MAX.feed +
-        h2EffectRef.current      * ACTION_MAX.h2 +
-        coolingEffectRef.current * ACTION_MAX.cooling
-      );
+      const activeLeverCount = [feedTsRef.current, h2TsRef.current, coolingTsRef.current]
+        .filter(ts => ts !== null).length;
+      // Levers reduce worsening forces; 3 active levers nearly silence drift
+      const decayScale = [1.00, 0.70, 0.30, 0.10][activeLeverCount] ?? 1.00;
 
-      // 3. desiredRoR from scenario band, reduced by active mitigations
-      const baseDesired = DESIRED_ROR[band] ?? DESIRED_ROR.NORMAL;
-      const desiredRoR  = baseDesired * (1 - totalEffect);
+      // 1. Random RoR wander (small, unbiased)
+      ror += (Math.random() - 0.5) * 2 * cfg.noise * decayScale;
 
-      // 4. First-order lag: simRoR moves slowly toward desiredRoR (inertia)
-      ror = ror + (desiredRoR - ror) * ROR_LAG;
+      // 2. Closed-loop TTL steering: proportional controller drives TTL toward targetTTL
+      //    error > 0 → TTL above target → increase RoR to bring TTL down
+      //    error < 0 → TTL below target → decrease RoR to let TTL recover
+      if (allFullMitigation) {
+        // Full mitigation: pull RoR down aggressively to drive recovery
+        ror -= 0.06;
+      } else if (cfg.k > 0) {
+        const error = currentTTL - cfg.targetTTL;
+        ror += error * cfg.k * decayScale;
+      }
 
-      // 5. Small jitter on RoR only (process noise, not on TTL)
-      ror += (Math.random() - 0.5) * 0.06;
+      // 3. Apply ramped mitigation
+      const { effectiveRoR } = computeMitigatedRoR(ror, {
+        feedTs:    feedTsRef.current,
+        h2Ts:      h2TsRef.current,
+        coolingTs: coolingTsRef.current,
+      });
+      ror = effectiveRoR;
 
-      // 6. Hard clamp RoR to physically plausible range
-      ror = Math.max(0.08, Math.min(1.70, ror));
+      // 4. Hard-clamp RoR (allow below band floor during active mitigation)
+      const anyMitig = activeLeverCount > 0;
+      const rorFloor = anyMitig ? 0.02 : cfg.rorMin;
+      ror = Math.max(rorFloor, Math.min(cfg.rorMax, ror));
 
-      // 7. Integrate temperature
-      temp = temp + ror * DT;
+      // 4b. Thermal recovery assist when all 3 levers fully ramped
+      if (allFullMitigation && getSimTTL(temp, ror, limits) < 58) {
+        temp -= 0.05; // pull temp down, makes TTL climb
+      }
+
+      // 5. Advance temperature
+      temp += ror * DT + (Math.random() - 0.5) * 0.03 * DT;
 
       simTempRef.current = temp;
       simRoRRef.current  = ror;
 
-      // 8. Compute raw TTL from multi-variable model (reactor + cooler min)
+      // Compute raw TTL from multi-variable model (reactor + cooler min)
       const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
 
-      // 9. Asymmetric EMA smoothing — no pinning or dip guards
+      // Asymmetric EMA: drops at 0.22 (responsive), rises at 0.16 (gradual recovery)
       setSmoothedTTL(prev => {
         if (prev === null) return rawTTL;
         const alpha = rawTTL < prev ? 0.22 : 0.16;
@@ -229,33 +249,27 @@ export default function Home() {
     setTimeout(() => setMitigationMsg(""), 6000);
   };
 
-  // ── Scenario seeds: (temp, ror) mid-band starting points ──────────────────
-  // Seeds place the simulation at the centre of each named band so the operator
-  // can immediately see the correct state without waiting for the physics to ramp.
-  // limit=370; temp = limit - desiredRoR * midBandTTL
-  // NORMAL:         desiredRoR=0.18, TTL≈100 → temp=352 (huge margin, calm)
-  // EARLY_DRIFT:    desiredRoR=0.42, TTL≈22  → temp=370-0.42*22=360.8
-  // SEVERE_DRIFT:   desiredRoR=0.95, TTL≈7   → temp=370-0.95*7=363.4
-  // IMMEDIATE_RISK: desiredRoR=1.45, TTL≈2   → temp=370-1.45*2=367.1
+  // ── Scenario seeds: (temp, ror) chosen so TTL starts mid-band ──────────────
+  // limit = 370; TTL_target = mid-band centre; temp = limit - ror * TTL_target
+  // NORMAL:         ror=0.20, TTL≈47 → temp = 370 - 0.20*47 = 360.6  (band 35–60, mid=47)
+  // EARLY_DRIFT:    ror=0.45, TTL≈22 → temp = 370 - 0.45*22 = 360.1  (band 10–35, mid=22)
+  // SEVERE_DRIFT:   ror=0.85, TTL≈7  → temp = 370 - 0.85*7  = 364.1  (band 4–10,  mid=7)
+  // IMMEDIATE_RISK: ror=1.50, TTL≈2  → temp = 370 - 1.50*2  = 367.0  (band 0.5–4, mid=2)
   const SCENARIO_SEEDS = {
-    NORMAL:         { temp: 352.0, ror: 0.18, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    EARLY_DRIFT:    { temp: 360.8, ror: 0.42, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    SEVERE_DRIFT:   { temp: 363.4, ror: 0.95, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
-    IMMEDIATE_RISK: { temp: 367.1, ror: 1.45, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    NORMAL:         { temp: 360.6, ror: 0.20, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    EARLY_DRIFT:    { temp: 360.1, ror: 0.45, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    SEVERE_DRIFT:   { temp: 364.1, ror: 0.85, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    IMMEDIATE_RISK: { temp: 367.0, ror: 1.50, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
   };
-
   const handleSelectScenario = (scenario) => {
     const seed = SCENARIO_SEEDS[scenario] || SCENARIO_SEEDS.NORMAL;
-    simTempRef.current   = seed.temp;
-    simRoRRef.current    = seed.ror;
-    scenarioBandRef.current = scenario;
-    // Reset action ramp effects so new scenario starts clean
-    feedEffectRef.current    = 0;
-    h2EffectRef.current      = 0;
-    coolingEffectRef.current = 0;
+    simTempRef.current = seed.temp;
+    simRoRRef.current  = seed.ror;
+    simRoRRef._scenarioBand = scenario;
     setSimTemp(seed.temp);
     setSimRoR(seed.ror);
     setSmoothedTTL(null);
+    // Reset all mitigation levers on scenario change
     feedTsRef.current    = null;
     h2TsRef.current      = null;
     coolingTsRef.current = null;
@@ -270,6 +284,7 @@ export default function Home() {
       }
     });
     setSimRunning(true);
+    setMitigationMsg("");
   };
 
   // Auto-cycle logic
@@ -419,11 +434,12 @@ export default function Home() {
   // Both modes: pure TTL-driven, stateless. getSystemState(TTL) is single source of truth.
   const derivedSystemState = getBandFromTTL(timeToNearest);
 
-  // Auto-update scenario band as TTL crosses thresholds — this is what drives staged progression
+  // Auto-steer scenario band so physics keeps TTL in the right range
   useEffect(() => {
     if (!isInteractive || !simRunning) return;
-    if (scenarioBandRef.current !== derivedSystemState) {
-      scenarioBandRef.current = derivedSystemState;
+    const current = simRoRRef._scenarioBand || "NORMAL";
+    if (current !== derivedSystemState) {
+      simRoRRef._scenarioBand = derivedSystemState;
     }
   }, [derivedSystemState, isInteractive, simRunning]);
 
