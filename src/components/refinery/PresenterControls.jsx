@@ -74,14 +74,16 @@ export default function PresenterControls({ presScenario, onSelectScenario, onRe
     return () => window.removeEventListener("mousemove", onMouseMove);
   }, [visible, scheduleHide]);
 
+  const safeIdx = (i) => Math.max(0, Math.min(i, total - 1));
+
   const prev = useCallback(() => {
     if (!total) return;
-    onSelectScenario(Math.max(0, (presScenario - 1 + total) % total));
+    onSelectScenario(safeIdx(presScenario - 1 < 0 ? 0 : presScenario - 1));
   }, [presScenario, total, onSelectScenario]);
 
   const next = useCallback(() => {
     if (!total) return;
-    onSelectScenario(Math.min(total - 1, (presScenario + 1) % total));
+    onSelectScenario(safeIdx(presScenario + 1 >= total ? total - 1 : presScenario + 1));
   }, [presScenario, total, onSelectScenario]);
 
   // Keyboard navigation — only in presentation mode (this component is mounted only then)
