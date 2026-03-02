@@ -608,7 +608,6 @@ export default function Home() {
         {alarmsOnly && (
           <AlarmsOnlyView
             currentValue={currentValue}
-            alarmState={alarmState}
             limits={activeData.limits}
             units={activeData.units}
           />
