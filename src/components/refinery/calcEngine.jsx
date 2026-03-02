@@ -206,6 +206,36 @@ export function getRecommendation(level, nearest, equipment, coolingCapacity, pr
   return "Immediate escalation required. Notify shift lead now.";
 }
 
+// ── Cooler limits (effluent cooler outlet temperature, °C) ────────────────────
+export const COOLER_LIMITS = { hi: 90, hihi: 100, trip: 110, spec: "", rampRate: "" };
+
+// ── Derive cooler outlet temperature from reactor outlet temperature ───────────
+// Realistic ratio: cooler outlet tracks reactor at ~25% of absolute value above a base of ~40°C.
+// e.g. reactorOut=370 → coolerOut ≈ 40 + (370-280)*0.6 = 94°C
+// This keeps cooler temps in a realistic 55–110°C band across the full reactor range (280–390°C).
+export function deriveCoolerOutC(reactorOutC) {
+  return 40 + Math.max(0, reactorOutC - 280) * 0.6;
+}
+
+// ── Compute combined (multi-variable) TTL ─────────────────────────────────────
+// Returns the MINIMUM of reactor-TTL and cooler-TTL.
+// slope is in the same units for both (°C/min for reactor; cooler tracks proportionally).
+export function computeMultiVarTTL(reactorOutC, reactorLimits, slope) {
+  const rLimits = normalizeLimits(reactorLimits);
+  const reactorConstraints = computeAllConstraints(reactorOutC, rLimits, slope);
+  const reactorNearest = getNearestConstraint(reactorConstraints);
+  const ttlReactor = reactorNearest ? reactorNearest.time : Infinity;
+
+  const coolerOutC = deriveCoolerOutC(reactorOutC);
+  // Cooler outlet rises at ~60% of reactor slope
+  const slopeCooler = slope * 0.6;
+  const coolerConstraints = computeAllConstraints(coolerOutC, COOLER_LIMITS, slopeCooler);
+  const coolerNearest = getNearestConstraint(coolerConstraints);
+  const ttlCooler = coolerNearest ? coolerNearest.time : Infinity;
+
+  return Math.min(ttlReactor, ttlCooler);
+}
+
 // Interactive Mode Demo Scenarios (4 only - scenario-driven with explicit uiState)
 // baseRoR per scenario: (highLimit=370 - currentTemp) / targetTTL
 // NORMAL:        margin=18, TTL≈60min → baseRoR=0.30°C/min  (step=0.60°C per 2-min interval)
