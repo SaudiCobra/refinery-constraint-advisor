@@ -499,9 +499,9 @@ export default function Home() {
     cooling: getRampPct(coolingTsRef, 'cooling'),
   };
 
-  // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL)
+  // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL, multi-var)
   const baselineTTL = isInteractive
-    ? getSimTTL(currentValue, simRoRRef.current, activeData.limits)  // unmitigated
+    ? computeMultiVarTTL(currentValue, activeData.limits, simRoRRef.current)  // unmitigated
     : null;
   const mitigatedTTL = isInteractive ? displayTTL : null;
   const minutesRecovered = (baselineTTL !== null && mitigatedTTL !== null)
