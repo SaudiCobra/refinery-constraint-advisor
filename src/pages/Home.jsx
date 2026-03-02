@@ -69,9 +69,8 @@ export default function Home() {
   const [preheatActive, setPreheatActive] = useState(false);
 
   // ── Physics simulation state (interactive mode only) ────────────────────────
-  // These are the raw physics variables; all display values derive from them.
-  const [simTemp,   setSimTemp]   = useState(358.0); // currentOutletTempC — seeds NORMAL mid-band
-  const [simRoR,    setSimRoR]    = useState(0.25);  // rateOfRiseC_per_min — seeds NORMAL
+  const [simTemp,    setSimTemp]    = useState(352.0); // seeds NORMAL — good margin
+  const [simRoR,     setSimRoR]     = useState(0.18);  // seeds NORMAL desired RoR
   const [simRunning, setSimRunning] = useState(true);
   const [mitigationMsg, setMitigationMsg] = useState("");
 
@@ -84,21 +83,27 @@ export default function Home() {
   const h2TsRef      = useRef(null);
   const coolingTsRef = useRef(null);
 
-  // Smoothed TTL for display — simple asymmetric EMA, no dip guards
+  // Smoothed TTL for display — asymmetric EMA only
   const [smoothedTTL, setSmoothedTTL] = useState(null);
-  const simTempRef = useRef(358.0);
-  const simRoRRef  = useRef(0.25);
-  simRoRRef._scenarioBand = simRoRRef._scenarioBand || "NORMAL";
 
-  // ── Band config: TTL targets, RoR clamps, noise, proportional steering gains ──
-  // targetTTL: where the closed-loop controller drives TTL within the band.
-  // k: proportional gain; error = (currentTTL - targetTTL); ror += error * k.
-  // IMMEDIATE_RISK k=0: no steering at the edge — just hold whatever RoR the scenario set.
-  const BAND_CONFIG = {
-    NORMAL:         { targetTTL: 45, rorMin: 0.10, rorMax: 0.30, noise: 0.012, k: 0.010 },
-    EARLY_DRIFT:    { targetTTL: 22, rorMin: 0.30, rorMax: 0.65, noise: 0.020, k: 0.016 },
-    SEVERE_DRIFT:   { targetTTL:  8, rorMin: 0.65, rorMax: 1.10, noise: 0.030, k: 0.020 },
-    IMMEDIATE_RISK: { targetTTL:  3, rorMin: 1.10, rorMax: 1.70, noise: 0.040, k: 0.000 },
+  // Physics refs — single source of truth inside the tick closure
+  const simTempRef = useRef(352.0);
+  const simRoRRef  = useRef(0.18);
+
+  // Per-action ramped effect scalars [0..1], updated each tick via first-order lag
+  const feedEffectRef    = useRef(0);
+  const h2EffectRef      = useRef(0);
+  const coolingEffectRef = useRef(0);
+
+  // Which scenario band is active (drives desiredRoR)
+  const scenarioBandRef = useRef("NORMAL");
+
+  // desiredRoR per scenario band — reflects "what the process wants" without forcing TTL
+  const DESIRED_ROR = {
+    NORMAL:         0.18,
+    EARLY_DRIFT:    0.42,
+    SEVERE_DRIFT:   0.95,
+    IMMEDIATE_RISK: 1.45,
   };
 
   // ── Derive named state from a TTL value — matches getSystemState in calcEngine ──
@@ -107,14 +112,6 @@ export default function Home() {
     if (ttlMin <= 10) return "SEVERE_DRIFT";
     if (ttlMin <= 35) return "EARLY_DRIFT";
     return "NORMAL";
-  };
-
-  // Derive computed TTL + state from sim vars (pure function, no state)
-  const getSimTTL = (temp, ror, limits) => {
-    const limitVal = Number(limits?.hi || 370);
-    const margin   = limitVal - temp;
-    if (margin <= 0) return 0;
-    return margin / Math.max(ror, 0.05);
   };
 
   // ── Safe scenario index helper ────────────────────────────────────────────
