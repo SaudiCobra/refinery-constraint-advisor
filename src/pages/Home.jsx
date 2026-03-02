@@ -430,13 +430,12 @@ export default function Home() {
     cooling: getRampPct(coolingTsRef, 'cooling'),
   };
 
-  // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL, multi-var)
+  // Minutes recovered = engine's TTL vs baseline (no-mitigation snapshot)
   const baselineTTL = isInteractive
-    ? computeMultiVarTTL(currentValue, safeLimits, simRoRRef.current).finalTTL  // unmitigated
+    ? computeMultiVarTTL(currentValue, safeLimits, engineState.rorCpm).finalTTL
     : null;
-  const mitigatedTTL = isInteractive ? displayTTL : null;
-  const minutesRecovered = (baselineTTL !== null && mitigatedTTL !== null)
-    ? Math.max(0, mitigatedTTL - baselineTTL)
+  const minutesRecovered = baselineTTL !== null
+    ? Math.max(0, displayTTL - baselineTTL)
     : 0;
 
   const handleRunDemo = useCallback((scenarioIndex) => {
