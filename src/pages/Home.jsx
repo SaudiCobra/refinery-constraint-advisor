@@ -490,9 +490,9 @@ export default function Home() {
   const hotSpotRisk     = computeHotSpotRisk(bedImbalance, activeData.equipment, coolingCapacity, effectiveSlope);
 
   // ── Derive system state from live TTL ──────────────────────────────────────
-  // derivedSystemState always follows the timer — used when demoActive is true
-  // so the entire UI automatically tracks the countdown across band thresholds.
-  const derivedSystemState = getBandFromTTL(timeToNearest);
+  // Interactive: use hysteresis-stabilized state to prevent bouncing + skipping.
+  // Presentation: use raw TTL-driven band (no hysteresis needed — static data).
+  const derivedSystemState = isInteractive ? hysteresisState : getBandFromTTL(timeToNearest);
 
   // When the interactive sim is running, auto-steer the scenario band to match
   // the derived state so steering stays in the right RoR range automatically.
