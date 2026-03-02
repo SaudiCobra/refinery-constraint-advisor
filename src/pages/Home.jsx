@@ -303,7 +303,7 @@ export default function Home() {
   useEffect(() => {
     if (autoCycling && displayMode === "presentation") {
       cycleRef.current = setInterval(() => {
-        setPresScenario(prev => (prev + 1) % SCENARIOS.length);
+        setPresScenario(prev => safeScenarioIndex((prev + 1) % Math.max(1, SCENARIOS.length), SCENARIOS.length));
         setSequenceStage(0);
       }, 5000);
     }
