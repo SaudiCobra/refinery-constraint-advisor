@@ -417,11 +417,7 @@ export default function Home() {
   const isInteractive = displayMode === "interactive";
 
   const currentValue  = isInteractive ? simTemp   : activeData.samples[activeData.samples.length - 1];
-  const rawSlope = isInteractive ? simRoR : computeRateOfRise(activeData.samples, activeData.interval);
-  // Drift stress multiplier — interactive only, applied when RoR >= 0.45 or already in drift band
-  const currentBandForStress = isInteractive ? getBandFromTTL(smoothedTTL ?? Infinity) : null;
-  const isDrifting = isInteractive && (rawSlope >= 0.45 || (currentBandForStress && currentBandForStress !== "NORMAL"));
-  const effectiveSlope = isDrifting ? rawSlope * 1.18 : rawSlope;
+  const effectiveSlope = isInteractive ? simRoR   : computeRateOfRise(activeData.samples, activeData.interval);
 
   // ── Guard: ensure limits are always defined before constraint calculations ───
   const safeLimits = normalizeLimits(activeData.limits, DEFAULTS.limits);
