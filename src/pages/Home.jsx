@@ -37,7 +37,6 @@ import {
   HOT_SPOT_SCENARIO,
 } from "@/components/refinery/calcEngine";
 import {
-  computeMitigatedRoR,
   computeMitigatedTimeToLimit,
   clampTimeToBaseline,
   getLeverEffect,
