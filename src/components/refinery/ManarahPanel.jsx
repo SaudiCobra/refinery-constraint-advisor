@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { X, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowUp, ArrowDown, Minus } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
