@@ -370,14 +370,15 @@ export default function Home() {
             opMode: stage.opMode,
           };
         }
-        
-        const scenario = SCENARIOS[presScenario];
+
+        const safeIdx = safeScenarioIndex(presScenario, SCENARIOS.length);
+        const scenario = SCENARIOS[safeIdx];
         if (!scenario) {
-          console.warn(`[Manarah] Scenario at index ${presScenario} is undefined — falling back to defaults.`);
+          console.warn(`[Manarah] Scenario at index ${safeIdx} is undefined — falling back to stable baseline.`);
           return { ...DEFAULTS };
         }
         if (scenario.isSequence && scenario.stages) {
-          const stage = scenario.stages[sequenceStage] || scenario.stages[0];
+          const stage = scenario.stages[safeScenarioIndex(sequenceStage, scenario.stages.length)] || scenario.stages[0];
           return {
             ...DEFAULTS,
             samples: stage.samples,
