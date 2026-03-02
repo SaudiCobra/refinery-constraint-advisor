@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { initInteractiveState, stepInteractiveState } from "@/components/refinery/interactiveEngine";
 import GlobalHeader from "@/components/refinery/GlobalHeader";
 import AlarmBanner from "@/components/refinery/AlarmBanner";
 import HeroMetric from "@/components/refinery/HeroMetric";
@@ -38,6 +37,8 @@ import {
   HOT_SPOT_SCENARIO,
 } from "@/components/refinery/calcEngine";
 import {
+  computeMitigatedTimeToLimit,
+  clampTimeToBaseline,
   getLeverEffect,
   ACTION_PARAMS,
 } from "@/components/refinery/mitigationEngine";
@@ -66,28 +67,45 @@ export default function Home() {
   const [state, setState] = useState({ ...DEFAULTS });
   const [preheatActive, setPreheatActive] = useState(false);
 
-  // ── Interactive engine state ──────────────────────────────────────────────
+  // ── Physics simulation state (interactive mode only) ────────────────────────
+  const [simTemp,    setSimTemp]    = useState(352.0); // seeds NORMAL — good margin
+  const [simRoR,     setSimRoR]     = useState(0.18);  // seeds NORMAL desired RoR
   const [simRunning, setSimRunning] = useState(true);
   const [mitigationMsg, setMitigationMsg] = useState("");
 
-  // Mitigation toggle state (UI)
+  // ── Mitigation toggle state ───────────────────────────────────────────────
   const [feedReductionActive, setFeedReductionActive] = useState(false);
   const [quenchBoostActive,   setQuenchBoostActive]   = useState(false);
   const [coolingBoostActive,  setCoolingBoostActive]  = useState(false);
-  // Activation timestamps for rampProgress UI only
+  // Activation timestamps (null = OFF). Refs so tick reads without stale closure.
   const feedTsRef    = useRef(null);
   const h2TsRef      = useRef(null);
   const coolingTsRef = useRef(null);
 
-  // Which drift mode is selected — drives desiredRoR in engine
-  const driftModeRef = useRef("NORMAL");
+  // Smoothed TTL for display — asymmetric EMA only
+  const [smoothedTTL, setSmoothedTTL] = useState(null);
 
-  // Engine state ref — single source of truth inside tick closure
-  const engineStateRef = useRef(initInteractiveState(DEFAULTS.limits));
-  // Reactive state for rendering
-  const [engineState, setEngineState] = useState(engineStateRef.current);
+  // Physics refs — single source of truth inside the tick closure
+  const simTempRef = useRef(352.0);
+  const simRoRRef  = useRef(0.18);
 
-  // ── Derive named state from TTL ───────────────────────────────────────────
+  // Per-action ramped effect scalars [0..1], updated each tick via first-order lag
+  const feedEffectRef    = useRef(0);
+  const h2EffectRef      = useRef(0);
+  const coolingEffectRef = useRef(0);
+
+  // Which scenario band is active (drives desiredRoR)
+  const scenarioBandRef = useRef("NORMAL");
+
+  // desiredRoR per scenario band — reflects "what the process wants" without forcing TTL
+  const DESIRED_ROR = {
+    NORMAL:         0.18,
+    EARLY_DRIFT:    0.42,
+    SEVERE_DRIFT:   0.95,
+    IMMEDIATE_RISK: 1.45,
+  };
+
+  // ── Derive named state from a TTL value — matches getSystemState in calcEngine ──
   const getBandFromTTL = (ttlMin) => {
     if (ttlMin <= 4)  return "IMMEDIATE_RISK";
     if (ttlMin <= 10) return "SEVERE_DRIFT";
@@ -111,32 +129,73 @@ export default function Home() {
   const sequenceRef = useRef(null);
   const demoRef = useRef(null);
 
-  // ── Interactive engine tick ───────────────────────────────────────────────
+  // ── Real-time physics tick ──────────────────────────────────────────────────
+  // Models real DCS behavior: RoR has inertia (first-order lag toward desiredRoR),
+  // corrective actions ramp in gradually, temperature integrates from RoR.
   useEffect(() => {
     if (!simRunning || displayMode !== "interactive") return;
-    let lastTs = Date.now();
+    const DT = 1 / 60; // demo-minutes per real second (1 tick/second)
+    const ROR_LAG = 0.06; // how fast simRoR tracks desiredRoR (per tick)
+
+    // Per-action effect lag constants (effectLag = 1 - exp(-dt/tau))
+    // feed: ramps in ~7s → lag ≈ 0.13, quench: ~15s → lag ≈ 0.065, cooling: ~25s → lag ≈ 0.04
+    const ACTION_LAG = { feed: 0.13, h2: 0.065, cooling: 0.04 };
+    // Max fractional RoR reduction per action
+    const ACTION_MAX = { feed: 0.35, h2: 0.25, cooling: 0.20 };
 
     const tick = setInterval(() => {
-      const now   = Date.now();
-      const dtMs  = now - lastTs;
-      lastTs = now;
+      let temp = simTempRef.current;
+      let ror  = simRoRRef.current;
+      const limits = state.limits;
+      const band = scenarioBandRef.current || "NORMAL";
 
-      const next = stepInteractiveState(
-        engineStateRef.current,
-        {
-          driftMode: driftModeRef.current,
-          limits:    state.limits,
-          actions: {
-            feedReduction: feedTsRef.current !== null,
-            quenchBoost:   h2TsRef.current   !== null,
-            coolingBoost:  coolingTsRef.current !== null,
-          },
-        },
-        dtMs
+      // 1. Ramp per-action effect scalars toward target (0 when OFF, 1 when fully ON)
+      const rampEffect = (ref, key) => {
+        const target = (key === 'feed' ? feedTsRef.current : key === 'h2' ? h2TsRef.current : coolingTsRef.current) !== null ? 1 : 0;
+        ref.current = ref.current + (target - ref.current) * ACTION_LAG[key];
+      };
+      rampEffect(feedEffectRef,    'feed');
+      rampEffect(h2EffectRef,      'h2');
+      rampEffect(coolingEffectRef, 'cooling');
+
+      // 2. Combined mitigation effect on desiredRoR (capped at 65%)
+      const totalEffect = Math.min(0.65,
+        feedEffectRef.current    * ACTION_MAX.feed +
+        h2EffectRef.current      * ACTION_MAX.h2 +
+        coolingEffectRef.current * ACTION_MAX.cooling
       );
 
-      engineStateRef.current = next;
-      setEngineState({ ...next });
+      // 3. desiredRoR from scenario band, reduced by active mitigations
+      const baseDesired = DESIRED_ROR[band] ?? DESIRED_ROR.NORMAL;
+      const desiredRoR  = baseDesired * (1 - totalEffect);
+
+      // 4. First-order lag: simRoR moves slowly toward desiredRoR (inertia)
+      ror = ror + (desiredRoR - ror) * ROR_LAG;
+
+      // 5. Small jitter on RoR only (process noise, not on TTL)
+      ror += (Math.random() - 0.5) * 0.06;
+
+      // 6. Hard clamp RoR to physically plausible range
+      ror = Math.max(0.08, Math.min(1.70, ror));
+
+      // 7. Integrate temperature
+      temp = temp + ror * DT;
+
+      simTempRef.current = temp;
+      simRoRRef.current  = ror;
+
+      // 8. Compute raw TTL from multi-variable model (reactor + cooler min)
+      const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
+
+      // 9. Asymmetric EMA smoothing — no pinning or dip guards
+      setSmoothedTTL(prev => {
+        if (prev === null) return rawTTL;
+        const alpha = rawTTL < prev ? 0.22 : 0.16;
+        return Math.max(0, prev + alpha * (rawTTL - prev));
+      });
+
+      setSimTemp(temp);
+      setSimRoR(ror);
     }, 1000);
 
     return () => clearInterval(tick);
@@ -170,36 +229,33 @@ export default function Home() {
     setTimeout(() => setMitigationMsg(""), 6000);
   };
 
-  // ── Scenario seeds: pre-warm engine to mid-band so operator sees correct state ──
+  // ── Scenario seeds: (temp, ror) mid-band starting points ──────────────────
+  // Seeds place the simulation at the centre of each named band so the operator
+  // can immediately see the correct state without waiting for the physics to ramp.
   // limit=370; temp = limit - desiredRoR * midBandTTL
+  // NORMAL:         desiredRoR=0.18, TTL≈100 → temp=352 (huge margin, calm)
+  // EARLY_DRIFT:    desiredRoR=0.42, TTL≈22  → temp=370-0.42*22=360.8
+  // SEVERE_DRIFT:   desiredRoR=0.95, TTL≈7   → temp=370-0.95*7=363.4
+  // IMMEDIATE_RISK: desiredRoR=1.45, TTL≈2   → temp=370-1.45*2=367.1
   const SCENARIO_SEEDS = {
-    NORMAL:         { temp: 352.0, ror: 0.18 },
-    EARLY_DRIFT:    { temp: 360.8, ror: 0.42 },
-    SEVERE_DRIFT:   { temp: 363.4, ror: 0.95 },
-    IMMEDIATE_RISK: { temp: 367.1, ror: 1.45 },
+    NORMAL:         { temp: 352.0, ror: 0.18, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    EARLY_DRIFT:    { temp: 360.8, ror: 0.42, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    SEVERE_DRIFT:   { temp: 363.4, ror: 0.95, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
+    IMMEDIATE_RISK: { temp: 367.1, ror: 1.45, limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" } },
   };
-
-  const SCENARIO_LIMITS = { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" };
 
   const handleSelectScenario = (scenario) => {
     const seed = SCENARIO_SEEDS[scenario] || SCENARIO_SEEDS.NORMAL;
-    driftModeRef.current = scenario;
-
-    // Seed the engine at the correct mid-band position
-    const seedState = initInteractiveState(SCENARIO_LIMITS);
-    seedState.tempReactorOutC = seed.temp;
-    seedState.rorCpm          = seed.ror;
-    seedState.actionEffects   = { feed: 0, quench: 0, cooling: 0 };
-    // Recompute TTL from seed
-    const { finalTTL } = computeMultiVarTTL(seed.temp, SCENARIO_LIMITS, seed.ror);
-    seedState.ttlMin      = finalTTL;
-    seedState.ttlShownMin = finalTTL;
-    seedState.systemState = getSystemState(finalTTL);
-
-    engineStateRef.current = seedState;
-    setEngineState({ ...seedState });
-
-    // Reset lever timestamps (UI)
+    simTempRef.current   = seed.temp;
+    simRoRRef.current    = seed.ror;
+    scenarioBandRef.current = scenario;
+    // Reset action ramp effects so new scenario starts clean
+    feedEffectRef.current    = 0;
+    h2EffectRef.current      = 0;
+    coolingEffectRef.current = 0;
+    setSimTemp(seed.temp);
+    setSimRoR(seed.ror);
+    setSmoothedTTL(null);
     feedTsRef.current    = null;
     h2TsRef.current      = null;
     coolingTsRef.current = null;
@@ -207,11 +263,10 @@ export default function Home() {
     setQuenchBoostActive(false);
     setCoolingBoostActive(false);
     setMitigationMsg("");
-
     import("@/components/refinery/calcEngine").then(({ DEMO_SCENARIOS }) => {
       const s = DEMO_SCENARIOS[scenario];
       if (s) {
-        setState(prev => ({ ...prev, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario, limits: SCENARIO_LIMITS }));
+        setState(prev => ({ ...prev, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario, limits: seed.limits }));
       }
     });
     setSimRunning(true);
@@ -320,23 +375,29 @@ export default function Home() {
     : state;
 
   // ── Determine active temperature and RoR depending on mode ──────────────────
+  // Interactive: use live physics sim; Presentation: use scenario sample data.
   const isInteractive = displayMode === "interactive";
 
-  const currentValue   = isInteractive ? engineState.tempReactorOutC : activeData.samples[activeData.samples.length - 1];
-  const effectiveSlope = isInteractive ? engineState.rorCpm          : computeRateOfRise(activeData.samples, activeData.interval);
+  const currentValue  = isInteractive ? simTemp   : activeData.samples[activeData.samples.length - 1];
+  const rawSlope = isInteractive ? simRoR : computeRateOfRise(activeData.samples, activeData.interval);
+  // No drift-stress multiplier — RoR from physics sim is already the effective slope
+  const effectiveSlope = rawSlope;
 
   // ── Guard: ensure limits are always defined before constraint calculations ───
   const safeLimits = normalizeLimits(activeData.limits, DEFAULTS.limits);
 
-  // ── Compute constraints for UI display ───────────────────────────────────────
+  // ── Compute TTL (single source of truth — multi-variable: reactor + cooler) ──
+  // Interactive: use smoothed physics TTL | Presentation: derive from samples
+  // Both use computeMultiVarTTL to ensure min(TTL_reactor, TTL_cooler) drives escalation.
   const rawMultiVar   = computeMultiVarTTL(currentValue, safeLimits, effectiveSlope);
   const { finalTTL: rawPhysicsTTL, ttlReactor, ttlCooler } = rawMultiVar;
+  const physicsTTL    = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
 
   const constraints = computeAllConstraints(currentValue, safeLimits, effectiveSlope);
   const nearest     = getNearestConstraint(constraints);
 
-  // timeToNearest: interactive uses engine's smoothed TTL, presentation uses raw
-  const timeToNearest = isInteractive ? engineState.ttlShownMin : rawPhysicsTTL;
+  // timeToNearest is THE single source for all state derivation
+  const timeToNearest = isInteractive ? physicsTTL : rawPhysicsTTL;
 
   // ── Dominant driver — derived from TTL breakdown ─────────────────────────────
   const { driver: dominantDriver, driverLine: dominantDriverLine } = getDominantDriver({
@@ -358,11 +419,11 @@ export default function Home() {
   // Both modes: pure TTL-driven, stateless. getSystemState(TTL) is single source of truth.
   const derivedSystemState = getBandFromTTL(timeToNearest);
 
-  // Auto-update driftMode as TTL crosses thresholds — drives staged band progression
+  // Auto-update scenario band as TTL crosses thresholds — this is what drives staged progression
   useEffect(() => {
     if (!isInteractive || !simRunning) return;
-    if (driftModeRef.current !== derivedSystemState) {
-      driftModeRef.current = derivedSystemState;
+    if (scenarioBandRef.current !== derivedSystemState) {
+      scenarioBandRef.current = derivedSystemState;
     }
   }, [derivedSystemState, isInteractive, simRunning]);
 
@@ -430,12 +491,13 @@ export default function Home() {
     cooling: getRampPct(coolingTsRef, 'cooling'),
   };
 
-  // Minutes recovered = engine's TTL vs baseline (no-mitigation snapshot)
+  // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL, multi-var)
   const baselineTTL = isInteractive
-    ? computeMultiVarTTL(currentValue, safeLimits, engineState.rorCpm).finalTTL
+    ? computeMultiVarTTL(currentValue, safeLimits, simRoRRef.current).finalTTL  // unmitigated
     : null;
-  const minutesRecovered = baselineTTL !== null
-    ? Math.max(0, displayTTL - baselineTTL)
+  const mitigatedTTL = isInteractive ? displayTTL : null;
+  const minutesRecovered = (baselineTTL !== null && mitigatedTTL !== null)
+    ? Math.max(0, mitigatedTTL - baselineTTL)
     : 0;
 
   const handleRunDemo = useCallback((scenarioIndex) => {
@@ -475,6 +537,7 @@ export default function Home() {
     setAutoCycling(false);
     setDemonstrationActive(false);
     setDemonstrationStage(0);
+    setSmoothedTTL(null);
   }, []);
 
   // ── Keyboard navigation — Presentation Mode only ─────────────────────────────
