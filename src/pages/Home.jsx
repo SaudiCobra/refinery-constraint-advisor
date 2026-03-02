@@ -90,13 +90,14 @@ export default function Home() {
   const simRoRRef  = useRef(0.25);
   simRoRRef._scenarioBand = simRoRRef._scenarioBand || "NORMAL";
 
-  // ── Band definitions: TTL [lo, hi] in minutes, RoR clamps, and noise ───────
-  // These drive seeding and continuous soft-steering only. NOT used for state derivation.
+  // ── Band definitions: TTL [lo, hi] in minutes, RoR clamps, noise, and drift bias ──
+  // drift: constant RoR nudge per tick — ensures TTL slowly bleeds down within each band.
+  // steerK: reactive correction when TTL overshoots band edges.
   const BAND_CONFIG = {
-    NORMAL:         { ttlLo: 35, ttlHi: 60, rorMin: 0.08, rorMax: 0.35, noise: 0.02,  steerK: 0.008 },
-    EARLY_DRIFT:    { ttlLo: 10, ttlHi: 35, rorMin: 0.30, rorMax: 0.70, noise: 0.03,  steerK: 0.015 },
-    SEVERE_DRIFT:   { ttlLo:  4, ttlHi: 10, rorMin: 0.65, rorMax: 1.20, noise: 0.04,  steerK: 0.025 },
-    IMMEDIATE_RISK: { ttlLo:  0.5, ttlHi: 4, rorMin: 1.00, rorMax: 2.00, noise: 0.05, steerK: 0.050 },
+    NORMAL:         { ttlLo: 35, ttlHi: 60, rorMin: 0.12, rorMax: 0.45, noise: 0.015, steerK: 0.006, drift: 0.008 },
+    EARLY_DRIFT:    { ttlLo: 10, ttlHi: 35, rorMin: 0.35, rorMax: 0.80, noise: 0.025, steerK: 0.012, drift: 0.012 },
+    SEVERE_DRIFT:   { ttlLo:  4, ttlHi: 10, rorMin: 0.70, rorMax: 1.30, noise: 0.035, steerK: 0.020, drift: 0.015 },
+    IMMEDIATE_RISK: { ttlLo:  0.5, ttlHi: 4, rorMin: 1.10, rorMax: 2.00, noise: 0.045, steerK: 0.040, drift: 0.008 },
   };
 
   // ── Derive named state from a TTL value — matches getSystemState in calcEngine ──
