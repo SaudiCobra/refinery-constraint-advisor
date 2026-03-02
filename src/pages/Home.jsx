@@ -317,14 +317,15 @@ export default function Home() {
   const SEQUENCE_STAGE_DURATIONS = [4500, 3000, 5000, null]; // null = hold indefinitely
 
   useEffect(() => {
-    const currentScenario = SCENARIOS[presScenario];
+    const safeIdx = safeScenarioIndex(presScenario, SCENARIOS.length);
+    const currentScenario = SCENARIOS[safeIdx];
     if (displayMode === "presentation" && currentScenario?.isSequence && !autoCycling && !demonstrationActive) {
       const duration = SEQUENCE_STAGE_DURATIONS[sequenceStage];
       if (duration === null) return; // Severe — manual advance only
       sequenceRef.current = setTimeout(() => {
         setSequenceStage(prev => {
           const nextStage = prev + 1;
-          if (nextStage >= currentScenario.stages.length) return 0;
+          if (nextStage >= (currentScenario.stages?.length ?? 1)) return 0;
           return nextStage;
         });
       }, duration);
