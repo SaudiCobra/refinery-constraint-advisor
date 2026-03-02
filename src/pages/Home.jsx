@@ -382,7 +382,7 @@ export default function Home() {
           return {
             ...DEFAULTS,
             samples: stage.samples,
-            limits: normalizeLimits(stage.limits ?? scenario.limits, DEFAULTS.limits),
+            limits: normalizeLimits(stage.limits ?? scenario.limits ?? DEFAULTS.limits, DEFAULTS.limits),
             equipment: stage.equipment || scenario.equipment || DEFAULTS.equipment,
             feedFlow: stage.feedFlow || scenario.feedFlow || DEFAULTS.feedFlow,
             sensorQuality: stage.sensorQuality || scenario.sensorQuality || DEFAULTS.sensorQuality,
