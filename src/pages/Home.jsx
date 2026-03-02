@@ -66,45 +66,28 @@ export default function Home() {
   const [state, setState] = useState({ ...DEFAULTS });
   const [preheatActive, setPreheatActive] = useState(false);
 
-  // ── Physics simulation state (interactive mode only) ────────────────────────
-  const [simTemp,    setSimTemp]    = useState(352.0); // seeds NORMAL — good margin
-  const [simRoR,     setSimRoR]     = useState(0.18);  // seeds NORMAL desired RoR
+  // ── Interactive engine state ──────────────────────────────────────────────
   const [simRunning, setSimRunning] = useState(true);
   const [mitigationMsg, setMitigationMsg] = useState("");
 
-  // ── Mitigation toggle state ───────────────────────────────────────────────
+  // Mitigation toggle state (UI)
   const [feedReductionActive, setFeedReductionActive] = useState(false);
   const [quenchBoostActive,   setQuenchBoostActive]   = useState(false);
   const [coolingBoostActive,  setCoolingBoostActive]  = useState(false);
-  // Activation timestamps (null = OFF). Refs so tick reads without stale closure.
+  // Activation timestamps for rampProgress UI only
   const feedTsRef    = useRef(null);
   const h2TsRef      = useRef(null);
   const coolingTsRef = useRef(null);
 
-  // Smoothed TTL for display — asymmetric EMA only
-  const [smoothedTTL, setSmoothedTTL] = useState(null);
+  // Which drift mode is selected — drives desiredRoR in engine
+  const driftModeRef = useRef("NORMAL");
 
-  // Physics refs — single source of truth inside the tick closure
-  const simTempRef = useRef(352.0);
-  const simRoRRef  = useRef(0.18);
+  // Engine state ref — single source of truth inside tick closure
+  const engineStateRef = useRef(initInteractiveState(DEFAULTS.limits));
+  // Reactive state for rendering
+  const [engineState, setEngineState] = useState(engineStateRef.current);
 
-  // Per-action ramped effect scalars [0..1], updated each tick via first-order lag
-  const feedEffectRef    = useRef(0);
-  const h2EffectRef      = useRef(0);
-  const coolingEffectRef = useRef(0);
-
-  // Which scenario band is active (drives desiredRoR)
-  const scenarioBandRef = useRef("NORMAL");
-
-  // desiredRoR per scenario band — reflects "what the process wants" without forcing TTL
-  const DESIRED_ROR = {
-    NORMAL:         0.18,
-    EARLY_DRIFT:    0.42,
-    SEVERE_DRIFT:   0.95,
-    IMMEDIATE_RISK: 1.45,
-  };
-
-  // ── Derive named state from a TTL value — matches getSystemState in calcEngine ──
+  // ── Derive named state from TTL ───────────────────────────────────────────
   const getBandFromTTL = (ttlMin) => {
     if (ttlMin <= 4)  return "IMMEDIATE_RISK";
     if (ttlMin <= 10) return "SEVERE_DRIFT";
