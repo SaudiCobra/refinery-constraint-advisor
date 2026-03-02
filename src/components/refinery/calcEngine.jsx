@@ -105,43 +105,12 @@ export function getEscalationBand(slopeCpm, reactorOutC, coolerOutC) {
 }
 
 // NEW 4-band model — single source of truth for all state derivation
-// NORMAL: > 30 min | EARLY_DRIFT: 12–30 | SEVERE_DRIFT: 4–12 | IMMEDIATE_RISK: ≤ 4
+// NORMAL: > 35 min | EARLY_DRIFT: 10–35 | SEVERE_DRIFT: 5–10 | IMMEDIATE_RISK: ≤ 5
 export function getSystemState(timeMinutes) {
-  if (timeMinutes === Infinity || timeMinutes == null || timeMinutes > 30) return "NORMAL";
-  if (timeMinutes > 12) return "EARLY_DRIFT";
-  if (timeMinutes > 4)  return "SEVERE_DRIFT";
+  if (timeMinutes === Infinity || timeMinutes == null || timeMinutes > 35) return "NORMAL";
+  if (timeMinutes > 10) return "EARLY_DRIFT";
+  if (timeMinutes > 5)  return "SEVERE_DRIFT";
   return "IMMEDIATE_RISK";
-}
-
-// Hysteresis thresholds: separate ENTER vs EXIT per transition
-// ENTER thresholds (going worse): NORMAL→EARLY ≤30, EARLY→SEVERE ≤12, SEVERE→IMMEDIATE ≤4
-// EXIT thresholds (going better):  EARLY→NORMAL ≥33, SEVERE→EARLY ≥14, IMMEDIATE→SEVERE ≥5
-const STATE_ORDER = ["NORMAL", "EARLY_DRIFT", "SEVERE_DRIFT", "IMMEDIATE_RISK"];
-const ENTER_TTL   = [30, 12, 4];   // TTL at which you enter each non-NORMAL state
-const EXIT_TTL    = [33, 14, 5];   // TTL at which you exit back to safer state
-
-export function getSystemStateWithHysteresis(rawTTL, prevState) {
-  const prevIdx = STATE_ORDER.indexOf(prevState);
-  const safeIdx = prevIdx < 0 ? 0 : prevIdx;
-
-  // Try to move one step worse
-  if (safeIdx < STATE_ORDER.length - 1) {
-    const enterThreshold = ENTER_TTL[safeIdx];
-    if (rawTTL <= enterThreshold) {
-      return STATE_ORDER[safeIdx + 1]; // one step worse
-    }
-  }
-
-  // Try to move one step better
-  if (safeIdx > 0) {
-    const exitThreshold = EXIT_TTL[safeIdx - 1];
-    if (rawTTL >= exitThreshold) {
-      return STATE_ORDER[safeIdx - 1]; // one step better
-    }
-  }
-
-  // Stay in current state
-  return prevState;
 }
 
 export function getEscalationLevel(timeMinutes, preheatActive, slope, coolingCapacity) {

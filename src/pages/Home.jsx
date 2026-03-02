@@ -32,7 +32,6 @@ import {
   normalizeLimits,
   computeMultiVarTTL,
   getDominantDriver,
-  getSystemStateWithHysteresis,
   SCENARIOS,
   DEMONSTRATION_STAGES,
   HOT_SPOT_SCENARIO,
@@ -87,11 +86,6 @@ export default function Home() {
 
   // Smoothed TTL for display (prevents jumps > 3 min per tick)
   const [smoothedTTL, setSmoothedTTL] = useState(null);
-  // Hysteresis state tracking: stablizes band transitions
-  const [hysteresisState, setHysteresisState] = useState("NORMAL");
-  const [stateEnteredAt, setStateEnteredAt] = useState(Date.now());
-  const hysteresisRef = useRef("NORMAL");
-  const stateEnteredAtRef = useRef(Date.now());
   const simTempRef = useRef(358.0);
   const simRoRRef  = useRef(0.25);
   simRoRRef._scenarioBand = simRoRRef._scenarioBand || "NORMAL";
@@ -99,17 +93,17 @@ export default function Home() {
   // ── Band definitions: TTL [lo, hi] in minutes, RoR clamps, and noise ───────
   // These drive both seeding and continuous soft-steering.
   const BAND_CONFIG = {
-    NORMAL:         { ttlLo: 30, ttlHi: 58, rorMin: 0.10, rorMax: 0.40, noise: 0.025, steerK: 0.012 },
-    EARLY_DRIFT:    { ttlLo: 12, ttlHi: 30, rorMin: 0.28, rorMax: 0.75, noise: 0.035, steerK: 0.018 },
-    SEVERE_DRIFT:   { ttlLo:  4, ttlHi: 12, rorMin: 0.60, rorMax: 1.30, noise: 0.045, steerK: 0.030 },
+    NORMAL:         { ttlLo: 35, ttlHi: 60, rorMin: 0.10, rorMax: 0.40, noise: 0.025, steerK: 0.012 },
+    EARLY_DRIFT:    { ttlLo: 10, ttlHi: 35, rorMin: 0.28, rorMax: 0.75, noise: 0.035, steerK: 0.018 },
+    SEVERE_DRIFT:   { ttlLo:  4, ttlHi: 13, rorMin: 0.60, rorMax: 1.30, noise: 0.045, steerK: 0.030 },
     IMMEDIATE_RISK: { ttlLo:  0.2, ttlHi: 4, rorMin: 1.00, rorMax: 2.20, noise: 0.055, steerK: 0.060 },
   };
 
   // ── Derive named state from a TTL value — single source of truth ────────────
   const getBandFromTTL = (ttlMin) => {
     if (ttlMin <= 4)  return "IMMEDIATE_RISK";
-    if (ttlMin <= 12) return "SEVERE_DRIFT";
-    if (ttlMin <= 30) return "EARLY_DRIFT";
+    if (ttlMin <= 13) return "SEVERE_DRIFT";
+    if (ttlMin <= 35) return "EARLY_DRIFT";
     return "NORMAL";
   };
 
@@ -232,9 +226,11 @@ export default function Home() {
         let next = rawTTL;
         if (band === "NORMAL") {
           if (realDrift) {
+            // Real drift: respond quickly, no dip guard
             const alpha = next < prev ? 0.22 : 0.20;
             next = prev + alpha * (next - prev);
           } else {
+            // Noise: stay calm, small dip guard (1.5 min)
             if (next < prev) next = Math.max(next, prev - 1.5);
             const alpha = next < prev ? 0.10 : 0.25;
             next = prev + alpha * (next - prev);
@@ -245,31 +241,6 @@ export default function Home() {
         }
         return Math.max(0, next);
       });
-
-      // Hysteresis + min dwell: update hysteresisState with one-step transitions + 2s dwell
-      const nowMs = Date.now();
-      const prevHysteresisState = hysteresisRef.current;
-      const candidateState = getSystemStateWithHysteresis(rawTTL, prevHysteresisState);
-      const STATE_ORDER_LOCAL = ["NORMAL", "EARLY_DRIFT", "SEVERE_DRIFT", "IMMEDIATE_RISK"];
-      const prevIdx = STATE_ORDER_LOCAL.indexOf(prevHysteresisState);
-      const candIdx = STATE_ORDER_LOCAL.indexOf(candidateState);
-      let nextHysteresis = prevHysteresisState;
-      if (candIdx > prevIdx) {
-        // Downgrade (worse): enforce 2s min dwell
-        const elapsed = nowMs - stateEnteredAtRef.current;
-        if (elapsed >= 2000) {
-          nextHysteresis = candidateState;
-        }
-      } else if (candIdx < prevIdx) {
-        // Upgrade (better): allow immediately
-        nextHysteresis = candidateState;
-      }
-      if (nextHysteresis !== prevHysteresisState) {
-        hysteresisRef.current = nextHysteresis;
-        stateEnteredAtRef.current = nowMs;
-        setHysteresisState(nextHysteresis);
-        setStateEnteredAt(nowMs);
-      }
 
       setSimTemp(temp);
       setSimRoR(ror);
@@ -340,11 +311,6 @@ export default function Home() {
         setState(prev => ({ ...prev, equipment: s.equipment, feedFlow: s.feedFlow, sensorQuality: s.sensorQuality, opMode: s.opMode, demoScenario: scenario, limits: seed.limits }));
       }
     });
-    // Reset hysteresis on scenario change
-    hysteresisRef.current = scenario;
-    stateEnteredAtRef.current = Date.now();
-    setHysteresisState(scenario);
-    setStateEnteredAt(Date.now());
     setSimRunning(true);
     setMitigationMsg("");
   };
@@ -495,9 +461,9 @@ export default function Home() {
   const hotSpotRisk     = computeHotSpotRisk(bedImbalance, activeData.equipment, coolingCapacity, effectiveSlope);
 
   // ── Derive system state from live TTL ──────────────────────────────────────
-  // Interactive: use hysteresis-stabilized state to prevent bouncing + skipping.
-  // Presentation: use raw TTL-driven band (no hysteresis needed — static data).
-  const derivedSystemState = isInteractive ? hysteresisState : getBandFromTTL(timeToNearest);
+  // derivedSystemState always follows the timer — used when demoActive is true
+  // so the entire UI automatically tracks the countdown across band thresholds.
+  const derivedSystemState = getBandFromTTL(timeToNearest);
 
   // When the interactive sim is running, auto-steer the scenario band to match
   // the derived state so steering stays in the right RoR range automatically.
