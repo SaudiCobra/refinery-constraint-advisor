@@ -1,5 +1,20 @@
 // Calculation engine for rate-of-rise and time-to-constraint projections
 
+// ── Limits normalization ──────────────────────────────────────────────────────
+// Single source of truth — call this everywhere before using limits.
+const DEFAULT_LIMITS = { hi: 370, hihi: 380, trip: 390, spec: "", rampRate: "" };
+
+export function normalizeLimits(limits, defaults = DEFAULT_LIMITS) {
+  if (!limits) return { ...defaults };
+  return {
+    hi:       limits.hi       ?? defaults.hi,
+    hihi:     limits.hihi     ?? defaults.hihi,
+    trip:     limits.trip     ?? defaults.trip,
+    spec:     limits.spec     ?? defaults.spec,
+    rampRate: limits.rampRate ?? defaults.rampRate,
+  };
+}
+
 export function computeRateOfRise(samples, interval) {
   const now = samples[samples.length - 1];
   const prev = samples[samples.length - 2];
