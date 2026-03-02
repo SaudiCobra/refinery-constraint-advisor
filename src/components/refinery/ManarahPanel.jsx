@@ -509,7 +509,11 @@ export default function ManarahPanel({
             color: isEmergency ? severityColor : "#999",
             fontWeight: isEmergency ? 600 : 400,
             lineHeight: 1.5,
-          }}>{dominantDriver}</p>
+            marginBottom: dominantDriverLine ? 4 : 0,
+          }}>{dominantDriver || "No dominant driver identified."}</p>
+          {dominantDriverLine && (
+            <p style={{ fontSize: fs(10), color: "#555", lineHeight: 1.4 }}>{dominantDriverLine}</p>
+          )}
 
           {!isEmergency && (
             <>
