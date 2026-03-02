@@ -90,15 +90,14 @@ export default function Home() {
   const simRoRRef  = useRef(0.25);
   simRoRRef._scenarioBand = simRoRRef._scenarioBand || "NORMAL";
 
-  // ── Band config: TTL targets, RoR clamps, noise, proportional steering gains ──
-  // targetTTL: where the closed-loop controller drives TTL within the band.
-  // k: proportional gain; error = (currentTTL - targetTTL); ror += error * k.
-  // IMMEDIATE_RISK k=0: no steering at the edge — just hold whatever RoR the scenario set.
+  // ── Band definitions: TTL [lo, hi] in minutes, RoR clamps, noise, and drift bias ──
+  // drift: constant RoR nudge per tick — ensures TTL slowly bleeds down within each band.
+  // steerK: reactive correction when TTL overshoots band edges.
   const BAND_CONFIG = {
-    NORMAL:         { targetTTL: 45, rorMin: 0.10, rorMax: 0.30, noise: 0.012, k: 0.010 },
-    EARLY_DRIFT:    { targetTTL: 22, rorMin: 0.30, rorMax: 0.65, noise: 0.020, k: 0.016 },
-    SEVERE_DRIFT:   { targetTTL:  8, rorMin: 0.65, rorMax: 1.10, noise: 0.030, k: 0.020 },
-    IMMEDIATE_RISK: { targetTTL:  3, rorMin: 1.10, rorMax: 1.70, noise: 0.040, k: 0.000 },
+    NORMAL:         { ttlLo: 35, ttlHi: 60, rorMin: 0.12, rorMax: 0.45, noise: 0.015, steerK: 0.006, drift: 0.008 },
+    EARLY_DRIFT:    { ttlLo: 10, ttlHi: 35, rorMin: 0.35, rorMax: 0.80, noise: 0.025, steerK: 0.012, drift: 0.012 },
+    SEVERE_DRIFT:   { ttlLo:  4, ttlHi: 10, rorMin: 0.70, rorMax: 1.30, noise: 0.035, steerK: 0.020, drift: 0.015 },
+    IMMEDIATE_RISK: { ttlLo:  0.5, ttlHi: 4, rorMin: 1.10, rorMax: 2.00, noise: 0.045, steerK: 0.040, drift: 0.008 },
   };
 
   // ── Derive named state from a TTL value — matches getSystemState in calcEngine ──
@@ -169,15 +168,22 @@ export default function Home() {
       // 1. Random RoR wander (small, unbiased)
       ror += (Math.random() - 0.5) * 2 * cfg.noise * decayScale;
 
-      // 2. Closed-loop TTL steering: proportional controller drives TTL toward targetTTL
-      //    error > 0 → TTL above target → increase RoR to bring TTL down
-      //    error < 0 → TTL below target → decrease RoR to let TTL recover
+      // 2. Constant drift bias — ensures TTL bleeds downward within the band
+      //    Reduced proportionally when levers are active
+      if (!allFullMitigation) {
+        ror += cfg.drift * decayScale;
+      }
+
+      // 3. Soft band-steering — corrects overshoots only
+      //    When mitigating fully, pull RoR down to drive recovery
       if (allFullMitigation) {
-        // Full mitigation: pull RoR down aggressively to drive recovery
         ror -= 0.06;
-      } else if (cfg.k > 0) {
-        const error = currentTTL - cfg.targetTTL;
-        ror += error * cfg.k * decayScale;
+      } else {
+        if (currentTTL < cfg.ttlLo) {
+          // TTL too low — overshoot prevention — bring RoR down
+          ror -= cfg.steerK * (cfg.ttlLo - currentTTL);
+        }
+        // No upper clamp needed — drift bias handles downward pressure naturally
       }
 
       // 3. Apply ramped mitigation
@@ -207,10 +213,10 @@ export default function Home() {
       // Compute raw TTL from multi-variable model (reactor + cooler min)
       const rawTTL = computeMultiVarTTL(temp, limits, ror).finalTTL;
 
-      // Asymmetric EMA: drops at 0.22 (responsive), rises at 0.16 (gradual recovery)
+      // Asymmetric EMA: TTL drops at alpha=0.35 (responsive), rises at alpha=0.12 (gradual recovery)
       setSmoothedTTL(prev => {
         if (prev === null) return rawTTL;
-        const alpha = rawTTL < prev ? 0.22 : 0.16;
+        const alpha = rawTTL < prev ? 0.35 : 0.12;
         return Math.max(0, prev + alpha * (rawTTL - prev));
       });
 
