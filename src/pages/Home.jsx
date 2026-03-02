@@ -382,7 +382,7 @@ export default function Home() {
           return {
             ...DEFAULTS,
             samples: stage.samples,
-            limits: normalizeLimits(stage.limits ?? scenario.limits ?? DEFAULTS.limits, DEFAULTS.limits),
+            limits: normalizeLimits(stage.limits ?? scenario.limits, DEFAULTS.limits),
             equipment: stage.equipment || scenario.equipment || DEFAULTS.equipment,
             feedFlow: stage.feedFlow || scenario.feedFlow || DEFAULTS.feedFlow,
             sensorQuality: stage.sensorQuality || scenario.sensorQuality || DEFAULTS.sensorQuality,
@@ -408,17 +408,14 @@ export default function Home() {
   const currentValue  = isInteractive ? simTemp   : activeData.samples[activeData.samples.length - 1];
   const effectiveSlope = isInteractive ? simRoR   : computeRateOfRise(activeData.samples, activeData.interval);
 
-  // ── Guard: ensure limits are always defined before constraint calculations ───
-  const safeLimits = normalizeLimits(activeData.limits, DEFAULTS.limits);
-
   // ── Compute TTL (single source of truth — multi-variable: reactor + cooler) ──
   // Interactive: use smoothed physics TTL | Presentation: derive from samples
   // Both use computeMultiVarTTL to ensure min(TTL_reactor, TTL_cooler) drives escalation.
-  const rawMultiVar   = computeMultiVarTTL(currentValue, safeLimits, effectiveSlope);
+  const rawMultiVar   = computeMultiVarTTL(currentValue, activeData.limits, effectiveSlope);
   const { finalTTL: rawPhysicsTTL, ttlReactor, ttlCooler } = rawMultiVar;
   const physicsTTL    = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
 
-  const constraints = computeAllConstraints(currentValue, safeLimits, effectiveSlope);
+  const constraints = computeAllConstraints(currentValue, activeData.limits, effectiveSlope);
   const nearest     = getNearestConstraint(constraints);
 
   // timeToNearest is THE single source for all state derivation
@@ -493,7 +490,7 @@ export default function Home() {
   const computedState = getSystemState(timeToNearest);
   const systemState   = isInteractive ? derivedSystemState : (explicitUiState || computedState);
   const demoState     = isInteractive ? derivedSystemState : computedState;
-  const alarmState    = getAlarmState(currentValue, safeLimits);
+  const alarmState    = getAlarmState(currentValue, activeData.limits);
 
   // displayTTL and displaySlope feed every consumer
   const displayTTL   = timeToNearest;
@@ -521,7 +518,7 @@ export default function Home() {
 
   // Minutes recovered = currentTTL − baselineTTL (no-mitigation TTL, multi-var)
   const baselineTTL = isInteractive
-    ? computeMultiVarTTL(currentValue, safeLimits, simRoRRef.current).finalTTL  // unmitigated
+    ? computeMultiVarTTL(currentValue, activeData.limits, simRoRRef.current).finalTTL  // unmitigated
     : null;
   const mitigatedTTL = isInteractive ? displayTTL : null;
   const minutesRecovered = (baselineTTL !== null && mitigatedTTL !== null)
