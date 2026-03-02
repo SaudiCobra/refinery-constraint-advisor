@@ -214,9 +214,7 @@ export const COOLER_LIMITS = { hi: 90, hihi: 100, trip: 110, spec: "", rampRate:
 // e.g. reactorOut=370 → coolerOut ≈ 40 + (370-280)*0.6 = 94°C
 // This keeps cooler temps in a realistic 55–110°C band across the full reactor range (280–390°C).
 export function deriveCoolerOutC(reactorOutC) {
-  const base = 45;
-  const delta = Math.max(0, reactorOutC - 360);
-  return Math.min(110, base + delta * 2.75);
+  return 40 + Math.max(0, reactorOutC - 280) * 0.6;
 }
 
 // ── Compute combined (multi-variable) TTL ─────────────────────────────────────
