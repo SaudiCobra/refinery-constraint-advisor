@@ -320,29 +320,23 @@ export default function Home() {
     : state;
 
   // ── Determine active temperature and RoR depending on mode ──────────────────
-  // Interactive: use live physics sim; Presentation: use scenario sample data.
   const isInteractive = displayMode === "interactive";
 
-  const currentValue  = isInteractive ? simTemp   : activeData.samples[activeData.samples.length - 1];
-  const rawSlope = isInteractive ? simRoR : computeRateOfRise(activeData.samples, activeData.interval);
-  // No drift-stress multiplier — RoR from physics sim is already the effective slope
-  const effectiveSlope = rawSlope;
+  const currentValue   = isInteractive ? engineState.tempReactorOutC : activeData.samples[activeData.samples.length - 1];
+  const effectiveSlope = isInteractive ? engineState.rorCpm          : computeRateOfRise(activeData.samples, activeData.interval);
 
   // ── Guard: ensure limits are always defined before constraint calculations ───
   const safeLimits = normalizeLimits(activeData.limits, DEFAULTS.limits);
 
-  // ── Compute TTL (single source of truth — multi-variable: reactor + cooler) ──
-  // Interactive: use smoothed physics TTL | Presentation: derive from samples
-  // Both use computeMultiVarTTL to ensure min(TTL_reactor, TTL_cooler) drives escalation.
+  // ── Compute constraints for UI display ───────────────────────────────────────
   const rawMultiVar   = computeMultiVarTTL(currentValue, safeLimits, effectiveSlope);
   const { finalTTL: rawPhysicsTTL, ttlReactor, ttlCooler } = rawMultiVar;
-  const physicsTTL    = smoothedTTL !== null ? smoothedTTL : rawPhysicsTTL;
 
   const constraints = computeAllConstraints(currentValue, safeLimits, effectiveSlope);
   const nearest     = getNearestConstraint(constraints);
 
-  // timeToNearest is THE single source for all state derivation
-  const timeToNearest = isInteractive ? physicsTTL : rawPhysicsTTL;
+  // timeToNearest: interactive uses engine's smoothed TTL, presentation uses raw
+  const timeToNearest = isInteractive ? engineState.ttlShownMin : rawPhysicsTTL;
 
   // ── Dominant driver — derived from TTL breakdown ─────────────────────────────
   const { driver: dominantDriver, driverLine: dominantDriverLine } = getDominantDriver({
