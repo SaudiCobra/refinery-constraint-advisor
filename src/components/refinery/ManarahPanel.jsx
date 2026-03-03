@@ -31,33 +31,41 @@ const STATE_GLOW = {
 
 // ── Dominant driver ───────────────────────────────────────────────────────────
 
-function getDominantDriver(slope, coolingCapacity, equipment, systemState, scenarioName) {
-  // Scenario-specific override: Dominant Driver Isolation
-  if (scenarioName?.includes("Dominant Driver")) {
-    if (systemState === "EARLY_DRIFT" || systemState === "SEVERE_DRIFT" || systemState === "IMMEDIATE_RISK") {
-      return "Quench valve unresponsive.";
-    }
-  }
-  // Scenario-specific override: Multi-Constraint Interaction
-  if (scenarioName?.includes("Multi-Constraint")) {
-    if (systemState === "EARLY_DRIFT") return "Hydrogen moderation limiting — H₂ quench margin reduced.";
-    if (systemState === "SEVERE_DRIFT" || systemState === "IMMEDIATE_RISK") return "Stacked constraints: H₂ moderation limited and mitigation headroom constrained.";
-  }
-  // Scenario-specific override: Signal Conflict
-  if (scenarioName?.includes("Signal Conflict")) {
+function getDominantDriver(slope, coolingCapacity, equipment, systemState, flags) {
+  // Data-driven signal conflict check
+  if (flags?.signalConflict) {
     return "Sensor signal inconsistency detected — dominant driver not confirmed.";
   }
-  if (systemState === "IMMEDIATE_RISK") {
-    return "Quench valve unresponsive — temperature control authority degraded.";
-  }
+
   const drivers = [];
-  if (slope > 1.0) drivers.push({ label: "rising rate-of-rise", weight: slope });
-  if (coolingCapacity === "SEVERELY_LIMITED") drivers.push({ label: "severely limited cooling capacity", weight: 3 });
-  else if (coolingCapacity === "REDUCED") drivers.push({ label: "reduced cooling margin", weight: 2 });
-  if (!equipment?.effluentCooler) drivers.push({ label: "effluent cooler unavailable", weight: 2 });
-  if (systemState === "SEVERE_DRIFT" && !drivers.some(d => d.label.includes("rate"))) {
-    drivers.push({ label: "sustained high rate-of-rise", weight: 1.5 });
+
+  // Quench valve — explicit equipment flag
+  if (equipment?.quenchValveResponsive === false || equipment?.quenchValve === "UNRESPONSIVE") {
+    drivers.push({ label: "quench valve unresponsive", weight: 4 });
   }
+
+  // Effluent cooler availability
+  if (!equipment?.effluentCooler) {
+    drivers.push({ label: "effluent cooling unavailable", weight: 3 });
+  }
+
+  // Cooling capacity
+  if (coolingCapacity === "SEVERELY_LIMITED") {
+    drivers.push({ label: "cooling capacity severely limited", weight: 3 });
+  } else if (coolingCapacity === "REDUCED") {
+    drivers.push({ label: "cooling margin reduced", weight: 2 });
+  }
+
+  // Rate-of-rise
+  if (slope > 1.0) {
+    drivers.push({ label: "temperature accelerating (high rate-of-rise)", weight: Math.min(3, slope) });
+  }
+
+  // Fallback for severe drift with no RoR driver
+  if (systemState === "SEVERE_DRIFT" && !drivers.some(d => d.label.includes("accelerat"))) {
+    drivers.push({ label: "sustained temperature acceleration", weight: 1.5 });
+  }
+
   if (drivers.length === 0) return "No dominant risk driver identified at current operating point.";
   drivers.sort((a, b) => b.weight - a.weight);
   if (drivers.length === 1) return `Risk driven primarily by ${drivers[0].label}.`;
