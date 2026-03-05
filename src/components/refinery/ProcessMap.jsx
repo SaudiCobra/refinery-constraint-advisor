@@ -743,7 +743,7 @@ export default function ProcessMap({
         {(() => {
           const hihi = 380; const gap = hihi - tOutlet; const near = gap <= 15;
           const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 64; // 1098 — left of outlet pipe
-          const cy = ANCHORS.R1.y + SIZES.R1.h/2 + 38 + 16;   // 854 — shifted down 16px
+          const cy = ANCHORS.R1.y + SIZES.R1.h/2 + 38 + 16 + 10; // 864 — shifted down 10px more
           return (
             <g transform={`translate(${cx}, ${cy})`}>
               <rect x="-64" y="-20" width="128" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
