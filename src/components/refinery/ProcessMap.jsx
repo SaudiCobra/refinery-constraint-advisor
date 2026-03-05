@@ -773,7 +773,7 @@ export default function ProcessMap({
         {(() => {
           const hihi = 100; const gap = hihi - tCoolerOutlet; const near = gap <= 15;
           return (
-            <g transform="translate(2080, 614)">
+            <g transform="translate(2075, 594)">
               <rect x="-66" y="-20" width="132" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
               <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">COOLER OUTLET</text>
               <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tCoolerOutlet}°C</text>
