@@ -622,39 +622,16 @@ export default function ProcessMap({
           <circle cx={ANCHORS.E2.x - SIZES.E2.w/2 - 70} cy={Y_SPINE} r="5" fill="#1a1a1a" stroke="#B47A1F" strokeWidth="2" />
         </g>
 
-        {/* SPINE: E-1 Shell Out → E-2
-            Routing:
-              1) Horizontal stub right from E-1 shell outlet nozzle to a dedicated riser x (RISER_X)
-              2) Vertical riser up from that stub to the TOP HEADER elevation (Y_TOP_HEADER)
-              3) TOP HEADER — continuous horizontal from RISER_X all the way right to E-2 drop
-              4) Vertical drop from TOP HEADER down to E-2 spine inlet
-            Junction dot at RISER_X / Y_TOP_HEADER makes the T-junction explicit.
-        */}
-        {(() => {
-          // Riser x: offset right from E-1 outlet so it doesn't share x with the tube outlet pipe
-          const RISER_X = ANCHORS.E1.x + SIZES.E1.w/2 + 60; // x=910
-          const Y_TOP_HEADER = Y_UPPER_ZONE - 60;            // y=460
-          const E1_SHELL_NOZZLE_Y = ANCHORS.E1.y + SIZES.E1.h/2 - 18; // bottom nozzle of E-1 shell side
-          const flowColor = getThermalColor(shellSideOutletTemp);
-          return (
-            <>
-              {/* 1) Short horizontal stub from E-1 shell outlet nozzle → RISER_X */}
-              <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_SHELL_NOZZLE_Y} x2={RISER_X} y2={E1_SHELL_NOZZLE_Y} stroke="#555" strokeWidth="4" opacity="0.9" />
-              {/* 2) Vertical riser from stub up to TOP HEADER */}
-              <line x1={RISER_X} y1={E1_SHELL_NOZZLE_Y} x2={RISER_X} y2={Y_TOP_HEADER} stroke="#555" strokeWidth="4" opacity="0.9" />
-              {/* Junction dot at T-intersection on TOP HEADER */}
-              <circle cx={RISER_X} cy={Y_TOP_HEADER} r="6" fill="#555" />
-              {/* 3) TOP HEADER — main line from RISER_X → E-2 drop point */}
-              <line x1={RISER_X} y1={Y_TOP_HEADER} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_TOP_HEADER} stroke="#555" strokeWidth="4" opacity="0.9" />
-              {/* 4) Vertical drop from TOP HEADER to E-2 inlet on spine */}
-              <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_TOP_HEADER} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
-              {/* Flow dot travelling along TOP HEADER to E-2 */}
-              <circle cx={RISER_X} cy={Y_TOP_HEADER} r="4" fill={flowColor}>
-                <animate attributeName="cx" values={`${RISER_X};${ANCHORS.E2.x - SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
-              </circle>
-            </>
-          );
-        })()}
+        {/* SPINE: E-1 Shell Out → E-2 */}
+        {/* Vertical rise from E-1 shell outlet to upper corridor */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_UPPER_ZONE - 60} stroke="#555" strokeWidth="4" opacity="0.9" />
+        {/* Horizontal run in upper corridor above reactor */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_UPPER_ZONE - 60} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_UPPER_ZONE - 60} stroke="#555" strokeWidth="4" opacity="0.9" />
+        {/* Vertical drop to E-2 inlet on spine */}
+        <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_UPPER_ZONE - 60} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.E2.x - SIZES.E2.w/2)/2} cy={Y_UPPER_ZONE - 60} r="4" fill={getThermalColor(shellSideOutletTemp)}>
+          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.E2.x - SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
 
         {/* EFFLUENT COOLER E-2 */}
         <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={() => handleUnitClick('e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")} opacity={getNonAffectedOpacity("cooler")}>
@@ -830,10 +807,10 @@ export default function ProcessMap({
                   strokeWidth="7"
                   opacity="0.08"
                 />
-                {/* Shell-side TOP HEADER to E-2 (matches new riser routing) */}
+                {/* Shell-side upper corridor to E-2 */}
                 <line
                   className="pfd-path"
-                  x1={ANCHORS.E1.x + SIZES.E1.w/2 + 60}
+                  x1={ANCHORS.E1.x + SIZES.E1.w/2}
                   y1={Y_UPPER_ZONE - 60}
                   x2={ANCHORS.E2.x - SIZES.E2.w/2}
                   y2={Y_UPPER_ZONE - 60}
