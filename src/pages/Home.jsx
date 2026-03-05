@@ -550,6 +550,27 @@ export default function Home() {
     setManarahOpen(true);
   };
 
+  // ── Keyboard quick-switch (Interactive mode only) ────────────────────────────
+  // 1 = NORMAL | 2 = EARLY_DRIFT | 3 = SEVERE_DRIFT | 4 = IMMEDIATE_RISK
+  // Ignored when focus is inside an input/textarea/select (prevents interference).
+  useEffect(() => {
+    if (displayMode !== "interactive") return;
+    const BAND_KEYS = {
+      "1": "NORMAL",
+      "2": "EARLY_DRIFT",
+      "3": "SEVERE_DRIFT",
+      "4": "IMMEDIATE_RISK",
+    };
+    const handler = (e) => {
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+      const band = BAND_KEYS[e.key];
+      if (band) handleSelectScenario(band);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [displayMode]);
+
   return (
     <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
       {!manarahOpen && (
