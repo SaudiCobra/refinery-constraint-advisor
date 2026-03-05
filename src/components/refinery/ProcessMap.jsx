@@ -759,7 +759,7 @@ export default function ProcessMap({
         {(() => {
           const hihi = 365; const gap = hihi - tQuench; const near = gap <= 15;
           return (
-            <g transform="translate(1466, 660)">
+            <g transform="translate(1472, 660)">
               <rect x="-60" y="-20" width="120" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
               <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">QUENCH ZONE</text>
               <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tQuench}°C</text>
