@@ -132,12 +132,11 @@ export default function LeverContext({
         <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
           <p className="text-[#666] text-[10px] uppercase tracking-wider mb-2 font-semibold">Corrective Actions</p>
 
-          {/* Buttons + preview card wrapped in a single hover-stable container.
-              The wrapper catches onMouseLeave so the preview card (pointer-events:none)
-              can never steal the cursor and cause a flicker loop. */}
+          {/* Stable hover container — onMouseLeave on wrapper clears preview,
+              never on individual buttons to avoid enter/leave flicker loops. */}
           {(() => {
             const getLeverStatus = (isActive, pct) => {
-              if (!isActive) return { label: "Idle", color: "#444" };
+              if (!isActive) return null;
               if (pct === 0)   return { label: "Commanded", color: "#aaa" };
               if (pct < 100)   return { label: `Building (${Math.round(pct)}%)`, color: "#E67E22" };
               return { label: "Full (100%)", color: "#0F9F9F" };
@@ -151,27 +150,7 @@ export default function LeverContext({
 
             return (
               <div onMouseLeave={() => setHoveredAction(null)}>
-                {/* Action Preview Card — pointer-events:none prevents cursor stealing.
-                    Fixed height reserve (130px) prevents layout shift when card appears/disappears. */}
-                <div style={{ height: 130, marginBottom: 8 }}>
-                  {preview && (
-                    <div
-                      style={{ pointerEvents: "none" }}
-                      className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg p-3 h-full overflow-hidden"
-                    >
-                      <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Action Preview · {preview.title}</p>
-                      <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-0.5">Predicted Effect</p>
-                      {preview.effects.map((e, i) => (
-                        <p key={i} className="text-[#888] text-xs">• {e}</p>
-                      ))}
-                      <div className="mt-1.5 pt-1.5 border-t border-[#1e1e1e]">
-                        <p className="text-[#3FC9B0] text-xs">{preview.projection(coolingCapacity)}</p>
-                        <p className="text-[#555] text-[10px] mt-0.5">{preview.stateShift(coolingCapacity)}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
+                {/* Button row — tight, no top spacer */}
                 <div className="flex flex-wrap gap-2">
                   {/* Feed Reduction */}
                   <div className="flex flex-col items-start gap-0.5">
@@ -187,7 +166,7 @@ export default function LeverContext({
                     >
                       {feedReductionActive ? "✓ " : "↓ "}Feed Reduction
                     </button>
-                    <span className="text-[10px] pl-0.5" style={{ color: feedStatus.color }}>{feedStatus.label}</span>
+                    {feedStatus && <span className="text-[10px] pl-0.5" style={{ color: feedStatus.color }}>{feedStatus.label}</span>}
                   </div>
 
                   {/* Quench Boost */}
@@ -204,7 +183,7 @@ export default function LeverContext({
                     >
                       {quenchBoostActive ? "✓ " : "↑ "}Quench Boost
                     </button>
-                    <span className="text-[10px] pl-0.5" style={{ color: quenchStatus.color }}>{quenchStatus.label}</span>
+                    {quenchStatus && <span className="text-[10px] pl-0.5" style={{ color: quenchStatus.color }}>{quenchStatus.label}</span>}
                   </div>
 
                   {/* Cooling Boost */}
@@ -221,8 +200,25 @@ export default function LeverContext({
                     >
                       {coolingBoostActive ? "✓ " : "↑ "}Cooling Boost
                     </button>
-                    <span className="text-[10px] pl-0.5" style={{ color: coolingStatus.color }}>{coolingStatus.label}</span>
+                    {coolingStatus && <span className="text-[10px] pl-0.5" style={{ color: coolingStatus.color }}>{coolingStatus.label}</span>}
                   </div>
+                </div>
+
+                {/* Preview panel BELOW buttons — fixed min-height so layout never jumps.
+                    pointer-events:none ensures it can never steal cursor from buttons. */}
+                <div style={{ minHeight: 90, marginTop: 10 }}>
+                  {preview && (
+                    <div style={{ pointerEvents: "none" }} className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg p-3">
+                      <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Action Preview · {preview.title}</p>
+                      {preview.effects.map((e, i) => (
+                        <p key={i} className="text-[#888] text-xs">• {e}</p>
+                      ))}
+                      <div className="mt-1.5 pt-1.5 border-t border-[#1e1e1e]">
+                        <p className="text-[#3FC9B0] text-xs">{preview.projection(coolingCapacity)}</p>
+                        <p className="text-[#555] text-[10px] mt-0.5">{preview.stateShift(coolingCapacity)}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );
