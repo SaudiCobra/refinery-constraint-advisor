@@ -2,6 +2,40 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 
+// Action preview definitions — static content + dynamic projection hook
+const ACTION_PREVIEWS = {
+  feedReduction: {
+    title: "Feed Reduction",
+    effects: [
+      "Reactor heat release reduced",
+      "Temperature slope slows",
+    ],
+    projection: (coolingCapacity) => "Time to limit increases moderately",
+    stateShift: (coolingCapacity) => "Improves margin across all states",
+  },
+  quench: {
+    title: "Quench Boost",
+    effects: [
+      "Hydrogen quench cooling increases",
+      "Reactor temperature drops slightly",
+    ],
+    projection: () => "Time to limit increases significantly",
+    stateShift: () => "Most effective at Severe Drift and above",
+  },
+  cooling: {
+    title: "Cooling Boost",
+    effects: [
+      "Effluent heat removal improves",
+      "Reactor outlet temperature stabilizes",
+    ],
+    projection: (coolingCapacity) =>
+      coolingCapacity === "CONSTRAINED" || coolingCapacity === "SEVERELY_LIMITED"
+        ? "Limited — cooling already constrained"
+        : "Largest improvement when cooling is available",
+    stateShift: () => "Best combined with feed reduction",
+  },
+};
+
 export default function LeverContext({
   equipment,
   coolingCapacity,
