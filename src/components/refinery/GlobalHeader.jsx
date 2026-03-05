@@ -2,7 +2,15 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import moment from "moment";
 
-export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, onAlarmsOnlyChange }) {
+const STATE_CHIP = {
+  NORMAL:         { label: "Stable",        dot: "#3FC9B0", text: "#3FC9B0" },
+  EARLY_DRIFT:    { label: "Early Drift",   dot: "#D9A441", text: "#D9A441" },
+  SEVERE_DRIFT:   { label: "Severe Drift",  dot: "#E06A2C", text: "#E06A2C" },
+  IMMEDIATE_RISK: { label: "Immediate Risk",dot: "#E14B3B", text: "#E14B3B" },
+};
+
+export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, onAlarmsOnlyChange, systemState }) {
+  const chip = STATE_CHIP[systemState] || STATE_CHIP.NORMAL;
   return (
     <div className="bg-[#161616] border-b border-[#2a2a2a] px-6 py-4">
       <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
