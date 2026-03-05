@@ -631,20 +631,20 @@ export default function ProcessMap({
           <circle cx={ANCHORS.E2.x - SIZES.E2.w/2 - 70} cy={Y_SPINE} r="5" fill="#1a1a1a" stroke="#B47A1F" strokeWidth="2" />
         </g>
 
-        {/* SPINE: E-1 Shell Out → E-2
+        {/* SPINE: E-1 Tube Out → E-2
+            Tube side = hot effluent being cooled → exits center-right nozzle (E1_TUBE_NOZZLE_Y = Y_SPINE) → goes to E-2.
             Routing:
-              1) Horizontal stub right from E-1 shell outlet nozzle to a dedicated riser x (RISER_X)
-              2) Vertical riser up from that stub to the TOP HEADER elevation (Y_TOP_HEADER)
+              1) Horizontal stub right from E-1 tube outlet (center-right) to RISER_X
+              2) Vertical riser up from stub to TOP HEADER elevation (Y_TOP_HEADER)
               3) TOP HEADER — continuous horizontal from RISER_X all the way right to E-2 drop
               4) Vertical drop from TOP HEADER down to E-2 spine inlet
             Junction dot at RISER_X / Y_TOP_HEADER makes the T-junction explicit.
+            Flow dot color = tubeThermalColor (hot effluent stream).
         */}
         {(() => {
-          // Riser x: offset right from E-1 outlet so it doesn't share x with the shell-to-reactor pipe
-          const RISER_X = ANCHORS.E1.x + SIZES.E1.w/2 + 60; // x=910
+          const RISER_X = ANCHORS.E1.x + SIZES.E1.w/2 + 60; // x=910 — offset right to avoid overlap with shell-to-reactor pipe
           const Y_TOP_HEADER = Y_UPPER_ZONE - 60;            // y=460
-          const E1_TUBE_NOZZLE_Y = ANCHORS.E1.y;             // center-right (tube outlet) of E-1
-          const flowColor = getThermalColor(shellSideOutletTemp);
+          const E1_TUBE_NOZZLE_Y = Y_SPINE;                  // center-right (tube outlet) = spine elevation
           return (
             <>
               {/* 1) Short horizontal stub from E-1 tube outlet nozzle (center-right) → RISER_X */}
@@ -657,8 +657,8 @@ export default function ProcessMap({
               <line x1={RISER_X} y1={Y_TOP_HEADER} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_TOP_HEADER} stroke="#555" strokeWidth="4" opacity="0.9" />
               {/* 4) Vertical drop from TOP HEADER to E-2 inlet on spine */}
               <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_TOP_HEADER} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
-              {/* Flow dot travelling along TOP HEADER to E-2 */}
-              <circle cx={RISER_X} cy={Y_TOP_HEADER} r="4" fill={flowColor}>
+              {/* Flow dot travelling along TOP HEADER to E-2 (tube = hot effluent color) */}
+              <circle cx={RISER_X} cy={Y_TOP_HEADER} r="4" fill={tubeThermalColor}>
                 <animate attributeName="cx" values={`${RISER_X};${ANCHORS.E2.x - SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
               </circle>
             </>
