@@ -711,14 +711,19 @@ export default function ProcessMap({
 
 
         {/* === STATIC TEMPERATURE INDICATORS === */}
-        {/* RIT — Reactor Inlet Temperature: top-right of reactor, above inlet pipe (user's white "RIT" box location) */}
-        {/* Position: same slot previously used by ROT — R1.x + R1.w/2 + 90, R1.y - R1.h/2 - 90 */}
+
+        {/* RIT — Reactor Inlet Temperature
+            Anchor: left of reactor body, vertically centered on reactor mid-point.
+            R1 left edge = R1.x - R1.w/2 = 1260 - 80 = 1180
+            Box half-width = 52. GAP = 18.
+            cx = 1180 - 18 - 52 = 1110   cy = R1.y = 660 (reactor center)
+        */}
         {(() => {
           const hihi = 370; const gap = hihi - tBed; const near = gap <= 15;
-          const rx = ANCHORS.R1.x + SIZES.R1.w/2 + 90;
-          const ry = ANCHORS.R1.y - SIZES.R1.h/2 - 90;
+          const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 52; // 1110
+          const cy = ANCHORS.R1.y;                            // 660
           return (
-            <g transform={`translate(${rx}, ${ry})`}>
+            <g transform={`translate(${cx}, ${cy})`}>
               <rect x="-52" y="-20" width="104" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
               <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">RIT</text>
               <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tBed}°C</text>
@@ -728,12 +733,19 @@ export default function ProcessMap({
           );
         })()}
 
-        {/* ROT — Reactor Outlet Temperature: below-left of reactor body, clear of outlet drop pipe */}
-        {/* Position: slot previously used by RIT (translate 1100, 870), nudged down to 900 to clear outlet pipe */}
+        {/* ROT — Reactor Outlet Temperature
+            Anchor: below reactor body, shifted LEFT of the outlet drop pipe (x=1260).
+            R1 bottom = R1.y + R1.h/2 = 660 + 140 = 800.
+            Outlet drop pipe is at x=1260. Place box left of it: cx = 1260 - 80 - 18 = 1162, shifted to 1090 for clear gap.
+            cy = 800 + 18 + 20 = 838 (below bottom nozzle, 18px gap).
+            Split point is at y=880 — box bottom at 838+36=874, clear.
+        */}
         {(() => {
           const hihi = 380; const gap = hihi - tOutlet; const near = gap <= 15;
+          const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 64; // 1098 — left of outlet pipe
+          const cy = ANCHORS.R1.y + SIZES.R1.h/2 + 38;       // 838 — below reactor bottom nozzle
           return (
-            <g transform="translate(1100, 900)">
+            <g transform={`translate(${cx}, ${cy})`}>
               <rect x="-64" y="-20" width="128" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
               <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">ROT</text>
               <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tOutlet}°C</text>
