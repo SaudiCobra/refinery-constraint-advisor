@@ -725,13 +725,17 @@ export default function ProcessMap({
           );
         })()}
 
-        {/* Reactor Outlet Temp: right of reactor outlet nozzle */}
+        {/* ROT — Reactor Outlet Temperature: positioned above-right of reactor, outside piping envelope */}
         {(() => {
           const hihi = 380; const gap = hihi - tOutlet; const near = gap <= 15;
+          // Anchor: right of reactor top nozzle area, above the upper-corridor pipe (Y_UPPER_ZONE - 60 = 460)
+          // Place at x = R1.x + R1.w/2 + 90 (clear of H₂ header at +40), y = R1.y - R1.h/2 - 90 (above top nozzle)
+          const rx = ANCHORS.R1.x + SIZES.R1.w/2 + 90;
+          const ry = ANCHORS.R1.y - SIZES.R1.h/2 - 90;
           return (
-            <g transform="translate(1390, 835)">
+            <g transform={`translate(${rx}, ${ry})`}>
               <rect x="-64" y="-20" width="128" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
-              <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">RXT OUTLET</text>
+              <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">ROT</text>
               <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tOutlet}°C</text>
               <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 370 · HIHI 380°C</text>
               {near && <text x="0" y="43" fill={gap <= 5 ? "#E14B3B" : gap <= 10 ? "#E06A2C" : "#D9A441"} fontSize="11" textAnchor="middle" fontWeight="600">{gap > 0 ? `${gap}°C to HIHI` : "AT HIHI"}</text>}
