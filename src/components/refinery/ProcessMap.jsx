@@ -726,30 +726,34 @@ export default function ProcessMap({
         {/* === STATIC TEMPERATURE INDICATORS === */}
         {/* T-bed: Upper bed area, left of reactor */}
         <g transform="translate(1075, 590)">
-          <rect x="-52" y="-20" width="104" height="40" rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
+          <rect x="-52" y="-20" width="104" height="56" rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
           <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">T-BED</text>
           <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tBed}°C</text>
+          <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 360 · HIHI 370°C</text>
         </g>
 
         {/* Reactor Outlet Temp: right of reactor outlet nozzle */}
         <g transform="translate(1390, 835)">
-          <rect x="-64" y="-20" width="128" height="40" rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
+          <rect x="-64" y="-20" width="128" height="56" rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
           <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">RXT OUTLET</text>
           <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tOutlet}°C</text>
+          <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 370 · HIHI 380°C</text>
         </g>
 
         {/* Quench Zone Temp: right of reactor mid-section (inter-bed quench zone) */}
         <g transform="translate(1460, 660)">
-          <rect x="-60" y="-20" width="120" height="40" rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
+          <rect x="-60" y="-20" width="120" height="56" rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
           <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">QUENCH ZONE</text>
           <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tQuench}°C</text>
+          <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 355 · HIHI 365°C</text>
         </g>
 
         {/* Feed Cooler Outlet Temp: above spine between E-2 and D-1 */}
         <g transform="translate(2080, 614)">
-          <rect x="-66" y="-20" width="132" height="40" rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
+          <rect x="-66" y="-20" width="132" height="56" rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
           <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">COOLER OUTLET</text>
           <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tCoolerOutlet}°C</text>
+          <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 90 · HIHI 100°C</text>
         </g>
 
       </svg>
