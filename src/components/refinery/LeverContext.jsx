@@ -7,19 +7,19 @@ const ACTION_PREVIEWS = {
   feedReduction: {
     title: "Feed Reduction",
     effects: [
-      "Reactor heat release reduced",
-      "Temperature slope slows",
+      "Reactor heat release drops",
+      "Temperature rise slows materially",
     ],
-    projection: (coolingCapacity) => "Time to limit increases moderately",
-    stateShift: (coolingCapacity) => "Improves margin across all states",
+    projection: () => "Time to limit increases strongly",
+    stateShift: () => "Best first move when drift is building",
   },
   quench: {
     title: "Quench Boost",
     effects: [
       "Hydrogen quench cooling increases",
-      "Reactor temperature drops slightly",
+      "Reactor temperature eases slightly",
     ],
-    projection: () => "Time to limit increases significantly",
+    projection: () => "Time to limit increases moderately",
     stateShift: () => "Most effective at Severe Drift and above",
   },
   cooling: {
