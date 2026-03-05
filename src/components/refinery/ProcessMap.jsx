@@ -401,19 +401,12 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* E-1 Shell Out → Reactor Inlet (Top Nozzle Entry) */}
-        {/* Vertical rise from E-1 shell outlet (bottom-right nozzle) to reactor top inlet elevation */}
-        {(() => {
-          const E1_SHELL_NOZZLE_Y = ANCHORS.E1.y + SIZES.E1.h/2 - 18;
-          return (
-            <>
-              <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_SHELL_NOZZLE_Y} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-              <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(E1_SHELL_NOZZLE_Y + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
-                <animate attributeName="cy" values={`${E1_SHELL_NOZZLE_Y};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
-              </circle>
-            </>
-          );
-        })()}
+        {/* E-1 Tube Out → Reactor Inlet (Top Nozzle Entry) */}
+        {/* Vertical rise from E-1 outlet to top nozzle elevation */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
+        <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
         
         {/* Horizontal run to reactor centerline at top */}
         <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
@@ -638,17 +631,17 @@ export default function ProcessMap({
             Junction dot at RISER_X / Y_TOP_HEADER makes the T-junction explicit.
         */}
         {(() => {
-          // Riser x: offset right from E-1 outlet so it doesn't share x with the shell-to-reactor pipe
+          // Riser x: offset right from E-1 outlet so it doesn't share x with the tube outlet pipe
           const RISER_X = ANCHORS.E1.x + SIZES.E1.w/2 + 60; // x=910
           const Y_TOP_HEADER = Y_UPPER_ZONE - 60;            // y=460
-          const E1_TUBE_NOZZLE_Y = ANCHORS.E1.y;             // center-right (tube outlet) of E-1
+          const E1_SHELL_NOZZLE_Y = ANCHORS.E1.y + SIZES.E1.h/2 - 18; // bottom nozzle of E-1 shell side
           const flowColor = getThermalColor(shellSideOutletTemp);
           return (
             <>
-              {/* 1) Short horizontal stub from E-1 tube outlet nozzle (center-right) → RISER_X */}
-              <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_TUBE_NOZZLE_Y} x2={RISER_X} y2={E1_TUBE_NOZZLE_Y} stroke="#555" strokeWidth="4" opacity="0.9" />
+              {/* 1) Short horizontal stub from E-1 shell outlet nozzle → RISER_X */}
+              <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_SHELL_NOZZLE_Y} x2={RISER_X} y2={E1_SHELL_NOZZLE_Y} stroke="#555" strokeWidth="4" opacity="0.9" />
               {/* 2) Vertical riser from stub up to TOP HEADER */}
-              <line x1={RISER_X} y1={E1_TUBE_NOZZLE_Y} x2={RISER_X} y2={Y_TOP_HEADER} stroke="#555" strokeWidth="4" opacity="0.9" />
+              <line x1={RISER_X} y1={E1_SHELL_NOZZLE_Y} x2={RISER_X} y2={Y_TOP_HEADER} stroke="#555" strokeWidth="4" opacity="0.9" />
               {/* Junction dot at T-intersection on TOP HEADER */}
               <circle cx={RISER_X} cy={Y_TOP_HEADER} r="6" fill="#555" />
               {/* 3) TOP HEADER — main line from RISER_X → E-2 drop point */}
