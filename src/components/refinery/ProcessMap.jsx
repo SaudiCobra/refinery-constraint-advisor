@@ -401,31 +401,33 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* E-1 Shell Out → Reactor Inlet (Top Nozzle Entry) */}
-        {/* Vertical rise from E-1 shell outlet (bottom-right nozzle) to reactor top inlet elevation */}
+        {/* E-1 Shell Out → Reactor Inlet (Top Nozzle Entry)
+            Shell side = cold feed being heated → exits bottom-right nozzle → goes to reactor.
+            Start Y = E1_SHELL_NOZZLE_Y (bottom-right nozzle of E-1).
+            Flow dot color = shellThermalColor (heated feed stream).
+        */}
         {(() => {
           const E1_SHELL_NOZZLE_Y = ANCHORS.E1.y + SIZES.E1.h/2 - 18;
           return (
             <>
+              {/* Vertical rise from shell outlet nozzle up to reactor top nozzle elevation */}
               <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_SHELL_NOZZLE_Y} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-              <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(E1_SHELL_NOZZLE_Y + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
+              <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(E1_SHELL_NOZZLE_Y + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={shellThermalColor}>
                 <animate attributeName="cy" values={`${E1_SHELL_NOZZLE_Y};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
+              </circle>
+              {/* Horizontal run to reactor centerline at top */}
+              <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
+              <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={shellThermalColor}>
+                <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
+              </circle>
+              {/* Short vertical nozzle penetration into reactor top */}
+              <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} {...getPathStyle()} className="transition-all duration-700" />
+              <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={shellThermalColor}>
+                <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
               </circle>
             </>
           );
         })()}
-        
-        {/* Horizontal run to reactor centerline at top */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
-        </circle>
-        
-        {/* Short vertical nozzle penetration into reactor top */}
-        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} {...getPathStyle()} className="transition-all duration-700" />
-        <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
-        </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
         <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("reactor")}>
