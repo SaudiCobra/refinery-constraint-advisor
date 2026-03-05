@@ -550,6 +550,17 @@ export default function Home() {
     setManarahOpen(true);
   };
 
+  // ── ESC key closes Manarah panel (both modes) ───────────────────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "Escape" && manarahOpen) {
+        setManarahOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [manarahOpen]);
+
   // ── Keyboard quick-switch (Interactive mode only) ────────────────────────────
   // 1 = NORMAL | 2 = EARLY_DRIFT | 3 = SEVERE_DRIFT | 4 = IMMEDIATE_RISK
   // Ignored when focus is inside an input/textarea/select (prevents interference).
