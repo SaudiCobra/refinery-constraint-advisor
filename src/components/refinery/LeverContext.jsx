@@ -50,6 +50,16 @@ export default function LeverContext({
 }) {
   const [expanded, setExpanded] = React.useState(false);
   const [hoveredAction, setHoveredAction] = React.useState(null);
+  // Debounce clear so moving between buttons doesn't flash the preview off/on
+  const clearTimerRef = React.useRef(null);
+
+  const handleEnter = (action) => {
+    if (clearTimerRef.current) { clearTimeout(clearTimerRef.current); clearTimerRef.current = null; }
+    setHoveredAction(action);
+  };
+  const handleLeave = () => {
+    clearTimerRef.current = setTimeout(() => setHoveredAction(null), 100);
+  };
   
   const levers = [
     {
