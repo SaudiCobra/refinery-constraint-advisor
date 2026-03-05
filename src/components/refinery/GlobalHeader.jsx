@@ -78,7 +78,27 @@ export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, on
             </label>
           </div>
 
-          <p className="text-[#555] text-xs italic">Advisory only — operator retains control.</p>
+          <div className="flex items-center gap-3">
+            {/* Status chip */}
+            <div
+              style={{ borderColor: chip.dot + "55" }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-[#111] transition-all duration-300"
+            >
+              <div
+                style={{ background: chip.dot }}
+                className="w-1.5 h-1.5 rounded-full flex-shrink-0 transition-all duration-300"
+              />
+              <span
+                style={{ color: chip.text }}
+                className="text-xs font-medium tracking-wide transition-all duration-300"
+              >
+                {displayMode === "interactive" ? "Interactive" : "Presentation"}
+                &nbsp;·&nbsp;
+                {chip.label}
+              </span>
+            </div>
+            <p className="text-[#555] text-xs italic">Advisory only — operator retains control.</p>
+          </div>
         </div>
       </div>
     </div>
