@@ -760,6 +760,109 @@ export default function ProcessMap({
         </g>
 
 
+        {/* === CAUSE → EFFECT PROPAGATION OVERLAYS (pointer-events: none) === */}
+        {isPropagating && (
+          <g pointerEvents="none">
+            {/* A) COOLING CAUSE — E-2 glow overlay */}
+            {isCoolingConstraint && (
+              <rect
+                className="pfd-cause"
+                x={ANCHORS.E2.x - SIZES.E2.w/2 - 6}
+                y={ANCHORS.E2.y - SIZES.E2.h/2 - 6}
+                width={SIZES.E2.w + 12}
+                height={SIZES.E2.h + 12}
+                rx="14"
+                fill="none"
+                stroke={pulseColor}
+                strokeWidth="5"
+                opacity="0.08"
+              />
+            )}
+
+            {/* B) QUENCH CAUSE — Q1/Q2 header segment glow */}
+            {isQuenchConstraint && (
+              <line
+                className="pfd-cause"
+                x1={ANCHORS.R1.x + SIZES.R1.w/2 + 40}
+                y1={ANCHORS.R1.y - SIZES.R1.h/2 - 30}
+                x2={ANCHORS.R1.x + SIZES.R1.w/2 + 40}
+                y2={ANCHORS.R1.y + SIZES.R1.h/2 - 10}
+                stroke={pulseColor}
+                strokeWidth="6"
+                opacity="0.08"
+              />
+            )}
+
+            {/* PATH — effluent line from reactor bottom → E-2 (vertical drop + upper corridor) */}
+            {isCoolingConstraint && (
+              <>
+                {/* Reactor outlet drop */}
+                <line
+                  className="pfd-path"
+                  x1={ANCHORS.R1.x}
+                  y1={ANCHORS.R1.y + SIZES.R1.h/2}
+                  x2={ANCHORS.R1.x}
+                  y2={Y_LOWER_ZONE - 20}
+                  stroke={pulseColor}
+                  strokeWidth="7"
+                  opacity="0.08"
+                />
+                {/* Shell-side upper corridor to E-2 */}
+                <line
+                  className="pfd-path"
+                  x1={ANCHORS.E1.x + SIZES.E1.w/2}
+                  y1={Y_UPPER_ZONE - 60}
+                  x2={ANCHORS.E2.x - SIZES.E2.w/2}
+                  y2={Y_UPPER_ZONE - 60}
+                  stroke={pulseColor}
+                  strokeWidth="7"
+                  opacity="0.08"
+                />
+              </>
+            )}
+
+            {/* PATH — quench feed lines from header into reactor */}
+            {isQuenchConstraint && (
+              <>
+                <line
+                  className="pfd-path"
+                  x1={ANCHORS.R1.x + SIZES.R1.w/2}
+                  y1={ANCHORS.R1.y - 22}
+                  x2={ANCHORS.R1.x + SIZES.R1.w/2 + 40}
+                  y2={ANCHORS.R1.y - 22}
+                  stroke={pulseColor}
+                  strokeWidth="5"
+                  opacity="0.08"
+                />
+                <line
+                  className="pfd-path"
+                  x1={ANCHORS.R1.x + SIZES.R1.w/2}
+                  y1={ANCHORS.R1.y + 58}
+                  x2={ANCHORS.R1.x + SIZES.R1.w/2 + 40}
+                  y2={ANCHORS.R1.y + 58}
+                  stroke={pulseColor}
+                  strokeWidth="5"
+                  opacity="0.08"
+                />
+              </>
+            )}
+
+            {/* IMPACT — Reactor outline pulse (always last, for both constraint types) */}
+            <rect
+              className="pfd-impact"
+              x={ANCHORS.R1.x - SIZES.R1.w/2 - 6}
+              y={ANCHORS.R1.y - SIZES.R1.h/2 - 6}
+              width={SIZES.R1.w + 12}
+              height={SIZES.R1.h + 12}
+              rx="6"
+              fill="none"
+              stroke={pulseColor}
+              strokeWidth="5"
+              opacity="0.08"
+            />
+          </g>
+        )}
+
         {/* === STATIC TEMPERATURE INDICATORS === */}
 
         {/* RIT — Reactor Inlet Temperature
