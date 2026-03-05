@@ -594,10 +594,10 @@ export default function ProcessMap({
           {[-60, -40, -20, 0, 20, 40, 60].map(y => (
             <line key={y} x1={-SIZES.E2.w/2 + 16} y1={y} x2={SIZES.E2.w/2 - 16} y2={y} stroke="#2F5D80" strokeWidth="2.5" opacity="0.54" />
           ))}
-          {!equipment.effluentCooler && (
+          {(effectiveState === "SEVERE_DRIFT" || effectiveState === "IMMEDIATE_RISK") && (
             <>
-              <line x1={-SIZES.E2.w/2 + 10} y1={-SIZES.E2.h/2 + 10} x2={SIZES.E2.w/2 - 10} y2={SIZES.E2.h/2 - 10} stroke="#A13A1F" strokeWidth="4" />
-              <line x1={SIZES.E2.w/2 - 10} y1={-SIZES.E2.h/2 + 10} x2={-SIZES.E2.w/2 + 10} y2={SIZES.E2.h/2 - 10} stroke="#A13A1F" strokeWidth="4" />
+              <line x1={-SIZES.E2.w/2 + 10} y1={-SIZES.E2.h/2 + 10} x2={SIZES.E2.w/2 - 10} y2={SIZES.E2.h/2 - 10} stroke="#A13A1F" strokeWidth="4" pointerEvents="none" />
+              <line x1={SIZES.E2.w/2 - 10} y1={-SIZES.E2.h/2 + 10} x2={-SIZES.E2.w/2 + 10} y2={SIZES.E2.h/2 - 10} stroke="#A13A1F" strokeWidth="4" pointerEvents="none" />
             </>
           )}
           <text x="0" y={SIZES.E2.h/2 + 28} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">E-2</text>
