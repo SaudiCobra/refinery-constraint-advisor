@@ -638,15 +638,15 @@ export default function ProcessMap({
             Junction dot at RISER_X / Y_TOP_HEADER makes the T-junction explicit.
         */}
         {(() => {
-          // Riser x: offset right from E-1 outlet so it doesn't share x with the tube outlet pipe
+          // Riser x: offset right from E-1 outlet so it doesn't share x with the shell-to-reactor pipe
           const RISER_X = ANCHORS.E1.x + SIZES.E1.w/2 + 60; // x=910
           const Y_TOP_HEADER = Y_UPPER_ZONE - 60;            // y=460
-          const E1_SHELL_NOZZLE_Y = ANCHORS.E1.y + SIZES.E1.h/2 - 18; // bottom nozzle of E-1 shell side
+          const E1_TUBE_NOZZLE_Y = ANCHORS.E1.y;             // center-right (tube outlet) of E-1
           const flowColor = getThermalColor(shellSideOutletTemp);
           return (
             <>
-              {/* 1) Short horizontal stub from E-1 shell outlet nozzle → RISER_X */}
-              <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_SHELL_NOZZLE_Y} x2={RISER_X} y2={E1_SHELL_NOZZLE_Y} stroke="#555" strokeWidth="4" opacity="0.9" />
+              {/* 1) Short horizontal stub from E-1 tube outlet nozzle (center-right) → RISER_X */}
+              <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_TUBE_NOZZLE_Y} x2={RISER_X} y2={E1_TUBE_NOZZLE_Y} stroke="#555" strokeWidth="4" opacity="0.9" />
               {/* 2) Vertical riser from stub up to TOP HEADER */}
               <line x1={RISER_X} y1={E1_SHELL_NOZZLE_Y} x2={RISER_X} y2={Y_TOP_HEADER} stroke="#555" strokeWidth="4" opacity="0.9" />
               {/* Junction dot at T-intersection on TOP HEADER */}
