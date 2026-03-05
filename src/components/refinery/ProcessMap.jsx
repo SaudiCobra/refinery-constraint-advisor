@@ -830,10 +830,10 @@ export default function ProcessMap({
                   strokeWidth="7"
                   opacity="0.08"
                 />
-                {/* Shell-side upper corridor to E-2 */}
+                {/* Shell-side TOP HEADER to E-2 (matches new riser routing) */}
                 <line
                   className="pfd-path"
-                  x1={ANCHORS.E1.x + SIZES.E1.w/2}
+                  x1={ANCHORS.E1.x + SIZES.E1.w/2 + 60}
                   y1={Y_UPPER_ZONE - 60}
                   x2={ANCHORS.E2.x - SIZES.E2.w/2}
                   y2={Y_UPPER_ZONE - 60}
