@@ -720,8 +720,8 @@ export default function ProcessMap({
         */}
         {(() => {
           const hihi = 370; const gap = hihi - tBed; const near = gap <= 15;
-          const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 52 - 18 - 14; // 1078 (shifted left 14px more)
-          const cy = ANCHORS.R1.y - 10 - 8;                            // 642 (shifted up 8px more)
+          const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 52 - 18 - 14 - 12; // 1066 (shifted left 12px more)
+          const cy = ANCHORS.R1.y - 10 - 8 - 8;                            // 634 (shifted up 8px more)
           return (
             <g transform={`translate(${cx}, ${cy})`}>
               <rect x="-52" y="-20" width="104" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
