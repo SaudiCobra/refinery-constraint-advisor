@@ -132,28 +132,9 @@ export default function LeverContext({
         <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
           <p className="text-[#666] text-[10px] uppercase tracking-wider mb-2 font-semibold">Corrective Actions</p>
 
-          {/* Action Preview Card */}
-          {hoveredAction && (() => {
-            const preview = ACTION_PREVIEWS[hoveredAction];
-            if (!preview) return null;
-            return (
-              <div className="mb-3 bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg p-3 pointer-events-none">
-                <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Action Preview</p>
-                <p className="text-[#bbb] text-xs font-semibold mb-2">{preview.title}</p>
-                <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Predicted Effect</p>
-                {preview.effects.map((e, i) => (
-                  <p key={i} className="text-[#888] text-xs">• {e}</p>
-                ))}
-                <div className="mt-2 pt-2 border-t border-[#1e1e1e]">
-                  <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Projection</p>
-                  <p className="text-[#3FC9B0] text-xs">{preview.projection(coolingCapacity)}</p>
-                  <p className="text-[#555] text-[10px] mt-0.5">{preview.stateShift(coolingCapacity)}</p>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* Helper: derive per-lever status label from rampProgress */}
+          {/* Buttons + preview card wrapped in a single hover-stable container.
+              The wrapper catches onMouseLeave so the preview card (pointer-events:none)
+              can never steal the cursor and cause a flicker loop. */}
           {(() => {
             const getLeverStatus = (isActive, pct) => {
               if (!isActive) return { label: "Idle", color: "#444" };
@@ -166,60 +147,82 @@ export default function LeverContext({
             const quenchStatus  = getLeverStatus(quenchBoostActive,   rampProgress?.h2      ?? 0);
             const coolingStatus = getLeverStatus(coolingBoostActive,  rampProgress?.cooling ?? 0);
 
+            const preview = hoveredAction ? ACTION_PREVIEWS[hoveredAction] : null;
+
             return (
-              <div className="flex flex-wrap gap-2">
-                {/* Feed Reduction */}
-                <div className="flex flex-col items-start gap-0.5">
-                  <button
-                    onClick={() => onMitigate("feedReduction")}
-                    onMouseEnter={() => setHoveredAction("feedReduction")}
-                    onMouseLeave={() => setHoveredAction(null)}
-                    className={cn(
-                      "px-3 py-1.5 rounded border text-xs transition-all duration-200",
-                      feedReductionActive
-                        ? "border-[#E67E22] text-[#E67E22] bg-[#E67E22]/10"
-                        : "border-[#444] text-[#aaa] hover:border-[#E67E22] hover:text-[#E67E22]"
-                    )}
-                  >
-                    {feedReductionActive ? "✓ " : "↓ "}Feed Reduction
-                  </button>
-                  <span className="text-[10px] pl-0.5" style={{ color: feedStatus.color }}>{feedStatus.label}</span>
+              <div onMouseLeave={() => setHoveredAction(null)}>
+                {/* Action Preview Card — pointer-events:none prevents cursor stealing.
+                    Fixed height reserve (130px) prevents layout shift when card appears/disappears. */}
+                <div style={{ height: 130, marginBottom: 8 }}>
+                  {preview && (
+                    <div
+                      style={{ pointerEvents: "none" }}
+                      className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg p-3 h-full overflow-hidden"
+                    >
+                      <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Action Preview · {preview.title}</p>
+                      <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-0.5">Predicted Effect</p>
+                      {preview.effects.map((e, i) => (
+                        <p key={i} className="text-[#888] text-xs">• {e}</p>
+                      ))}
+                      <div className="mt-1.5 pt-1.5 border-t border-[#1e1e1e]">
+                        <p className="text-[#3FC9B0] text-xs">{preview.projection(coolingCapacity)}</p>
+                        <p className="text-[#555] text-[10px] mt-0.5">{preview.stateShift(coolingCapacity)}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Quench Boost */}
-                <div className="flex flex-col items-start gap-0.5">
-                  <button
-                    onClick={() => onMitigate("quench")}
-                    onMouseEnter={() => setHoveredAction("quench")}
-                    onMouseLeave={() => setHoveredAction(null)}
-                    className={cn(
-                      "px-3 py-1.5 rounded border text-xs transition-all duration-200",
-                      quenchBoostActive
-                        ? "border-[#4A90E2] text-[#4A90E2] bg-[#4A90E2]/10"
-                        : "border-[#444] text-[#aaa] hover:border-[#4A90E2] hover:text-[#4A90E2]"
-                    )}
-                  >
-                    {quenchBoostActive ? "✓ " : "↑ "}Quench Boost
-                  </button>
-                  <span className="text-[10px] pl-0.5" style={{ color: quenchStatus.color }}>{quenchStatus.label}</span>
-                </div>
+                <div className="flex flex-wrap gap-2">
+                  {/* Feed Reduction */}
+                  <div className="flex flex-col items-start gap-0.5">
+                    <button
+                      onClick={() => onMitigate("feedReduction")}
+                      onMouseEnter={() => setHoveredAction("feedReduction")}
+                      className={cn(
+                        "px-3 py-1.5 rounded border text-xs transition-colors duration-150",
+                        feedReductionActive
+                          ? "border-[#E67E22] text-[#E67E22] bg-[#E67E22]/10"
+                          : "border-[#444] text-[#aaa] hover:border-[#E67E22] hover:text-[#E67E22]"
+                      )}
+                    >
+                      {feedReductionActive ? "✓ " : "↓ "}Feed Reduction
+                    </button>
+                    <span className="text-[10px] pl-0.5" style={{ color: feedStatus.color }}>{feedStatus.label}</span>
+                  </div>
 
-                {/* Cooling Boost */}
-                <div className="flex flex-col items-start gap-0.5">
-                  <button
-                    onClick={() => onMitigate("cooling")}
-                    onMouseEnter={() => setHoveredAction("cooling")}
-                    onMouseLeave={() => setHoveredAction(null)}
-                    className={cn(
-                      "px-3 py-1.5 rounded border text-xs transition-all duration-200",
-                      coolingBoostActive
-                        ? "border-[#0F9F9F] text-[#0F9F9F] bg-[#0F9F9F]/10"
-                        : "border-[#444] text-[#aaa] hover:border-[#0F7F7F] hover:text-[#0F9F9F]"
-                    )}
-                  >
-                    {coolingBoostActive ? "✓ " : "↑ "}Cooling Boost
-                  </button>
-                  <span className="text-[10px] pl-0.5" style={{ color: coolingStatus.color }}>{coolingStatus.label}</span>
+                  {/* Quench Boost */}
+                  <div className="flex flex-col items-start gap-0.5">
+                    <button
+                      onClick={() => onMitigate("quench")}
+                      onMouseEnter={() => setHoveredAction("quench")}
+                      className={cn(
+                        "px-3 py-1.5 rounded border text-xs transition-colors duration-150",
+                        quenchBoostActive
+                          ? "border-[#4A90E2] text-[#4A90E2] bg-[#4A90E2]/10"
+                          : "border-[#444] text-[#aaa] hover:border-[#4A90E2] hover:text-[#4A90E2]"
+                      )}
+                    >
+                      {quenchBoostActive ? "✓ " : "↑ "}Quench Boost
+                    </button>
+                    <span className="text-[10px] pl-0.5" style={{ color: quenchStatus.color }}>{quenchStatus.label}</span>
+                  </div>
+
+                  {/* Cooling Boost */}
+                  <div className="flex flex-col items-start gap-0.5">
+                    <button
+                      onClick={() => onMitigate("cooling")}
+                      onMouseEnter={() => setHoveredAction("cooling")}
+                      className={cn(
+                        "px-3 py-1.5 rounded border text-xs transition-colors duration-150",
+                        coolingBoostActive
+                          ? "border-[#0F9F9F] text-[#0F9F9F] bg-[#0F9F9F]/10"
+                          : "border-[#444] text-[#aaa] hover:border-[#0F7F7F] hover:text-[#0F9F9F]"
+                      )}
+                    >
+                      {coolingBoostActive ? "✓ " : "↑ "}Cooling Boost
+                    </button>
+                    <span className="text-[10px] pl-0.5" style={{ color: coolingStatus.color }}>{coolingStatus.label}</span>
+                  </div>
                 </div>
               </div>
             );
