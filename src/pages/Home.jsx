@@ -599,7 +599,6 @@ export default function Home() {
         onModeChange={setDisplayMode}
         alarmsOnly={alarmsOnly}
         onAlarmsOnlyChange={setAlarmsOnly}
-        systemState={systemState}
       />
 
       <AlarmBanner

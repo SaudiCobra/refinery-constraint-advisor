@@ -2,15 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import moment from "moment";
 
-const STATE_CHIP = {
-  NORMAL:         { label: "Stable",        dot: "#3FC9B0", text: "#3FC9B0" },
-  EARLY_DRIFT:    { label: "Early Drift",   dot: "#D9A441", text: "#D9A441" },
-  SEVERE_DRIFT:   { label: "Severe Drift",  dot: "#E06A2C", text: "#E06A2C" },
-  IMMEDIATE_RISK: { label: "Immediate Risk",dot: "#E14B3B", text: "#E14B3B" },
-};
-
-export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, onAlarmsOnlyChange, systemState }) {
-  const chip = STATE_CHIP[systemState] || STATE_CHIP.NORMAL;
+export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, onAlarmsOnlyChange }) {
   return (
     <div className="bg-[#161616] border-b border-[#2a2a2a] px-6 py-4">
       <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -78,27 +70,7 @@ export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, on
             </label>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Status chip */}
-            <div
-              style={{ borderColor: chip.dot + "55" }}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-[#111] transition-all duration-300"
-            >
-              <div
-                style={{ background: chip.dot }}
-                className="w-1.5 h-1.5 rounded-full flex-shrink-0 transition-all duration-300"
-              />
-              <span
-                style={{ color: chip.text }}
-                className="text-xs font-medium tracking-wide transition-all duration-300"
-              >
-                {displayMode === "interactive" ? "Interactive" : "Presentation"}
-                &nbsp;·&nbsp;
-                {chip.label}
-              </span>
-            </div>
-            <p className="text-[#555] text-xs italic">Advisory only — operator retains control.</p>
-          </div>
+          <p className="text-[#555] text-xs italic">Advisory only — operator retains control.</p>
         </div>
       </div>
     </div>
