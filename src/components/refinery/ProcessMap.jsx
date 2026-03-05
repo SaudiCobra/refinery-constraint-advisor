@@ -233,6 +233,45 @@ export default function ProcessMap({
     return { stroke: "#555", strokeWidth: "4", opacity: 0.9 };
   };
 
+  // ── CAUSE → EFFECT propagation highlight ────────────────────────────────────
+  // Determine which constraint sources are active (cooling / quench / both)
+  const isCoolingConstraint = (
+    !equipment.effluentCooler ||
+    coolingCapacity === "CONSTRAINED" ||
+    coolingCapacity === "SEVERELY_LIMITED"
+  ) && effectiveState !== "NORMAL";
+
+  const isQuenchConstraint = (
+    equipment.h2Compressor === false ||
+    (hotSpotRisk === "HIGH" && effectiveState !== "NORMAL")
+  ) && effectiveState !== "NORMAL";
+
+  // Only pulse when at least Early Drift — never in Stable
+  const isPropagating = effectiveState !== "NORMAL" && (isCoolingConstraint || isQuenchConstraint);
+
+  // Phase: 0=cause, 1=path, 2=impact — cycles on 1500ms interval
+  const phaseRef = useRef(0);
+  const [propagationPhase, setPropagationPhase] = useState(0);
+
+  useEffect(() => {
+    if (!isPropagating) {
+      setPropagationPhase(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      phaseRef.current = (phaseRef.current + 1) % 3;
+      setPropagationPhase(phaseRef.current);
+    }, 500); // each phase = 500ms → full 1500ms cycle
+    return () => clearInterval(interval);
+  }, [isPropagating]);
+
+  // Pick pulse color from existing state palette
+  const pulseColor = effectiveState === "IMMEDIATE_RISK" ? "#C0392B"
+    : effectiveState === "SEVERE_DRIFT"   ? "#D4653F"
+    : "#E67E22"; // EARLY_DRIFT
+
+  const pulseOpacity = (phase, target) => propagationPhase === target ? 0.55 : 0.10;
+
   return (
     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative">
       <svg viewBox="0 0 2560 1200" className="w-full h-auto">
