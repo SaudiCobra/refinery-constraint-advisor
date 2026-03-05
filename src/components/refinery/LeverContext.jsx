@@ -142,126 +142,125 @@ export default function LeverContext({
         <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
           <p className="text-[#666] text-[10px] uppercase tracking-wider mb-2 font-semibold">Corrective Actions</p>
 
-          {/* Stable hover container — onMouseLeave on wrapper clears preview,
-              never on individual buttons to avoid enter/leave flicker loops. */}
-          {(() => {
-            const getLeverStatus = (isActive, pct) => {
-              if (!isActive) return null;
-              if (pct === 0)   return { label: "Commanded", color: "#aaa" };
-              if (pct < 100)   return { label: `Building (${Math.round(pct)}%)`, color: "#E67E22" };
-              return { label: "Full (100%)", color: "#0F9F9F" };
-            };
-
-            const feedStatus    = getLeverStatus(feedReductionActive, rampProgress?.feed    ?? 0);
-            const quenchStatus  = getLeverStatus(quenchBoostActive,   rampProgress?.h2      ?? 0);
-            const coolingStatus = getLeverStatus(coolingBoostActive,  rampProgress?.cooling ?? 0);
-
-            const preview = hoveredAction ? ACTION_PREVIEWS[hoveredAction] : null;
-
-            return (
-              <div onMouseLeave={() => setHoveredAction(null)}>
-                {/* Button row — tight, no top spacer */}
-                <div className="flex flex-wrap gap-2">
-                  {/* Feed Reduction */}
-                  <div className="flex flex-col items-start gap-0.5">
-                    <button
-                      onClick={() => onMitigate("feedReduction")}
-                      onMouseEnter={() => setHoveredAction("feedReduction")}
-                      className={cn(
-                        "px-3 py-1.5 rounded border text-xs transition-colors duration-150",
-                        feedReductionActive
-                          ? "border-[#E67E22] text-[#E67E22] bg-[#E67E22]/10"
-                          : "border-[#444] text-[#aaa] hover:border-[#E67E22] hover:text-[#E67E22]"
-                      )}
-                    >
-                      {feedReductionActive ? "✓ " : "↓ "}Feed Reduction
-                    </button>
-                    {feedStatus && <span className="text-[10px] pl-0.5" style={{ color: feedStatus.color }}>{feedStatus.label}</span>}
-                  </div>
-
-                  {/* Quench Boost */}
-                  <div className="flex flex-col items-start gap-0.5">
-                    <button
-                      onClick={() => onMitigate("quench")}
-                      onMouseEnter={() => setHoveredAction("quench")}
-                      className={cn(
-                        "px-3 py-1.5 rounded border text-xs transition-colors duration-150",
-                        quenchBoostActive
-                          ? "border-[#4A90E2] text-[#4A90E2] bg-[#4A90E2]/10"
-                          : "border-[#444] text-[#aaa] hover:border-[#4A90E2] hover:text-[#4A90E2]"
-                      )}
-                    >
-                      {quenchBoostActive ? "✓ " : "↑ "}Quench Boost
-                    </button>
-                    {quenchStatus && <span className="text-[10px] pl-0.5" style={{ color: quenchStatus.color }}>{quenchStatus.label}</span>}
-                  </div>
-
-                  {/* Cooling Boost */}
-                  <div className="flex flex-col items-start gap-0.5">
-                    <button
-                      onClick={() => onMitigate("cooling")}
-                      onMouseEnter={() => setHoveredAction("cooling")}
-                      className={cn(
-                        "px-3 py-1.5 rounded border text-xs transition-colors duration-150",
-                        coolingBoostActive
-                          ? "border-[#0F9F9F] text-[#0F9F9F] bg-[#0F9F9F]/10"
-                          : "border-[#444] text-[#aaa] hover:border-[#0F7F7F] hover:text-[#0F9F9F]"
-                      )}
-                    >
-                      {coolingBoostActive ? "✓ " : "↑ "}Cooling Boost
-                    </button>
-                    {coolingStatus && <span className="text-[10px] pl-0.5" style={{ color: coolingStatus.color }}>{coolingStatus.label}</span>}
-                  </div>
-                </div>
-
-                {/* Preview panel BELOW buttons — fixed min-height so layout never jumps.
-                    pointer-events:none ensures it can never steal cursor from buttons. */}
-                <div style={{ minHeight: 90, marginTop: 10 }}>
-                  {preview && (
-                    <div style={{ pointerEvents: "none" }} className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg p-3">
-                      <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Action Preview · {preview.title}</p>
-                      {preview.effects.map((e, i) => (
-                        <p key={i} className="text-[#888] text-xs">• {e}</p>
-                      ))}
-                      <div className="mt-1.5 pt-1.5 border-t border-[#1e1e1e]">
-                        <p className="text-[#3FC9B0] text-xs">{preview.projection(coolingCapacity)}</p>
-                        <p className="text-[#555] text-[10px] mt-0.5">{preview.stateShift(coolingCapacity)}</p>
-                      </div>
-                    </div>
+          {/* Wrapper: enter/leave on wrapper with debounce — buttons never fire leave */}
+          <div onMouseLeave={handleLeave}>
+            {/* Button row — always first, no top spacer */}
+            <div className="flex flex-wrap gap-2">
+              {/* Feed Reduction */}
+              <div className="flex flex-col items-start gap-0.5">
+                <button
+                  onClick={() => onMitigate("feedReduction")}
+                  onMouseEnter={() => handleEnter("feedReduction")}
+                  className={cn(
+                    "px-3 py-1.5 rounded border text-xs transition-colors duration-150",
+                    feedReductionActive
+                      ? "border-[#E67E22] text-[#E67E22] bg-[#E67E22]/10"
+                      : "border-[#444] text-[#aaa] hover:border-[#E67E22] hover:text-[#E67E22]"
                   )}
-                </div>
+                >
+                  {feedReductionActive ? "✓ " : "↓ "}Feed Reduction
+                </button>
+                {feedReductionActive && rampProgress && (() => {
+                  const pct = rampProgress.feed ?? 0;
+                  const label = pct === 0 ? "Commanded" : pct < 100 ? `Building (${Math.round(pct)}%)` : "Full (100%)";
+                  const color = pct < 100 ? "#E67E22" : "#0F9F9F";
+                  return <span className="text-[10px] pl-0.5" style={{ color }}>{label}</span>;
+                })()}
               </div>
-            );
-          })()}
 
-          {mitigationMsg && (
-            <p className="text-[#E67E22] text-xs mt-2 italic">{mitigationMsg}</p>
-          )}
+              {/* Quench Boost */}
+              <div className="flex flex-col items-start gap-0.5">
+                <button
+                  onClick={() => onMitigate("quench")}
+                  onMouseEnter={() => handleEnter("quench")}
+                  className={cn(
+                    "px-3 py-1.5 rounded border text-xs transition-colors duration-150",
+                    quenchBoostActive
+                      ? "border-[#4A90E2] text-[#4A90E2] bg-[#4A90E2]/10"
+                      : "border-[#444] text-[#aaa] hover:border-[#4A90E2] hover:text-[#4A90E2]"
+                  )}
+                >
+                  {quenchBoostActive ? "✓ " : "↑ "}Quench Boost
+                </button>
+                {quenchBoostActive && rampProgress && (() => {
+                  const pct = rampProgress.h2 ?? 0;
+                  const label = pct === 0 ? "Commanded" : pct < 100 ? `Building (${Math.round(pct)}%)` : "Full (100%)";
+                  const color = pct < 100 ? "#E67E22" : "#0F9F9F";
+                  return <span className="text-[10px] pl-0.5" style={{ color }}>{label}</span>;
+                })()}
+              </div>
 
-          {/* Overall mitigation response summary */}
-          {rampProgress && (() => {
-            const activeProgresses = [
-              feedReductionActive ? rampProgress.feed : null,
-              quenchBoostActive   ? rampProgress.h2   : null,
-              coolingBoostActive  ? rampProgress.cooling : null,
-            ].filter(p => p !== null);
+              {/* Cooling Boost */}
+              <div className="flex flex-col items-start gap-0.5">
+                <button
+                  onClick={() => onMitigate("cooling")}
+                  onMouseEnter={() => handleEnter("cooling")}
+                  className={cn(
+                    "px-3 py-1.5 rounded border text-xs transition-colors duration-150",
+                    coolingBoostActive
+                      ? "border-[#0F9F9F] text-[#0F9F9F] bg-[#0F9F9F]/10"
+                      : "border-[#444] text-[#aaa] hover:border-[#0F7F7F] hover:text-[#0F9F9F]"
+                  )}
+                >
+                  {coolingBoostActive ? "✓ " : "↑ "}Cooling Boost
+                </button>
+                {coolingBoostActive && rampProgress && (() => {
+                  const pct = rampProgress.cooling ?? 0;
+                  const label = pct === 0 ? "Commanded" : pct < 100 ? `Building (${Math.round(pct)}%)` : "Full (100%)";
+                  const color = pct < 100 ? "#E67E22" : "#0F9F9F";
+                  return <span className="text-[10px] pl-0.5" style={{ color }}>{label}</span>;
+                })()}
+              </div>
+            </div>
 
-            if (activeProgresses.length === 0) return (
-              <p className="text-[#444] text-[10px] mt-2">Mitigation response: Idle</p>
-            );
+            {/* Preview panel BELOW buttons — fixed min-height prevents layout jump.
+                pointer-events:none so it can never steal cursor from buttons. */}
+            <div style={{ minHeight: 88, marginTop: 8, pointerEvents: "none" }}>
+              {hoveredAction && ACTION_PREVIEWS[hoveredAction] && (() => {
+                const preview = ACTION_PREVIEWS[hoveredAction];
+                return (
+                  <div className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg p-3">
+                    <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Action Preview · {preview.title}</p>
+                    {preview.effects.map((e, i) => (
+                      <p key={i} className="text-[#888] text-xs">• {e}</p>
+                    ))}
+                    <div className="mt-1.5 pt-1.5 border-t border-[#1e1e1e]">
+                      <p className="text-[#3FC9B0] text-xs">{preview.projection(coolingCapacity)}</p>
+                      <p className="text-[#555] text-[10px] mt-0.5">{preview.stateShift(coolingCapacity)}</p>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
 
-            const allFull = activeProgresses.every(p => p >= 100);
+          {/* Mitigation response — always present, never disappears */}
+          {(() => {
+            const anyActive = feedReductionActive || quenchBoostActive || coolingBoostActive;
+            const allFull = anyActive && [
+              feedReductionActive ? (rampProgress?.feed ?? 0) : 100,
+              quenchBoostActive   ? (rampProgress?.h2   ?? 0) : 100,
+              coolingBoostActive  ? (rampProgress?.cooling ?? 0) : 100,
+            ].every(p => p >= 100);
+
+            let statusText;
+            if (!anyActive) {
+              statusText = <span className="text-[#3a3a3a]">Mitigation response: Standing by</span>;
+            } else if (allFull) {
+              statusText = <span className="text-[#0F9F9F]">Mitigation response: All levers at full effect — stabilizing</span>;
+            } else if (mitigationMsg) {
+              statusText = <span className="text-[#E67E22]">{mitigationMsg}</span>;
+            } else {
+              statusText = <span className="text-[#888]">Mitigation response: Building…</span>;
+            }
+
             return (
-              <div className="mt-2 space-y-0.5">
-                {minutesRecovered > 0.3 && (
-                  <p className="text-[#555] text-[10px]">
-                    Minutes recovered: <span className="text-[#7DBF9E]">+{Math.min(minutesRecovered, 30).toFixed(1)} min</span>
-                  </p>
+              <p className="text-[10px] mt-2" style={{ minHeight: "1.4em" }}>
+                {statusText}
+                {anyActive && minutesRecovered > 0.3 && (
+                  <span className="text-[#555] ml-2">+{Math.min(minutesRecovered, 30).toFixed(1)} min recovered</span>
                 )}
-                {allFull && (
-                  <p className="text-[#0F9F9F] text-[10px]">All levers at full effect — stabilizing</p>
-                )}
-              </div>
+              </p>
             );
           })()}
         </div>
