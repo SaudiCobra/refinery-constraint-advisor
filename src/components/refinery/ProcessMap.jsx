@@ -401,12 +401,19 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* E-1 Tube Out → Reactor Inlet (Top Nozzle Entry) */}
-        {/* Vertical rise from E-1 outlet to top nozzle elevation */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-        <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
-        </circle>
+        {/* E-1 Shell Out → Reactor Inlet (Top Nozzle Entry) */}
+        {/* Vertical rise from E-1 shell outlet (bottom-right nozzle) to reactor top inlet elevation */}
+        {(() => {
+          const E1_SHELL_NOZZLE_Y = ANCHORS.E1.y + SIZES.E1.h/2 - 18;
+          return (
+            <>
+              <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_SHELL_NOZZLE_Y} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
+              <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(E1_SHELL_NOZZLE_Y + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
+                <animate attributeName="cy" values={`${E1_SHELL_NOZZLE_Y};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
+              </circle>
+            </>
+          );
+        })()}
         
         {/* Horizontal run to reactor centerline at top */}
         <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
