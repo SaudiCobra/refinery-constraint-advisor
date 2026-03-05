@@ -711,12 +711,14 @@ export default function ProcessMap({
 
 
         {/* === STATIC TEMPERATURE INDICATORS === */}
-        {/* RIT — Reactor Inlet Temperature: below reactor body, left of outlet pipe, clear of all pipes */}
-        {/* Before: translate(1075, 590) — overlapping upper zone. After: translate(1100, 870) — below reactor, above split point */}
+        {/* RIT — Reactor Inlet Temperature: top-right of reactor, above inlet pipe (user's white "RIT" box location) */}
+        {/* Position: same slot previously used by ROT — R1.x + R1.w/2 + 90, R1.y - R1.h/2 - 90 */}
         {(() => {
           const hihi = 370; const gap = hihi - tBed; const near = gap <= 15;
+          const rx = ANCHORS.R1.x + SIZES.R1.w/2 + 90;
+          const ry = ANCHORS.R1.y - SIZES.R1.h/2 - 90;
           return (
-            <g transform="translate(1100, 870)">
+            <g transform={`translate(${rx}, ${ry})`}>
               <rect x="-52" y="-20" width="104" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
               <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">RIT</text>
               <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tBed}°C</text>
@@ -726,15 +728,12 @@ export default function ProcessMap({
           );
         })()}
 
-        {/* ROT — Reactor Outlet Temperature: positioned above-right of reactor, outside piping envelope */}
+        {/* ROT — Reactor Outlet Temperature: below-left of reactor body, clear of outlet drop pipe */}
+        {/* Position: slot previously used by RIT (translate 1100, 870), nudged down to 900 to clear outlet pipe */}
         {(() => {
           const hihi = 380; const gap = hihi - tOutlet; const near = gap <= 15;
-          // Anchor: right of reactor top nozzle area, above the upper-corridor pipe (Y_UPPER_ZONE - 60 = 460)
-          // Place at x = R1.x + R1.w/2 + 90 (clear of H₂ header at +40), y = R1.y - R1.h/2 - 90 (above top nozzle)
-          const rx = ANCHORS.R1.x + SIZES.R1.w/2 + 90;
-          const ry = ANCHORS.R1.y - SIZES.R1.h/2 - 90;
           return (
-            <g transform={`translate(${rx}, ${ry})`}>
+            <g transform="translate(1100, 900)">
               <rect x="-64" y="-20" width="128" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
               <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">ROT</text>
               <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tOutlet}°C</text>
