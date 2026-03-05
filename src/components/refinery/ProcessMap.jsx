@@ -648,7 +648,7 @@ export default function ProcessMap({
               {/* 1) Short horizontal stub from E-1 tube outlet nozzle (center-right) → RISER_X */}
               <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_TUBE_NOZZLE_Y} x2={RISER_X} y2={E1_TUBE_NOZZLE_Y} stroke="#555" strokeWidth="4" opacity="0.9" />
               {/* 2) Vertical riser from stub up to TOP HEADER */}
-              <line x1={RISER_X} y1={E1_SHELL_NOZZLE_Y} x2={RISER_X} y2={Y_TOP_HEADER} stroke="#555" strokeWidth="4" opacity="0.9" />
+              <line x1={RISER_X} y1={E1_TUBE_NOZZLE_Y} x2={RISER_X} y2={Y_TOP_HEADER} stroke="#555" strokeWidth="4" opacity="0.9" />
               {/* Junction dot at T-intersection on TOP HEADER */}
               <circle cx={RISER_X} cy={Y_TOP_HEADER} r="6" fill="#555" />
               {/* 3) TOP HEADER — main line from RISER_X → E-2 drop point */}
