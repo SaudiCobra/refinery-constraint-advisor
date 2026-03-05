@@ -132,6 +132,27 @@ export default function LeverContext({
         <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
           <p className="text-[#666] text-[10px] uppercase tracking-wider mb-2 font-semibold">Corrective Actions</p>
 
+          {/* Action Preview Card */}
+          {hoveredAction && (() => {
+            const preview = ACTION_PREVIEWS[hoveredAction];
+            if (!preview) return null;
+            return (
+              <div className="mb-3 bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg p-3 pointer-events-none">
+                <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Action Preview</p>
+                <p className="text-[#bbb] text-xs font-semibold mb-2">{preview.title}</p>
+                <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Predicted Effect</p>
+                {preview.effects.map((e, i) => (
+                  <p key={i} className="text-[#888] text-xs">• {e}</p>
+                ))}
+                <div className="mt-2 pt-2 border-t border-[#1e1e1e]">
+                  <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Projection</p>
+                  <p className="text-[#3FC9B0] text-xs">{preview.projection(coolingCapacity)}</p>
+                  <p className="text-[#555] text-[10px] mt-0.5">{preview.stateShift(coolingCapacity)}</p>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Helper: derive per-lever status label from rampProgress */}
           {(() => {
             const getLeverStatus = (isActive, pct) => {
@@ -151,6 +172,8 @@ export default function LeverContext({
                 <div className="flex flex-col items-start gap-0.5">
                   <button
                     onClick={() => onMitigate("feedReduction")}
+                    onMouseEnter={() => setHoveredAction("feedReduction")}
+                    onMouseLeave={() => setHoveredAction(null)}
                     className={cn(
                       "px-3 py-1.5 rounded border text-xs transition-all duration-200",
                       feedReductionActive
@@ -167,6 +190,8 @@ export default function LeverContext({
                 <div className="flex flex-col items-start gap-0.5">
                   <button
                     onClick={() => onMitigate("quench")}
+                    onMouseEnter={() => setHoveredAction("quench")}
+                    onMouseLeave={() => setHoveredAction(null)}
                     className={cn(
                       "px-3 py-1.5 rounded border text-xs transition-all duration-200",
                       quenchBoostActive
@@ -183,6 +208,8 @@ export default function LeverContext({
                 <div className="flex flex-col items-start gap-0.5">
                   <button
                     onClick={() => onMitigate("cooling")}
+                    onMouseEnter={() => setHoveredAction("cooling")}
+                    onMouseLeave={() => setHoveredAction(null)}
                     className={cn(
                       "px-3 py-1.5 rounded border text-xs transition-all duration-200",
                       coolingBoostActive
