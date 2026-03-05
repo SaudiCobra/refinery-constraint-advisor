@@ -401,33 +401,31 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* E-1 Shell Out → Reactor Inlet (Top Nozzle Entry)
-            Shell side = cold feed being heated → exits bottom-right nozzle → goes to reactor.
-            Start Y = E1_SHELL_NOZZLE_Y (bottom-right nozzle of E-1).
-            Flow dot color = shellThermalColor (heated feed stream).
-        */}
+        {/* E-1 Shell Out → Reactor Inlet (Top Nozzle Entry) */}
+        {/* Vertical rise from E-1 shell outlet (bottom-right nozzle) to reactor top inlet elevation */}
         {(() => {
           const E1_SHELL_NOZZLE_Y = ANCHORS.E1.y + SIZES.E1.h/2 - 18;
           return (
             <>
-              {/* Vertical rise from shell outlet nozzle up to reactor top nozzle elevation */}
               <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={E1_SHELL_NOZZLE_Y} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-              <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(E1_SHELL_NOZZLE_Y + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={shellThermalColor}>
+              <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(E1_SHELL_NOZZLE_Y + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
                 <animate attributeName="cy" values={`${E1_SHELL_NOZZLE_Y};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
-              </circle>
-              {/* Horizontal run to reactor centerline at top */}
-              <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-              <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={shellThermalColor}>
-                <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
-              </circle>
-              {/* Short vertical nozzle penetration into reactor top */}
-              <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} {...getPathStyle()} className="transition-all duration-700" />
-              <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={shellThermalColor}>
-                <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
               </circle>
             </>
           );
         })()}
+        
+        {/* Horizontal run to reactor centerline at top */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
+        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
+        
+        {/* Short vertical nozzle penetration into reactor top */}
+        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} {...getPathStyle()} className="transition-all duration-700" />
+        <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
         <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("reactor")}>
@@ -631,20 +629,20 @@ export default function ProcessMap({
           <circle cx={ANCHORS.E2.x - SIZES.E2.w/2 - 70} cy={Y_SPINE} r="5" fill="#1a1a1a" stroke="#B47A1F" strokeWidth="2" />
         </g>
 
-        {/* SPINE: E-1 Tube Out → E-2
-            Tube side = hot effluent being cooled → exits center-right nozzle (E1_TUBE_NOZZLE_Y = Y_SPINE) → goes to E-2.
+        {/* SPINE: E-1 Shell Out → E-2
             Routing:
-              1) Horizontal stub right from E-1 tube outlet (center-right) to RISER_X
-              2) Vertical riser up from stub to TOP HEADER elevation (Y_TOP_HEADER)
+              1) Horizontal stub right from E-1 shell outlet nozzle to a dedicated riser x (RISER_X)
+              2) Vertical riser up from that stub to the TOP HEADER elevation (Y_TOP_HEADER)
               3) TOP HEADER — continuous horizontal from RISER_X all the way right to E-2 drop
               4) Vertical drop from TOP HEADER down to E-2 spine inlet
             Junction dot at RISER_X / Y_TOP_HEADER makes the T-junction explicit.
-            Flow dot color = tubeThermalColor (hot effluent stream).
         */}
         {(() => {
-          const RISER_X = ANCHORS.E1.x + SIZES.E1.w/2 + 60; // x=910 — offset right to avoid overlap with shell-to-reactor pipe
+          // Riser x: offset right from E-1 outlet so it doesn't share x with the shell-to-reactor pipe
+          const RISER_X = ANCHORS.E1.x + SIZES.E1.w/2 + 60; // x=910
           const Y_TOP_HEADER = Y_UPPER_ZONE - 60;            // y=460
-          const E1_TUBE_NOZZLE_Y = Y_SPINE;                  // center-right (tube outlet) = spine elevation
+          const E1_TUBE_NOZZLE_Y = ANCHORS.E1.y;             // center-right (tube outlet) of E-1
+          const flowColor = getThermalColor(shellSideOutletTemp);
           return (
             <>
               {/* 1) Short horizontal stub from E-1 tube outlet nozzle (center-right) → RISER_X */}
@@ -657,8 +655,8 @@ export default function ProcessMap({
               <line x1={RISER_X} y1={Y_TOP_HEADER} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_TOP_HEADER} stroke="#555" strokeWidth="4" opacity="0.9" />
               {/* 4) Vertical drop from TOP HEADER to E-2 inlet on spine */}
               <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_TOP_HEADER} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
-              {/* Flow dot travelling along TOP HEADER to E-2 (tube = hot effluent color) */}
-              <circle cx={RISER_X} cy={Y_TOP_HEADER} r="4" fill={tubeThermalColor}>
+              {/* Flow dot travelling along TOP HEADER to E-2 */}
+              <circle cx={RISER_X} cy={Y_TOP_HEADER} r="4" fill={flowColor}>
                 <animate attributeName="cx" values={`${RISER_X};${ANCHORS.E2.x - SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
               </circle>
             </>
