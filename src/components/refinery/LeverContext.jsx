@@ -49,6 +49,7 @@ export default function LeverContext({
   minutesRecovered,   // number | null
 }) {
   const [expanded, setExpanded] = React.useState(false);
+  const [hoveredAction, setHoveredAction] = React.useState(null);
   
   const levers = [
     {
