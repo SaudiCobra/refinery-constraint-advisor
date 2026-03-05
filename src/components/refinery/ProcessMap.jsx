@@ -711,13 +711,14 @@ export default function ProcessMap({
 
 
         {/* === STATIC TEMPERATURE INDICATORS === */}
-        {/* T-bed: Upper bed area, left of reactor */}
+        {/* RIT — Reactor Inlet Temperature: below reactor body, left of outlet pipe, clear of all pipes */}
+        {/* Before: translate(1075, 590) — overlapping upper zone. After: translate(1100, 870) — below reactor, above split point */}
         {(() => {
           const hihi = 370; const gap = hihi - tBed; const near = gap <= 15;
           return (
-            <g transform="translate(1075, 590)">
+            <g transform="translate(1100, 870)">
               <rect x="-52" y="-20" width="104" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
-              <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">T-BED</text>
+              <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">RIT</text>
               <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tBed}°C</text>
               <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 360 · HIHI 370°C</text>
               {near && <text x="0" y="43" fill={gap <= 5 ? "#E14B3B" : gap <= 10 ? "#E06A2C" : "#D9A441"} fontSize="11" textAnchor="middle" fontWeight="600">{gap > 0 ? `${gap}°C to HIHI` : "AT HIHI"}</text>}
