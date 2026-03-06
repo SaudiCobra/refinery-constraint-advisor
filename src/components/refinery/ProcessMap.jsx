@@ -379,7 +379,7 @@ export default function ProcessMap({
             <path d="M25 42 L50 57 L25 72 Z"/>
             <path d="M75 42 L50 57 L75 72 Z"/>
           </g>
-          {interactive && <text x="0" y="-22" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-01B</text>}
+          {interactive && <text x="0" y="-46" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-01B</text>}
         </g>
         
         {/* SPINE: TCV-01B → E-1 Tube Inlet */}
