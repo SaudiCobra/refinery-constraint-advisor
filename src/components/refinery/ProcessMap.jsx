@@ -713,7 +713,7 @@ export default function ProcessMap({
           </g>
           
           {valveStates.tcv03a === "OPEN" && (
-            <circle cx={VALVES.TCV03A.x} cy={Y_LOWER_ZONE} r="4" fill="#B47A1F">
+            <circle cx={VALVES.TCV03A.x} cy={Y_LOWER_ZONE} r="4" fill={getDotColor("bypass")}>
               <animate attributeName="cx" values={`${ANCHORS.E2.x - SIZES.E2.w/2};${ANCHORS.E2.x + SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
