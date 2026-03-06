@@ -300,6 +300,17 @@ export default function ProcessMap({
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative">
+      {isPropagating && (
+        <style>{`
+          @keyframes pfd-pulse {
+            0%, 100% { opacity: 0.08; }
+            50%       { opacity: 0.55; }
+          }
+          .pfd-cause  { animation: pfd-pulse 1.5s ease-in-out infinite 0s;   }
+          .pfd-path   { animation: pfd-pulse 1.5s ease-in-out infinite 0.5s; }
+          .pfd-impact { animation: pfd-pulse 1.5s ease-in-out infinite 1.0s; }
+        `}</style>
+      )}
       <svg viewBox="0 0 2560 1200" className="w-full h-auto" onClick={e => e.stopPropagation()}>
         <defs>
           <filter id="equipmentShadow" x="-50%" y="-50%" width="200%" height="200%">
