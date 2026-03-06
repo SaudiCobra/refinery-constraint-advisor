@@ -409,34 +409,11 @@ export default function ProcessMap({
           <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
         
-        {/* Orthogonal feed line: E-1 center → vertical up → horizontal → drop into reactor top */}
-        {(() => {
-          const startX = ANCHORS.E1.x + SIZES.E1.w/2;
-          const startY = ANCHORS.E1.y;
-          const endX = ANCHORS.R1.x;
-          const endY = ANCHORS.R1.y - SIZES.R1.h/2;
-          const midY = endY - 28;
-          const ps = getPathStyle();
-          return (
-            <>
-              <path
-                d={`M ${startX} ${startY} L ${startX} ${midY} L ${endX} ${midY} L ${endX} ${endY}`}
-                fill="none"
-                stroke={ps.stroke}
-                strokeWidth={ps.strokeWidth}
-                opacity={ps.opacity}
-                className="transition-all duration-700"
-              />
-              <circle r="4" fill={tubeThermalColor}>
-                <animateMotion
-                  dur={animationSpeed}
-                  repeatCount="indefinite"
-                  path={`M ${startX} ${startY} L ${startX} ${midY} L ${endX} ${midY} L ${endX} ${endY}`}
-                />
-              </circle>
-            </>
-          );
-        })()}
+        {/* Horizontal run to reactor centerline at top */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
+        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
         
         {/* Short vertical nozzle penetration into reactor top */}
         <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} {...getPathStyle()} className="transition-all duration-700" />
