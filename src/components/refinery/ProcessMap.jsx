@@ -389,14 +389,14 @@ export default function ProcessMap({
 
         {/* === UPPER ZONE: INPUT CONTROL === */}
         
-        {/* TCV-01A: Tube Bypass (Upper Zone) */}
+        {/* TCV-01A: Tube Bypass (Upper Zone) — terminates at feed line second turn (x=974, beside RIT) */}
         <g opacity={valveStates.tcv01a === "OOS" ? 0.3 : 1}>
           {/* Riser from spine */}
           <line x1={VALVES.TCV01B.x + 20} y1={Y_SPINE} x2={VALVES.TCV01B.x + 20} y2={Y_UPPER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
-          {/* Horizontal run in upper zone */}
-          <line x1={VALVES.TCV01B.x + 20} y1={Y_UPPER_ZONE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_UPPER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
-          {/* Return to spine */}
-          <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_UPPER_ZONE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Horizontal run in upper zone — ends at x=974 (second turn of E-1 outlet feed line) */}
+          <line x1={VALVES.TCV01B.x + 20} y1={Y_UPPER_ZONE} x2={974} y2={Y_UPPER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          {/* Drop to meet the E-1 outlet feed line at its second turn (y=536) */}
+          <line x1={974} y1={Y_UPPER_ZONE} x2={974} y2={536} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV01A.x}, ${VALVES.TCV01A.y})`} onClick={(e) => handleUnitClick(e, 'tcv01a')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv01a === "OPEN" ? "#2F5D80" : "#333"} stroke={valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} strokeWidth="2" />
@@ -410,7 +410,7 @@ export default function ProcessMap({
           
           {valveStates.tcv01a === "OPEN" && (
             <circle cx={VALVES.TCV01A.x} cy={Y_UPPER_ZONE} r="4" fill={getDotColor("bypass")}>
-              <animate attributeName="cx" values={`${VALVES.TCV01B.x + 20};${ANCHORS.E1.x + SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
+              <animate attributeName="cx" values={`${VALVES.TCV01B.x + 20};974`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
         </g>
