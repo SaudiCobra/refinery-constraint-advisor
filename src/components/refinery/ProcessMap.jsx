@@ -43,7 +43,7 @@ const SIZES = {
 const VALVES = {
   TCV01B: { x: 500, y: Y_SPINE },           // Main feed control (on spine)
   TCV01A: { x: 640, y: Y_UPPER_ZONE },      // Tube bypass (upper zone)
-  TCV02A: { x: 1535, y: Y_LOWER_ZONE + 5 }, // Shell return control (lower zone)
+  TCV02A: { x: 1515, y: Y_LOWER_ZONE + 5 }, // Shell return control (lower zone)
   TCV02B: { x: 1400, y: Y_LOWER_ZONE + 85 },// Shell bypass (lower zone)
   TCV03A: { x: ANCHORS.E2.x, y: Y_LOWER_ZONE },     // Cooler bypass (lower zone)
 };
