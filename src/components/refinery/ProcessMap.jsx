@@ -725,16 +725,18 @@ export default function ProcessMap({
         </circle>
 
         {/* EFFLUENT COOLER E-2 */}
-        <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={(e) => handleUnitClick(e, 'e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")} opacity={getNonAffectedOpacity("cooler")}>
+        <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={(e) => handleUnitClick(e, 'e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")} opacity={getNonAffectedOpacity("cooler")} filter="url(#equipmentShadow)">
           {(() => {
             const stroke = getEquipmentStroke("cooler");
             return (
-              <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+              <CoolerIcon
+                w={SIZES.E2.w} h={SIZES.E2.h}
+                stroke="#2F5D80"
+                bodyStroke={stroke.color}
+                strokeWidth={parseFloat(stroke.width)}
+              />
             );
           })()}
-          {[-60, -40, -20, 0, 20, 40, 60].map(y => (
-            <line key={y} x1={-SIZES.E2.w/2 + 16} y1={y} x2={SIZES.E2.w/2 - 16} y2={y} stroke="#2F5D80" strokeWidth="2.5" opacity="0.54" />
-          ))}
           {(effectiveState === "SEVERE_DRIFT" || effectiveState === "IMMEDIATE_RISK") && (
             <>
               <line x1={-SIZES.E2.w/2 + 10} y1={-SIZES.E2.h/2 + 10} x2={SIZES.E2.w/2 - 10} y2={SIZES.E2.h/2 - 10} stroke="#A13A1F" strokeWidth="4" pointerEvents="none" />
