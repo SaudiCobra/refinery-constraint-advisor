@@ -860,106 +860,160 @@ export default function ProcessMap({
         </g>
 
 
-        {/* === CAUSE → EFFECT PROPAGATION OVERLAYS (pointer-events: none) === */}
+        {/* ═══════════════════════════════════════════════════════════════════
+            STATIC PROPAGATION STORYTELLING LAYER
+            Pure opacity-graded overlays — no animation, no flashing.
+            Origin → Path → Impact, all rendered simultaneously.
+            Opacity scales with state severity (Early < Severe < Immediate).
+            ═══════════════════════════════════════════════════════════════════ */}
         {isPropagating && (
           <g pointerEvents="none">
-            {/* A) COOLING CAUSE — E-2 glow overlay */}
-            {isCoolingConstraint && (
+
+            {/* ── REACTOR TEMPERATURE as origin (default when not cooling/quench) ── */}
+            {/* Origin: feed path into reactor — E-1 tube outlet → reactor top */}
+            {/* Visible in ALL drift states; strongest when reactor is the dominant constraint */}
+            <>
+              {/* Origin halo: reactor body soft glow (blurred fill) */}
               <rect
-                className="pfd-cause"
-                x={ANCHORS.E2.x - SIZES.E2.w/2 - 6}
-                y={ANCHORS.E2.y - SIZES.E2.h/2 - 6}
-                width={SIZES.E2.w + 12}
-                height={SIZES.E2.h + 12}
-                rx="14"
-                fill="none"
-                stroke={pulseColor}
-                strokeWidth="5"
-                opacity="0.08"
+                x={ANCHORS.R1.x - SIZES.R1.w/2 - 16}
+                y={ANCHORS.R1.y - SIZES.R1.h/2 - 16}
+                width={SIZES.R1.w + 32}
+                height={SIZES.R1.h + 32}
+                rx="10"
+                fill={hlColor}
+                opacity={isCoolingConstraint || isQuenchConstraint ? hlImpact : hlOrigin}
+                filter="url(#hlBlur)"
               />
-            )}
 
-            {/* B) QUENCH CAUSE — Q1/Q2 header segment glow */}
-            {isQuenchConstraint && (
+              {/* Feed path highlight: Leg 3 (horizontal → reactor centerline at y=536) */}
               <line
-                className="pfd-cause"
-                x1={ANCHORS.R1.x + SIZES.R1.w/2 + 40}
-                y1={ANCHORS.R1.y - SIZES.R1.h/2 - 30}
-                x2={ANCHORS.R1.x + SIZES.R1.w/2 + 40}
-                y2={ANCHORS.R1.y + SIZES.R1.h/2 - 10}
-                stroke={pulseColor}
-                strokeWidth="6"
-                opacity="0.08"
+                x1={974} y1={536}
+                x2={ANCHORS.R1.x} y2={536}
+                stroke={hlColor}
+                strokeWidth="10"
+                opacity={isCoolingConstraint || isQuenchConstraint ? hlImpact : hlPath}
+                filter="url(#hlBlurMd)"
               />
-            )}
+              {/* Feed path highlight: Leg 4 (vertical drop into reactor) */}
+              <line
+                x1={ANCHORS.R1.x} y1={536}
+                x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2}
+                stroke={hlColor}
+                strokeWidth="10"
+                opacity={isCoolingConstraint || isQuenchConstraint ? hlImpact : hlPath}
+                filter="url(#hlBlurMd)"
+              />
+            </>
 
-            {/* PATH — effluent line from reactor bottom → E-2 (vertical drop + upper corridor) */}
+            {/* ── COOLING CONSTRAINT as origin ── */}
             {isCoolingConstraint && (
               <>
-                {/* Reactor outlet drop */}
-                <line
-                  className="pfd-path"
-                  x1={ANCHORS.R1.x}
-                  y1={ANCHORS.R1.y + SIZES.R1.h/2}
-                  x2={ANCHORS.R1.x}
-                  y2={Y_LOWER_ZONE - 20}
-                  stroke={pulseColor}
-                  strokeWidth="7"
-                  opacity="0.08"
+                {/* Origin halo: E-2 cooler body */}
+                <rect
+                  x={ANCHORS.E2.x - SIZES.E2.w/2 - 18}
+                  y={ANCHORS.E2.y - SIZES.E2.h/2 - 18}
+                  width={SIZES.E2.w + 36}
+                  height={SIZES.E2.h + 36}
+                  rx="16"
+                  fill={hlColor}
+                  opacity={hlOrigin}
+                  filter="url(#hlBlur)"
                 />
-                {/* Shell-side upper corridor to E-2 */}
+
+                {/* Path: reactor outlet drop → split point */}
                 <line
-                  className="pfd-path"
-                  x1={ANCHORS.E1.x + SIZES.E1.w/2}
-                  y1={Y_UPPER_ZONE - 60}
-                  x2={ANCHORS.E2.x - SIZES.E2.w/2}
-                  y2={Y_UPPER_ZONE - 60}
-                  stroke={pulseColor}
-                  strokeWidth="7"
-                  opacity="0.08"
+                  x1={ANCHORS.R1.x} y1={ANCHORS.R1.y + SIZES.R1.h/2}
+                  x2={ANCHORS.R1.x} y2={Y_LOWER_ZONE - 20}
+                  stroke={hlColor}
+                  strokeWidth="12"
+                  opacity={hlPath}
+                  filter="url(#hlBlurMd)"
+                />
+                {/* Path: shell-side upper corridor E-1 → E-2 */}
+                <line
+                  x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_UPPER_ZONE - 60}
+                  x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_UPPER_ZONE - 60}
+                  stroke={hlColor}
+                  strokeWidth="12"
+                  opacity={hlPath}
+                  filter="url(#hlBlurMd)"
+                />
+                {/* Path: vertical drop to E-2 inlet */}
+                <line
+                  x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_UPPER_ZONE - 60}
+                  x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE}
+                  stroke={hlColor}
+                  strokeWidth="12"
+                  opacity={hlPath}
+                  filter="url(#hlBlurMd)"
+                />
+
+                {/* Impact: reactor body (thermal effect propagates back) */}
+                <rect
+                  x={ANCHORS.R1.x - SIZES.R1.w/2 - 10}
+                  y={ANCHORS.R1.y - SIZES.R1.h/2 - 10}
+                  width={SIZES.R1.w + 20}
+                  height={SIZES.R1.h + 20}
+                  rx="8"
+                  fill={hlColor}
+                  opacity={hlImpact}
+                  filter="url(#hlBlur)"
                 />
               </>
             )}
 
-            {/* PATH — quench feed lines from header into reactor */}
+            {/* ── QUENCH CONSTRAINT as origin ── */}
             {isQuenchConstraint && (
               <>
+                {/* Origin halo: H₂ quench header vertical line */}
+                <rect
+                  x={ANCHORS.R1.x + SIZES.R1.w/2 + 20}
+                  y={ANCHORS.R1.y - SIZES.R1.h/2 - 40}
+                  width={50}
+                  height={SIZES.R1.h + 50}
+                  rx="6"
+                  fill={hlColor}
+                  opacity={hlOrigin}
+                  filter="url(#hlBlur)"
+                />
+
+                {/* Path: Q1 branch into reactor */}
                 <line
-                  className="pfd-path"
                   x1={ANCHORS.R1.x + SIZES.R1.w/2}
                   y1={ANCHORS.R1.y - 22}
                   x2={ANCHORS.R1.x + SIZES.R1.w/2 + 40}
                   y2={ANCHORS.R1.y - 22}
-                  stroke={pulseColor}
-                  strokeWidth="5"
-                  opacity="0.08"
+                  stroke={hlColor}
+                  strokeWidth="10"
+                  opacity={hlPath}
+                  filter="url(#hlBlurMd)"
                 />
+                {/* Path: Q2 branch into reactor */}
                 <line
-                  className="pfd-path"
                   x1={ANCHORS.R1.x + SIZES.R1.w/2}
                   y1={ANCHORS.R1.y + 58}
                   x2={ANCHORS.R1.x + SIZES.R1.w/2 + 40}
                   y2={ANCHORS.R1.y + 58}
-                  stroke={pulseColor}
-                  strokeWidth="5"
-                  opacity="0.08"
+                  stroke={hlColor}
+                  strokeWidth="10"
+                  opacity={hlPath}
+                  filter="url(#hlBlurMd)"
+                />
+
+                {/* Impact: reactor body */}
+                <rect
+                  x={ANCHORS.R1.x - SIZES.R1.w/2 - 10}
+                  y={ANCHORS.R1.y - SIZES.R1.h/2 - 10}
+                  width={SIZES.R1.w + 20}
+                  height={SIZES.R1.h + 20}
+                  rx="8"
+                  fill={hlColor}
+                  opacity={hlImpact}
+                  filter="url(#hlBlur)"
                 />
               </>
             )}
 
-            {/* IMPACT — Reactor outline pulse (always last, for both constraint types) */}
-            <rect
-              className="pfd-impact"
-              x={ANCHORS.R1.x - SIZES.R1.w/2 - 6}
-              y={ANCHORS.R1.y - SIZES.R1.h/2 - 6}
-              width={SIZES.R1.w + 12}
-              height={SIZES.R1.h + 12}
-              rx="6"
-              fill="none"
-              stroke={pulseColor}
-              strokeWidth="5"
-              opacity="0.08"
-            />
           </g>
         )}
 
