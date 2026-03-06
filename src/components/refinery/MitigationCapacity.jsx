@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { CheckCircleIcon, TriangleAlertIcon } from "./DashboardIcons";
 
 // Control margin percentage targets per state
 const MARGIN_TARGETS = {
@@ -43,23 +44,24 @@ export default function MitigationCapacity({ systemState }) {
       style={{ transition: "border-color 400ms ease" }}
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">
-            Control Margin:
-          </span>
-          <div className="flex items-center gap-2">
-            <div
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: cfg.color, transition: "background-color 400ms ease" }}
-            />
-            <span
-              className="text-sm font-semibold"
-              style={{ color: cfg.color, transition: "color 400ms ease" }}
-            >
-              {cfg.label}
-            </span>
-          </div>
-        </div>
+         <div className="flex items-center gap-3">
+           <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">
+             Control Margin:
+           </span>
+           <div className="flex items-center gap-2">
+             {state === "NORMAL" ? (
+               <CheckCircleIcon className="w-4 h-4" style={{ color: cfg.color }} />
+             ) : (
+               <TriangleAlertIcon className="w-4 h-4" style={{ color: cfg.color }} />
+             )}
+             <span
+               className="text-sm font-semibold"
+               style={{ color: cfg.color, transition: "color 400ms ease" }}
+             >
+               {cfg.label}
+             </span>
+           </div>
+         </div>
         <span
           className="text-xs font-mono tabular-nums"
           style={{ color: cfg.color, opacity: 0.8, transition: "color 400ms ease" }}
