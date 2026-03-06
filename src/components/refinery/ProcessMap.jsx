@@ -710,7 +710,7 @@ export default function ProcessMap({
           <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE - 20} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE + 85} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           {/* Valve symbol */}
-          <g transform={`translate(${VALVES.TCV02B.x + 25}, ${VALVES.TCV02B.y})`} onClick={(e) => handleUnitClick(e, 'tcv02b')} className={cn(interactive && "cursor-pointer")}>
+          <g transform={`translate(${VALVES.TCV02B.x + 31}, ${VALVES.TCV02B.y})`} onClick={(e) => handleUnitClick(e, 'tcv02b')} className={cn(interactive && "cursor-pointer")}>
             <g transform="translate(-38,-43.32) scale(0.76)" fill="none" stroke={valveStates.tcv02b === "OPEN" ? "#B47A1F" : "#555"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
               <path d="M50 32 V56"/>
               <path d="M37.648 31.852 C40.395 26.16 45.029 22.728 50 22.728 C54.971 22.728 59.605 26.16 62.352 31.852 Z"/>
