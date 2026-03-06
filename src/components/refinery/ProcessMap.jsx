@@ -224,8 +224,20 @@ export default function ProcessMap({
       }
       return { color: stateColors.base, width: "3" };
     }
-    // Interactive mode
-    if (unitType === "reactor") return { color: baseColor, width: "4" };
+    // Interactive mode — reactor uses state-driven warm palette, never harsh red
+    if (unitType === "reactor") {
+      const reactorStrokeColor =
+        effectiveState === "IMMEDIATE_RISK" ? "#D4653F" :
+        effectiveState === "SEVERE_DRIFT"   ? "#B47A1F" :
+        effectiveState === "EARLY_DRIFT"    ? "#2F5D80" :
+        "#0F5F5F";
+      const reactorStrokeWidth =
+        effectiveState === "IMMEDIATE_RISK" ? "5" :
+        effectiveState === "SEVERE_DRIFT"   ? "4.5" :
+        effectiveState === "EARLY_DRIFT"    ? "4" :
+        "3.5";
+      return { color: reactorStrokeColor, width: reactorStrokeWidth };
+    }
     if (unitType === "cooler") return { color: coolerColor, width: "3" };
     if (unitType === "exchanger") return { color: preheatColor, width: "3" };
     return { color: "#777", width: "3" };
