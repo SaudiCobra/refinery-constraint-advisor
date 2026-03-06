@@ -841,7 +841,7 @@ export default function ProcessMap({
           {/* H₂ header — vertical dashed blue line on right side */}
           <line 
             x1={ANCHORS.R1.x + SIZES.R1.w/2 + 40} 
-            y1={ANCHORS.R1.y - SIZES.R1.h/2 - 30} 
+            y1={ANCHORS.R1.y - SIZES.R1.h/2 - 25} 
             x2={ANCHORS.R1.x + SIZES.R1.w/2 + 40} 
             y2={ANCHORS.R1.y + SIZES.R1.h/2 - 10} 
             stroke="#4A90E2" 
