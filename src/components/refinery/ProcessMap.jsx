@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { FeedFilterIcon, ShellTubeHXIcon, CoolerIcon, ControlValveIcon } from "./PFDIcons";
 
 const LEVEL_COLORS = {
   0: "#0F5F5F",
@@ -350,8 +349,13 @@ export default function ProcessMap({
         {/* === MAIN PROCESS SPINE === */}
         
         {/* FEED FILTER F-1 */}
-        <g transform={`translate(${ANCHORS.F1.x}, ${ANCHORS.F1.y})`} onClick={(e) => handleUnitClick(e, 'f1')} className={cn(interactive && "cursor-pointer")} filter="url(#equipmentShadow)">
-          <FeedFilterIcon w={SIZES.F1.w} h={SIZES.F1.h} stroke={stateColors?.base || "#777"} strokeWidth={3} />
+        <g transform={`translate(${ANCHORS.F1.x}, ${ANCHORS.F1.y})`} onClick={(e) => handleUnitClick(e, 'f1')} className={cn(interactive && "cursor-pointer")}>
+          <ellipse cx="0" cy={-SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#1a1a1a" stroke={stateColors?.base || "#555"} strokeWidth="2.5" />
+          <rect x={-SIZES.F1.w/2} y={-SIZES.F1.h/2} width={SIZES.F1.w} height={SIZES.F1.h} fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="3" filter="url(#equipmentShadow)" />
+          <ellipse cx="0" cy={SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="2.5" />
+          {[-30, -10, 10, 30].map(y => (
+            <line key={y} x1={-SIZES.F1.w/3} y1={y} x2={SIZES.F1.w/3} y2={y} stroke="#444" strokeWidth="1.8" opacity="0.9" />
+          ))}
           <text x="0" y={SIZES.F1.h/2 + 24} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">F-1</text>
           {interactive && (
             <>
@@ -369,8 +373,8 @@ export default function ProcessMap({
         
         {/* TCV-01B: Main Feed Control (on spine) */}
         <g transform={`translate(${VALVES.TCV01B.x}, ${VALVES.TCV01B.y})`} onClick={(e) => handleUnitClick(e, 'tcv01b')} className={cn(interactive && "cursor-pointer")}>
-          <ControlValveIcon size={10} fill="#2F5D80" stroke="#555" strokeWidth={1.5} />
-          {interactive && <text x="0" y="-22" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-01B</text>}
+          <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill="#2F5D80" stroke="#555" strokeWidth="2" />
+          {interactive && <text x="0" y="-20" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-01B</text>}
         </g>
         
         {/* SPINE: TCV-01B → E-1 Tube Inlet */}
@@ -380,19 +384,30 @@ export default function ProcessMap({
         </circle>
 
         {/* MAIN EXCHANGER E-1 (Tube = Cold Feed, Shell = Hot Effluent) */}
-        <g transform={`translate(${ANCHORS.E1.x}, ${ANCHORS.E1.y})`} onClick={(e) => handleUnitClick(e, 'e1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("exchanger")} filter="url(#equipmentShadow)">
+        <g transform={`translate(${ANCHORS.E1.x}, ${ANCHORS.E1.y})`} onClick={(e) => handleUnitClick(e, 'e1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("exchanger")}>
           {(() => {
             const stroke = getEquipmentStroke("exchanger");
             return (
-              <ShellTubeHXIcon
-                w={SIZES.E1.w} h={SIZES.E1.h}
-                strokeColor={stroke.color}
-                strokeWidth={parseFloat(stroke.width)}
-                tubeThermalColor={tubeThermalColor}
-                shellThermalColor={shellThermalColor}
-              />
+              <>
+                <ellipse cx={-SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#1a1a1a" stroke={stroke.color} strokeWidth="2.5" className="transition-all duration-700" />
+                <rect x={-SIZES.E1.w/2} y={-SIZES.E1.h/2 + 8} width={SIZES.E1.w} height={SIZES.E1.h - 16} fill="#2a2a2a" stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+                <ellipse cx={SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#2a2a2a" stroke={stroke.color} strokeWidth="2.5" className="transition-all duration-700" />
+              </>
             );
           })()}
+          
+          {[-50, -35, -20, -5, 10, 25, 40, 55].map(yOffset => (
+            <line key={yOffset} x1={-SIZES.E1.w/2 + 12} y1={yOffset} x2={SIZES.E1.w/2 - 12} y2={yOffset} stroke="#444" strokeWidth="1.5" opacity="0.9" />
+          ))}
+          
+          <rect x={-SIZES.E1.w/2 + 12} y={-SIZES.E1.h/2 + 18} width={SIZES.E1.w - 24} height={SIZES.E1.h - 36} fill={tubeThermalColor} opacity="0.108" className="transition-all duration-500" />
+          <rect x={-SIZES.E1.w/2 + 8} y={-SIZES.E1.h/2 + 14} width={SIZES.E1.w - 16} height={SIZES.E1.h - 28} fill={shellThermalColor} opacity="0.072" className="transition-all duration-500" />
+          
+          <circle cx={-SIZES.E1.w/2} cy="0" r="5" fill="#333" stroke={tubeThermalColor} strokeWidth="2" />
+          <circle cx={SIZES.E1.w/2} cy="0" r="5" fill="#333" stroke={tubeThermalColor} strokeWidth="2" />
+          <circle cx={-SIZES.E1.w/2} cy={-SIZES.E1.h/2 + 18} r="5" fill="#333" stroke={shellThermalColor} strokeWidth="2" />
+          <circle cx={SIZES.E1.w/2} cy={SIZES.E1.h/2 - 18} r="5" fill="#333" stroke={shellThermalColor} strokeWidth="2" />
+          
           <text x="0" y={SIZES.E1.h/2 + 28} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">E-1</text>
           {interactive && <text x="0" y={SIZES.E1.h/2 + 46} fill="#888" fontSize="16" textAnchor="middle">Exchanger</text>}
         </g>
@@ -411,11 +426,11 @@ export default function ProcessMap({
           <line x1={974} y1={Y_UPPER_ZONE} x2={974} y2={536} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV01A.x}, ${VALVES.TCV01A.y})`} onClick={(e) => handleUnitClick(e, 'tcv01a')} className={cn(interactive && "cursor-pointer")}>
-            <ControlValveIcon size={10} fill={valveStates.tcv01a === "OPEN" ? "#2F5D80" : "#333"} stroke={valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} strokeWidth={1.5} />
+            <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv01a === "OPEN" ? "#2F5D80" : "#333"} stroke={valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} strokeWidth="2" />
             {interactive && (
               <>
-                <text x="0" y="-22" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-01A</text>
-                <text x="0" y="34" fill="#888" fontSize="14" textAnchor="middle">Tube Bypass</text>
+                <text x="0" y="-20" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-01A</text>
+                <text x="0" y="32" fill="#888" fontSize="14" textAnchor="middle">Tube Bypass</text>
               </>
             )}
           </g>
@@ -645,11 +660,11 @@ export default function ProcessMap({
           
           {/* Valve symbol */}
           <g transform={`translate(${VALVES.TCV02A.x}, ${VALVES.TCV02A.y})`} onClick={(e) => handleUnitClick(e, 'tcv02a')} className={cn(interactive && "cursor-pointer")}>
-            <ControlValveIcon size={10} fill={valveStates.tcv02a === "OPEN" ? "#2F5D80" : "#B47A1F"} stroke="#555" strokeWidth={1.5} />
+            <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv02a === "OPEN" ? "#2F5D80" : "#B47A1F"} stroke="#555" strokeWidth="2" />
             {interactive && (
               <>
-                <text x="0" y="-22" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-02A</text>
-                <text x="0" y="-38" fill="#888" fontSize="14" textAnchor="middle">Shell Return</text>
+                <text x="0" y="-20" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-02A</text>
+                <text x="0" y="-36" fill="#888" fontSize="14" textAnchor="middle">Shell Return</text>
               </>
             )}
           </g>
@@ -681,11 +696,11 @@ export default function ProcessMap({
           
           {/* Valve symbol */}
           <g transform={`translate(${VALVES.TCV02B.x}, ${VALVES.TCV02B.y})`} onClick={(e) => handleUnitClick(e, 'tcv02b')} className={cn(interactive && "cursor-pointer")}>
-            <ControlValveIcon size={10} fill={valveStates.tcv02b === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth={1.5} />
+            <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv02b === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth="2" />
             {interactive && (
               <>
-                <text x="0" y="34" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-02B</text>
-                <text x="0" y="50" fill="#888" fontSize="14" textAnchor="middle">Shell Bypass</text>
+                <text x="0" y="32" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-02B</text>
+                <text x="0" y="48" fill="#888" fontSize="14" textAnchor="middle">Shell Bypass</text>
               </>
             )}
           </g>
@@ -725,18 +740,16 @@ export default function ProcessMap({
         </circle>
 
         {/* EFFLUENT COOLER E-2 */}
-        <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={(e) => handleUnitClick(e, 'e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")} opacity={getNonAffectedOpacity("cooler")} filter="url(#equipmentShadow)">
+        <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={(e) => handleUnitClick(e, 'e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")} opacity={getNonAffectedOpacity("cooler")}>
           {(() => {
             const stroke = getEquipmentStroke("cooler");
             return (
-              <CoolerIcon
-                w={SIZES.E2.w} h={SIZES.E2.h}
-                stroke="#2F5D80"
-                bodyStroke={stroke.color}
-                strokeWidth={parseFloat(stroke.width)}
-              />
+              <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
             );
           })()}
+          {[-60, -40, -20, 0, 20, 40, 60].map(y => (
+            <line key={y} x1={-SIZES.E2.w/2 + 16} y1={y} x2={SIZES.E2.w/2 - 16} y2={y} stroke="#2F5D80" strokeWidth="2.5" opacity="0.54" />
+          ))}
           {(effectiveState === "SEVERE_DRIFT" || effectiveState === "IMMEDIATE_RISK") && (
             <>
               <line x1={-SIZES.E2.w/2 + 10} y1={-SIZES.E2.h/2 + 10} x2={SIZES.E2.w/2 - 10} y2={SIZES.E2.h/2 - 10} stroke="#A13A1F" strokeWidth="4" pointerEvents="none" />
@@ -757,11 +770,11 @@ export default function ProcessMap({
           <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_LOWER_ZONE} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV03A.x}, ${VALVES.TCV03A.y})`} onClick={(e) => handleUnitClick(e, 'tcv03a')} className={cn(interactive && "cursor-pointer")}>
-            <ControlValveIcon size={10} fill={valveStates.tcv03a === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth={1.5} />
+            <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv03a === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth="2" />
             {interactive && (
               <>
-                <text x="0" y="30" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-03A</text>
-                <text x="0" y="46" fill="#888" fontSize="14" textAnchor="middle">Cooler Bypass</text>
+                <text x="0" y="28" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-03A</text>
+                <text x="0" y="44" fill="#888" fontSize="14" textAnchor="middle">Cooler Bypass</text>
               </>
             )}
           </g>
