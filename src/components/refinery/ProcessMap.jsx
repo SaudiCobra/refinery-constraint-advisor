@@ -903,27 +903,49 @@ export default function ProcessMap({
               />
             )}
 
-            {/* PATH — effluent line from reactor bottom → E-2 (vertical drop + upper corridor) */}
+            {/* PATH — E-1 middle outlet → reactor inlet (orthogonal feed route, legs 1-4) */}
             {isCoolingConstraint && (
               <>
-                {/* Reactor outlet drop */}
+                {/* Leg 1: horizontal right from E-1 center nozzle to RIT box left edge (x=974) */}
                 <line
                   className="pfd-path"
-                  x1={ANCHORS.R1.x}
-                  y1={ANCHORS.R1.y + SIZES.R1.h/2}
-                  x2={ANCHORS.R1.x}
-                  y2={Y_LOWER_ZONE - 20}
+                  x1={ANCHORS.E1.x + SIZES.E1.w/2}
+                  y1={ANCHORS.E1.y}
+                  x2={974}
+                  y2={ANCHORS.E1.y}
                   stroke={pulseColor}
                   strokeWidth="7"
                   opacity="0.08"
                 />
-                {/* Shell-side upper corridor to E-2 */}
+                {/* Leg 2: vertical up from E-1 center elevation to top of RIT box (y=536) */}
                 <line
                   className="pfd-path"
-                  x1={ANCHORS.E1.x + SIZES.E1.w/2}
-                  y1={Y_UPPER_ZONE - 60}
-                  x2={ANCHORS.E2.x - SIZES.E2.w/2}
-                  y2={Y_UPPER_ZONE - 60}
+                  x1={974}
+                  y1={ANCHORS.E1.y}
+                  x2={974}
+                  y2={536}
+                  stroke={pulseColor}
+                  strokeWidth="7"
+                  opacity="0.08"
+                />
+                {/* Leg 3: horizontal right at y=536 to reactor centerline */}
+                <line
+                  className="pfd-path"
+                  x1={974}
+                  y1={536}
+                  x2={ANCHORS.R1.x}
+                  y2={536}
+                  stroke={pulseColor}
+                  strokeWidth="7"
+                  opacity="0.08"
+                />
+                {/* Leg 4: vertical drop into reactor top nozzle */}
+                <line
+                  className="pfd-path"
+                  x1={ANCHORS.R1.x}
+                  y1={536}
+                  x2={ANCHORS.R1.x}
+                  y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22}
                   stroke={pulseColor}
                   strokeWidth="7"
                   opacity="0.08"
