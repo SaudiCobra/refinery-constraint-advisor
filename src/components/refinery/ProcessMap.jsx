@@ -569,7 +569,7 @@ export default function ProcessMap({
         
         {/* Reactor outlet — Vertical drop to split point */}
         <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y + SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={Y_LOWER_ZONE - 20} {...getPathStyle()} className="transition-all duration-700" />
-        <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y + SIZES.R1.h/2 + 30} r="4" fill={shellThermalColor}>
+        <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y + SIZES.R1.h/2 + 30} r="4" fill={getDotColor("shell")}>
           <animate attributeName="cy" values={`${ANCHORS.R1.y + SIZES.R1.h/2};${Y_LOWER_ZONE - 20}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
