@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { FeedFilterIcon, ShellTubeHXIcon, CoolerIcon, ControlValveIcon } from "./PFDIcons";
 
 const LEVEL_COLORS = {
   0: "#0F5F5F",
