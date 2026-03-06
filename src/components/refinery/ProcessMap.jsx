@@ -259,44 +259,41 @@ export default function ProcessMap({
     return { stroke: "#555", strokeWidth: "4", opacity: 0.9 };
   };
 
-  // ── CAUSE → EFFECT propagation highlight ────────────────────────────────────
-  // Determine which constraint sources are active (cooling / quench / both)
-  const isCoolingConstraint = (
-    !equipment.effluentCooler ||
-    coolingCapacity === "CONSTRAINED" ||
-    coolingCapacity === "SEVERELY_LIMITED"
-  ) && effectiveState !== "NORMAL";
+  // ── CAUSE → EFFECT static propagation highlight ─────────────────────────────
+  // No animation — purely opacity-graded static overlays that tell the story:
+  // "this is the origin, this is the path, this is where it lands."
 
-  const isQuenchConstraint = (
-    equipment.h2Compressor === false ||
-    (hotSpotRisk === "HIGH" && effectiveState !== "NORMAL")
-  ) && effectiveState !== "NORMAL";
+  const isReactorConstraint = effectiveState !== "NORMAL" &&
+    !isCoolingConstraintActive() && !isQuenchConstraintActive();
 
-  // Only pulse when at least Early Drift — never in Stable
-  const isPropagating = effectiveState !== "NORMAL" && (isCoolingConstraint || isQuenchConstraint);
+  function isCoolingConstraintActive() {
+    return (
+      !equipment.effluentCooler ||
+      coolingCapacity === "CONSTRAINED" ||
+      coolingCapacity === "SEVERELY_LIMITED"
+    ) && effectiveState !== "NORMAL";
+  }
+  function isQuenchConstraintActive() {
+    return (
+      equipment.h2Compressor === false ||
+      (hotSpotRisk === "HIGH" && effectiveState !== "NORMAL")
+    ) && effectiveState !== "NORMAL";
+  }
 
-  // Phase: 0=cause, 1=path, 2=impact — cycles on 1500ms interval
-  const phaseRef = useRef(0);
-  const [propagationPhase, setPropagationPhase] = useState(0);
+  const isCoolingConstraint = isCoolingConstraintActive();
+  const isQuenchConstraint  = isQuenchConstraintActive();
+  const isPropagating = effectiveState !== "NORMAL";
 
-  useEffect(() => {
-    if (!isPropagating) {
-      setPropagationPhase(0);
-      return;
-    }
-    const interval = setInterval(() => {
-      phaseRef.current = (phaseRef.current + 1) % 3;
-      setPropagationPhase(phaseRef.current);
-    }, 500); // each phase = 500ms → full 1500ms cycle
-    return () => clearInterval(interval);
-  }, [isPropagating]);
+  // Highlight color — warm palette, no harsh red
+  const hlColor =
+    effectiveState === "IMMEDIATE_RISK" ? "#D4653F" :
+    effectiveState === "SEVERE_DRIFT"   ? "#B47A1F" :
+    "#C8AA50"; // EARLY_DRIFT
 
-  // Pick pulse color from existing state palette
-  const pulseColor = effectiveState === "IMMEDIATE_RISK" ? "#C0392B"
-    : effectiveState === "SEVERE_DRIFT"   ? "#D4653F"
-    : "#E67E22"; // EARLY_DRIFT
-
-  const pulseOpacity = (phase, target) => propagationPhase === target ? 0.55 : 0.10;
+  // Static opacity tiers per state severity
+  const hlOrigin = effectiveState === "IMMEDIATE_RISK" ? 0.38 : effectiveState === "SEVERE_DRIFT" ? 0.24 : 0.12;
+  const hlPath   = effectiveState === "IMMEDIATE_RISK" ? 0.20 : effectiveState === "SEVERE_DRIFT" ? 0.13 : 0.06;
+  const hlImpact = effectiveState === "IMMEDIATE_RISK" ? 0.14 : effectiveState === "SEVERE_DRIFT" ? 0.09 : 0.04;
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative">
