@@ -659,6 +659,10 @@ export default function Home() {
               uiState={systemState}
               demoTimeMin={displayTTL}
               demoState={demoState}
+              hotSpotRisk={hotSpotRisk}
+              coolingCapacity={coolingCapacity}
+              equipment={activeData.equipment}
+              currentTemp={currentValue}
             />
             
             <div className="max-w-3xl mx-auto space-y-3">
