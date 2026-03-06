@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircleIcon, WrenchIcon, ActivityIcon } from "./DashboardIcons";
 
 // Action preview definitions — static content + dynamic projection hook
 const ACTION_PREVIEWS = {
@@ -89,9 +89,12 @@ export default function LeverContext({
   return (
     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-[#888] text-xs font-semibold uppercase tracking-wider">
-          Operational Flexibility
-        </h4>
+        <div className="flex items-center gap-2">
+          <ShieldIcon className="w-4 h-4 text-[#888]" />
+          <h4 className="text-[#888] text-xs font-semibold uppercase tracking-wider">
+            Operational Flexibility
+          </h4>
+        </div>
         <span className={cn(
           "text-xs font-bold px-2 py-0.5 rounded",
           availableCount >= 3 && "bg-[#0F5F5F]/50 text-[#0F9F9F]",
@@ -106,7 +109,7 @@ export default function LeverContext({
         {levers.map((lever, idx) => (
           <div key={idx} className="flex items-center gap-1.5">
             {lever.available ? (
-              <CheckCircle2 className="w-3 h-3 text-[#0F9F9F] flex-shrink-0" />
+              <CheckCircleIcon className="w-3 h-3 text-[#0F9F9F] flex-shrink-0" />
             ) : (
               <span className="w-3 h-3 rounded-full border border-[#555] flex-shrink-0" />
             )}
@@ -140,7 +143,10 @@ export default function LeverContext({
       {/* Corrective action toggles — interactive mode only */}
       {onMitigate && (
         <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
-          <p className="text-[#666] text-[10px] uppercase tracking-wider mb-2 font-semibold">Corrective Actions</p>
+          <div className="flex items-center gap-2 mb-2">
+            <WrenchIcon className="w-3 h-3 text-[#666]" />
+            <p className="text-[#666] text-[10px] uppercase tracking-wider font-semibold">Corrective Actions</p>
+          </div>
 
           {/* Wrapper: enter/leave on wrapper with debounce — buttons never fire leave */}
           <div onMouseLeave={handleLeave}>
@@ -244,23 +250,29 @@ export default function LeverContext({
             ].every(p => p >= 100);
 
             let statusText;
+            let statusColor;
             if (!anyActive) {
-              statusText = <span className="text-[#3a3a3a]">Mitigation response: Standing by</span>;
+              statusText = "Mitigation response: Standing by";
+              statusColor = "#3a3a3a";
             } else if (allFull) {
-              statusText = <span className="text-[#0F9F9F]">Mitigation response: All levers at full effect — stabilizing</span>;
+              statusText = "Mitigation response: All levers at full effect — stabilizing";
+              statusColor = "#0F9F9F";
             } else if (mitigationMsg) {
-              statusText = <span className="text-[#E67E22]">{mitigationMsg}</span>;
+              statusText = mitigationMsg;
+              statusColor = "#E67E22";
             } else {
-              statusText = <span className="text-[#888]">Mitigation response: Building…</span>;
+              statusText = "Mitigation response: Building…";
+              statusColor = "#888";
             }
 
             return (
-              <p className="text-[10px] mt-2" style={{ minHeight: "1.4em" }}>
-                {statusText}
+              <div className="text-[10px] mt-2 flex items-center gap-2" style={{ minHeight: "1.4em" }}>
+                <ActivityIcon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: statusColor }} />
+                <span style={{ color: statusColor }}>{statusText}</span>
                 {anyActive && minutesRecovered > 0.3 && (
-                  <span className="text-[#555] ml-2">+{Math.min(minutesRecovered, 30).toFixed(1)} min recovered</span>
+                  <span className="text-[#555]">+{Math.min(minutesRecovered, 30).toFixed(1)} min recovered</span>
                 )}
-              </p>
+                </div>
             );
           })()}
         </div>
