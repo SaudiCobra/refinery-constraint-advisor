@@ -21,6 +21,34 @@ const LEVEL_COLORS = {
   3: UI_STATE_COLORS.IMMEDIATE_RISK,
 };
 
+// Derives a short, executive-friendly constraint label from the same logic
+// already used by DecisionWindowBar — display only, no new business logic.
+const getDominantConstraintLabel = ({ timerState, hotSpotRisk, coolingCapacity, equipment, currentTemp, escalationLevel }) => {
+  if (timerState === "IMMEDIATE_RISK") {
+    if (hotSpotRisk === "HIGH") return "Reactor Temperature (RIT)";
+    if (coolingCapacity === "SEVERELY_LIMITED" || !equipment?.effluentCooler) return "Cooling Capacity (E-2)";
+    return "Reactor Temperature (RIT)";
+  }
+  if (timerState === "SEVERE_DRIFT") {
+    if (!equipment?.h2Compressor) return "Quench Response";
+    if (coolingCapacity === "CONSTRAINED" || coolingCapacity === "REDUCED") return "Cooling Capacity (E-2)";
+    return "Reactor Temperature (RIT)";
+  }
+  if (timerState === "EARLY_DRIFT") {
+    const constrainedCount = [
+      coolingCapacity === "CONSTRAINED" || coolingCapacity === "SEVERELY_LIMITED",
+      !equipment?.h2Compressor,
+      !equipment?.bypassValve,
+    ].filter(Boolean).length;
+    if (constrainedCount >= 2) return "Multi-Constraint Interaction";
+    if (hotSpotRisk === "HIGH") return "Reactor Temperature (RIT)";
+    if (!equipment?.h2Compressor) return "Quench Response";
+    if (coolingCapacity !== "NORMAL") return "Cooling Capacity (E-2)";
+    return "Reactor Temperature (RIT)";
+  }
+  return null;
+};
+
 export default function HeroMetric({
   timeToNearest,
   escalationLevel,
@@ -28,6 +56,10 @@ export default function HeroMetric({
   uiState,
   demoTimeMin,
   demoState,
+  hotSpotRisk,
+  coolingCapacity,
+  equipment,
+  currentTemp,
 }) {
   const useDemoClock = demoTimeMin !== null && demoTimeMin !== undefined;
   const activeState = useDemoClock ? demoState : uiState;
