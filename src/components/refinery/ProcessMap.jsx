@@ -313,10 +313,25 @@ export default function ProcessMap({
             </feMerge>
           </filter>
           
-          <linearGradient id="reactorGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={baseColor} stopOpacity="0.3" />
-            <stop offset="100%" stopColor={baseColor} stopOpacity="0.1" />
-          </linearGradient>
+          {/* Reactor state glow — state-driven, no harsh red */}
+          <radialGradient id="reactorGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor={
+              effectiveState === "IMMEDIATE_RISK" ? "#D4653F" :
+              effectiveState === "SEVERE_DRIFT"   ? "#B47A1F" :
+              effectiveState === "EARLY_DRIFT"    ? "#2F5D80" :
+              "#0F5F5F"
+            } stopOpacity={
+              effectiveState === "IMMEDIATE_RISK" ? "0.18" :
+              effectiveState === "SEVERE_DRIFT"   ? "0.13" :
+              effectiveState === "EARLY_DRIFT"    ? "0.08" :
+              "0.05"
+            } />
+            <stop offset="100%" stopColor={
+              effectiveState === "IMMEDIATE_RISK" ? "#D4653F" :
+              effectiveState === "SEVERE_DRIFT"   ? "#B47A1F" :
+              "#0F5F5F"
+            } stopOpacity="0" />
+          </radialGradient>
         </defs>
 
         {/* === MAIN PROCESS SPINE === */}
