@@ -309,7 +309,7 @@ export default function ProcessMap({
         {/* === MAIN PROCESS SPINE === */}
         
         {/* FEED FILTER F-1 */}
-        <g transform={`translate(${ANCHORS.F1.x}, ${ANCHORS.F1.y})`} onClick={() => handleUnitClick('f1')} className={cn(interactive && "cursor-pointer")}>
+        <g transform={`translate(${ANCHORS.F1.x}, ${ANCHORS.F1.y})`} onClick={(e) => handleUnitClick(e, 'f1')} className={cn(interactive && "cursor-pointer")}>
           <ellipse cx="0" cy={-SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#1a1a1a" stroke={stateColors?.base || "#555"} strokeWidth="2.5" />
           <rect x={-SIZES.F1.w/2} y={-SIZES.F1.h/2} width={SIZES.F1.w} height={SIZES.F1.h} fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="3" filter="url(#equipmentShadow)" />
           <ellipse cx="0" cy={SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="2.5" />
