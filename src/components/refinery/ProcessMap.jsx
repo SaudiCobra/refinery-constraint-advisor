@@ -515,13 +515,10 @@ export default function ProcessMap({
                 }
                 return "#3A3A3A"; // Neutral fill
               }
-              // Interactive mode logic
-              if (hotSpotRisk === "HIGH" && isDominant) return "#A13A1F";
-              if (hotSpotRisk === "MEDIUM" && isDominant) return "#B47A1F";
-              if (isDominant && bedImbalance.severity === "SEVERE") return "#A13A1F";
-              if (isDominant && bedImbalance.severity === "MILD") return "#B47A1F";
-              if (escalationLevel >= 2) return "#B47A1F";
-              if (escalationLevel >= 1) return "#2F5D80";
+              // Interactive mode — state-driven warm palette, no harsh red
+              if (effectiveState === "IMMEDIATE_RISK") return "#D4653F";
+              if (effectiveState === "SEVERE_DRIFT")   return "#B47A1F";
+              if (effectiveState === "EARLY_DRIFT")    return "#2F5D80";
               return "#0F5F5F";
             };
             
