@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { ThermometerIcon, TriangleAlertIcon } from "./DashboardIcons";
 
 export default function PreheatIndicator({ preheatActive, onToggle, currentTemp, slope }) {
   const ACTIVATION_LOWER = 280;
@@ -54,15 +55,19 @@ export default function PreheatIndicator({ preheatActive, onToggle, currentTemp,
         <>
           <div className="w-px h-6 bg-[#444] hidden md:block" />
           <div className="flex items-center gap-3">
+            <ThermometerIcon className="w-4 h-4" style={{ color: statusColor }} />
             <span className="text-[#666] text-xs uppercase tracking-wider">Preheat Envelope:</span>
             <span className="text-sm font-medium" style={{ color: statusColor }}>{status}</span>
           </div>
           {advisory && (
             <>
               <div className="w-px h-6 bg-[#444] hidden md:block" />
-              <span className="text-xs italic" style={{ color: statusColor }}>
-                {advisory}
-              </span>
+              <div className="flex items-center gap-2">
+                <TriangleAlertIcon className="w-4 h-4" style={{ color: statusColor }} />
+                <span className="text-xs italic" style={{ color: statusColor }}>
+                  {advisory}
+                </span>
+              </div>
             </>
           )}
         </>
