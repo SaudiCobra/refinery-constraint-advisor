@@ -838,13 +838,17 @@ export default function ProcessMap({
         
         {/* H₂ System — Right-side header with quench branches */}
         <g opacity="0.4">
-          {/* H₂ header — vertical dashed blue line on right side */}
+          {/* H₂ header — vertical dashed line on right side; color shifts green in high escalation */}
           <line 
             x1={ANCHORS.R1.x + SIZES.R1.w/2 + 40} 
             y1={ANCHORS.R1.y - SIZES.R1.h/2 - 25} 
             x2={ANCHORS.R1.x + SIZES.R1.w/2 + 40} 
             y2={ANCHORS.R1.y + SIZES.R1.h/2 - 10} 
-            stroke="#4A90E2" 
+            stroke={
+              effectiveState === "IMMEDIATE_RISK" ? "#22D3A0" :
+              effectiveState === "SEVERE_DRIFT"   ? "#34C989" :
+              "#4A90E2"
+            }
             strokeWidth="2.5" 
             strokeDasharray="4,4" 
           />
