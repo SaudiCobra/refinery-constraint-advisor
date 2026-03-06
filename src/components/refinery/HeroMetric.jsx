@@ -119,6 +119,15 @@ export default function HeroMetric({
         {displayTime}
       </div>
 
+      {dominantConstraint && (
+        <div className="mt-4 flex flex-col items-center gap-0.5">
+          <p className="text-[#555] text-[10px] uppercase tracking-[0.12em] font-semibold">Dominant Constraint</p>
+          <p className={cn("text-sm font-medium transition-colors duration-700", colors.text)}>
+            {dominantConstraint}
+          </p>
+        </div>
+      )}
+
       {hiTime && (
         <div className="mt-4 text-center space-y-1">
           <p className="text-[#666] text-xs">If unchanged: High limit in {hiTime}</p>
