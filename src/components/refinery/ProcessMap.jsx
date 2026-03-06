@@ -325,14 +325,6 @@ export default function ProcessMap({
             </feMerge>
           </filter>
           
-          {/* Soft blur for constraint origin halos */}
-          <filter id="hlBlur" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="8" />
-          </filter>
-          <filter id="hlBlurMd" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="5" />
-          </filter>
-
           {/* Reactor state glow — state-driven, no harsh red */}
           <radialGradient id="reactorGlow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor={
