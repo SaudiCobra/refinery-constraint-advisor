@@ -553,7 +553,12 @@ export default function ProcessMap({
                       cy={py}
                       r="2"
                       fill={bedColor}
-                      opacity={interactive ? (0.6 + glowIntensity) : 0.25}
+                      opacity={interactive ? (
+                        effectiveState === "IMMEDIATE_RISK" ? 0.75 :
+                        effectiveState === "SEVERE_DRIFT"   ? 0.65 :
+                        effectiveState === "EARLY_DRIFT"    ? 0.55 :
+                        0.45
+                      ) : 0.25}
                       className="transition-all duration-500"
                     />
                   );
