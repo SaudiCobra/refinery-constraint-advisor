@@ -38,19 +38,34 @@ const deriveH2Availability = (equipment, coolingCapacity, slope) => {
 };
 
 const getStateColor = (state) => {
-  switch (state) {
-    case "Full":
-      return "text-[#0F5F5F]";
-    case "Limited":
-      return "text-[#B47A1F]";
-    case "Restricted":
-      return "text-[#D4653F]";
-    case "Unavailable":
-      return "text-[#A13A1F]";
-    default:
-      return "text-[#888]";
-  }
-};
+   switch (state) {
+     case "Full":
+       return "text-[#0F5F5F]";
+     case "Limited":
+       return "text-[#B47A1F]";
+     case "Restricted":
+       return "text-[#D4653F]";
+     case "Unavailable":
+       return "text-[#A13A1F]";
+     default:
+       return "text-[#888]";
+   }
+ };
+
+ const getStateColorValue = (state) => {
+   switch (state) {
+     case "Full":
+       return "#0F5F5F";
+     case "Limited":
+       return "#B47A1F";
+     case "Restricted":
+       return "#D4653F";
+     case "Unavailable":
+       return "#A13A1F";
+     default:
+       return "#888";
+   }
+ };
 
 export default function H2AvailabilityIndicator({ equipment, coolingCapacity, slope }) {
   const h2State = deriveH2Availability(equipment, coolingCapacity, slope);
@@ -67,9 +82,9 @@ export default function H2AvailabilityIndicator({ equipment, coolingCapacity, sl
      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-4 py-2">
        <div className="flex items-start gap-2">
          {h2State === "Full" ? (
-           <CheckCircleIcon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: getStateColor(h2State).replace('text-', '') }} />
+           <CheckCircleIcon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: getStateColorValue(h2State) }} />
          ) : (
-           <TriangleAlertIcon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: getStateColor(h2State).replace('text-', '') }} />
+           <TriangleAlertIcon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: getStateColorValue(h2State) }} />
          )}
          <p className={`text-xs leading-relaxed transition-colors duration-500 ${stateColor}`}>
            {getMessage()}
