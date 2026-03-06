@@ -645,11 +645,11 @@ export default function ProcessMap({
           
           {/* Valve symbol */}
           <g transform={`translate(${VALVES.TCV02A.x}, ${VALVES.TCV02A.y})`} onClick={(e) => handleUnitClick(e, 'tcv02a')} className={cn(interactive && "cursor-pointer")}>
-            <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv02a === "OPEN" ? "#2F5D80" : "#B47A1F"} stroke="#555" strokeWidth="2" />
+            <ControlValveIcon size={10} fill={valveStates.tcv02a === "OPEN" ? "#2F5D80" : "#B47A1F"} stroke="#555" strokeWidth={1.5} />
             {interactive && (
               <>
-                <text x="0" y="-20" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-02A</text>
-                <text x="0" y="-36" fill="#888" fontSize="14" textAnchor="middle">Shell Return</text>
+                <text x="0" y="-22" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-02A</text>
+                <text x="0" y="-38" fill="#888" fontSize="14" textAnchor="middle">Shell Return</text>
               </>
             )}
           </g>
