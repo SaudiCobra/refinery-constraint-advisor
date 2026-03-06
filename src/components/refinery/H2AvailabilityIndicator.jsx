@@ -1,4 +1,5 @@
 import React from "react";
+import { CheckCircleIcon, TriangleAlertIcon } from "./DashboardIcons";
 
 /**
  * Derives H₂ Availability state from equipment status
@@ -63,10 +64,17 @@ export default function H2AvailabilityIndicator({ equipment, coolingCapacity, sl
   };
   
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-4 py-2">
-      <p className={`text-xs leading-relaxed transition-colors duration-500 ${stateColor}`}>
-        {getMessage()}
-      </p>
-    </div>
-  );
+     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-4 py-2">
+       <div className="flex items-start gap-2">
+         {h2State === "Full" ? (
+           <CheckCircleIcon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: getStateColor(h2State).replace('text-', '') }} />
+         ) : (
+           <TriangleAlertIcon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: getStateColor(h2State).replace('text-', '') }} />
+         )}
+         <p className={`text-xs leading-relaxed transition-colors duration-500 ${stateColor}`}>
+           {getMessage()}
+         </p>
+       </div>
+     </div>
+   );
 }
