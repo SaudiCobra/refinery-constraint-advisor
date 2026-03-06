@@ -344,7 +344,7 @@ export default function ProcessMap({
         </circle>
 
         {/* MAIN EXCHANGER E-1 (Tube = Cold Feed, Shell = Hot Effluent) */}
-        <g transform={`translate(${ANCHORS.E1.x}, ${ANCHORS.E1.y})`} onClick={() => handleUnitClick('e1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("exchanger")}>
+        <g transform={`translate(${ANCHORS.E1.x}, ${ANCHORS.E1.y})`} onClick={(e) => handleUnitClick(e, 'e1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("exchanger")}>
           {(() => {
             const stroke = getEquipmentStroke("exchanger");
             return (
