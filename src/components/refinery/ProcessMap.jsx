@@ -851,7 +851,7 @@ export default function ProcessMap({
           {interactive && (
             <text 
               x={ANCHORS.R1.x + SIZES.R1.w/2 + 40} 
-              y={ANCHORS.R1.y - SIZES.R1.h/2 - 38} 
+              y={ANCHORS.R1.y - SIZES.R1.h/2 - 33} 
               fill="#888" 
               fontSize="14" 
               textAnchor="middle"
