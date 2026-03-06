@@ -586,9 +586,44 @@ export default function ProcessMap({
             );
           })}
           
-          {/* Glow effect only in interactive mode */}
-          {interactive && escalationLevel >= 2 && (
-            <rect x={-SIZES.R1.w/2 + 5} y={-SIZES.R1.h/2 + 5} width={SIZES.R1.w - 10} height={SIZES.R1.h - 10} fill="url(#reactorGlow)" opacity="0.15" className="transition-opacity duration-500" />
+          {/* State-driven inner glow — smooth, no flashing */}
+          {effectiveState !== "NORMAL" && (
+            <rect
+              x={-SIZES.R1.w/2 + 4} y={-SIZES.R1.h/2 + 4}
+              width={SIZES.R1.w - 8} height={SIZES.R1.h - 8}
+              fill="url(#reactorGlow)"
+              opacity={
+                effectiveState === "IMMEDIATE_RISK" ? 1 :
+                effectiveState === "SEVERE_DRIFT"   ? 0.85 :
+                0.5
+              }
+              className="transition-all duration-700"
+            />
+          )}
+          {/* Outer emphasis ring — subtle halo, intensity scales with state */}
+          {effectiveState !== "NORMAL" && (
+            <rect
+              x={-SIZES.R1.w/2 - 5} y={-SIZES.R1.h/2 - 5}
+              width={SIZES.R1.w + 10} height={SIZES.R1.h + 10}
+              rx="5" fill="none"
+              stroke={
+                effectiveState === "IMMEDIATE_RISK" ? "#D4653F" :
+                effectiveState === "SEVERE_DRIFT"   ? "#B47A1F" :
+                "#2F5D80"
+              }
+              strokeWidth={
+                effectiveState === "IMMEDIATE_RISK" ? "3" :
+                effectiveState === "SEVERE_DRIFT"   ? "2.5" :
+                "1.5"
+              }
+              opacity={
+                effectiveState === "IMMEDIATE_RISK" ? 0.45 :
+                effectiveState === "SEVERE_DRIFT"   ? 0.30 :
+                0.15
+              }
+              className="transition-all duration-700"
+              pointerEvents="none"
+            />
           )}
           
           <text x={-SIZES.R1.w/2 - 40} y={SIZES.R1.h/2 + 12} fill="#aaa" fontSize="22" textAnchor="end" fontWeight="bold">R-1</text>
