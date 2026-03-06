@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { ClockIcon, TrendingUpIcon } from "./DashboardIcons";
 
 import { formatDemoTime } from "./HeroMetric";
 
@@ -122,7 +123,10 @@ export default function DecisionWindowBar({
     <div className="space-y-2">
       <div className="flex flex-col gap-1.5 bg-[#1e1e1e] border border-[#333] rounded-lg px-4 py-2">
         <div className="flex items-center justify-between">
-          <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">Decision Window</span>
+          <div className="flex items-center gap-2">
+            <ClockIcon className="w-3.5 h-3.5 text-[#888]" />
+            <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">Decision Window</span>
+          </div>
           <span className="text-[#aaa] text-sm font-semibold">{timeDisplay}</span>
         </div>
         <div className="w-full h-3 bg-[#0d0d0d] rounded-full border border-[#2a2a2a] overflow-hidden">
@@ -150,7 +154,10 @@ export default function DecisionWindowBar({
               {expanded && (
                 <div className="mt-2 space-y-1 pl-2 border-l-2 border-[#2a2a2a]">
                   {trendCredibility && (
-                    <p className="text-[#666] text-xs italic">{trendCredibility}</p>
+                    <div className="flex items-start gap-2">
+                      <TrendingUpIcon className="w-3.5 h-3.5 text-[#888] mt-0.5 flex-shrink-0" />
+                      <p className="text-[#666] text-xs italic">{trendCredibility}</p>
+                    </div>
                   )}
                   {constraintLeverRelationship && (
                     <p className="text-[#777] text-xs leading-relaxed">
