@@ -422,7 +422,7 @@ export default function ProcessMap({
         </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
-        <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={() => handleUnitClick('r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("reactor")}>
+        <g transform={`translate(${ANCHORS.R1.x}, ${ANCHORS.R1.y})`} onClick={(e) => handleUnitClick(e, 'r1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("reactor")}>
           {(() => {
             const stroke = getEquipmentStroke("reactor");
             return (
