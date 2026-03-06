@@ -133,8 +133,9 @@ export default function ProcessMap({
     : preheatActive && preheatStatus?.includes("Warning") ? "#B47A1F" 
     : "#0F5F5F";
 
-  const handleUnitClick = (unit) => {
+  const handleUnitClick = (e, unit) => {
     if (!interactive) return;
+    e.stopPropagation();
     setSelectedUnit(selectedUnit === unit ? null : unit);
   };
 
