@@ -635,7 +635,7 @@ export default function ProcessMap({
         </circle>
 
         {/* EFFLUENT COOLER E-2 */}
-        <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={() => handleUnitClick('e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")} opacity={getNonAffectedOpacity("cooler")}>
+        <g transform={`translate(${ANCHORS.E2.x}, ${ANCHORS.E2.y})`} onClick={(e) => handleUnitClick(e, 'e2')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400", interactive && coolingCapacity === "CONSTRAINED" && "animate-[wiggle_2s_ease-in-out_infinite]")} opacity={getNonAffectedOpacity("cooler")}>
           {(() => {
             const stroke = getEquipmentStroke("cooler");
             return (
