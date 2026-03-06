@@ -402,17 +402,23 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* E-1 Tube Out → Reactor Inlet (L-shaped: horizontal then vertical drop) */}
-        {/* Leg 1: Horizontal run from E-1 center nozzle to reactor centerline X */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y} x2={ANCHORS.R1.x} y2={ANCHORS.E1.y} {...getPathStyle()} className="transition-all duration-700" />
-        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.E1.y} r="4" fill={tubeThermalColor}>
+        {/* E-1 Tube Out → Reactor Inlet (Top Nozzle Entry) */}
+        {/* Vertical rise from E-1 center nozzle to top nozzle elevation */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
+        <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
+        
+        {/* Horizontal run to reactor centerline at top */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
+        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
-
-        {/* Leg 2: Vertical drop from E-1 center elevation down to reactor top nozzle */}
-        <line x1={ANCHORS.R1.x} y1={ANCHORS.E1.y} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-        <circle cx={ANCHORS.R1.x} cy={(ANCHORS.E1.y + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cy" values={`${ANCHORS.E1.y};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
+        
+        {/* Short vertical nozzle penetration into reactor top */}
+        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} {...getPathStyle()} className="transition-all duration-700" />
+        <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
