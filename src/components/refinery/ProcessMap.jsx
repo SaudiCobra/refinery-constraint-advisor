@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import ConstraintPropagationInsight from "./ConstraintPropagationInsight";
 
 const LEVEL_COLORS = {
   0: "#0F5F5F",
@@ -300,6 +301,7 @@ export default function ProcessMap({
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative">
+      <ConstraintPropagationInsight systemState={effectiveState} />
       {isPropagating && (
         <style>{`
           @keyframes pfd-pulse {
