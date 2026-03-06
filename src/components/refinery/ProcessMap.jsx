@@ -263,9 +263,6 @@ export default function ProcessMap({
   // No animation — purely opacity-graded static overlays that tell the story:
   // "this is the origin, this is the path, this is where it lands."
 
-  const isReactorConstraint = effectiveState !== "NORMAL" &&
-    !isCoolingConstraintActive() && !isQuenchConstraintActive();
-
   function isCoolingConstraintActive() {
     return (
       !equipment.effluentCooler ||
