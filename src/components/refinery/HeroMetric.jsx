@@ -78,6 +78,17 @@ export default function HeroMetric({
     ? formatDemoTime(demoTimeMin + Math.max(1, demoTimeMin * 0.6))
     : null;
 
+  const timerState = activeTime <= 4 ? "IMMEDIATE_RISK" : activeTime <= 13 ? "SEVERE_DRIFT" : activeTime <= 35 ? "EARLY_DRIFT" : "NORMAL";
+  const resolvedState = activeState || timerState;
+  const dominantConstraint = stable ? null : getDominantConstraintLabel({
+    timerState: resolvedState,
+    hotSpotRisk,
+    coolingCapacity,
+    equipment,
+    currentTemp,
+    escalationLevel,
+  });
+
   const animationClass = (() => {
     if (stable) return "";
     if (activeState === "IMMEDIATE_RISK") return "animate-hero-pulse";
