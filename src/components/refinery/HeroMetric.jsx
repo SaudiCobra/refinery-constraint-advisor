@@ -21,34 +21,6 @@ const LEVEL_COLORS = {
   3: UI_STATE_COLORS.IMMEDIATE_RISK,
 };
 
-// Derives a short, executive-friendly constraint label from the same logic
-// already used by DecisionWindowBar — display only, no new business logic.
-const getDominantConstraintLabel = ({ timerState, hotSpotRisk, coolingCapacity, equipment, currentTemp, escalationLevel }) => {
-  if (timerState === "IMMEDIATE_RISK") {
-    if (hotSpotRisk === "HIGH") return "Reactor Temperature (RIT)";
-    if (coolingCapacity === "SEVERELY_LIMITED" || !equipment?.effluentCooler) return "Cooling Capacity (E-2)";
-    return "Reactor Temperature (RIT)";
-  }
-  if (timerState === "SEVERE_DRIFT") {
-    if (!equipment?.h2Compressor) return "Quench Response";
-    if (coolingCapacity === "CONSTRAINED" || coolingCapacity === "REDUCED") return "Cooling Capacity (E-2)";
-    return "Reactor Temperature (RIT)";
-  }
-  if (timerState === "EARLY_DRIFT") {
-    const constrainedCount = [
-      coolingCapacity === "CONSTRAINED" || coolingCapacity === "SEVERELY_LIMITED",
-      !equipment?.h2Compressor,
-      !equipment?.bypassValve,
-    ].filter(Boolean).length;
-    if (constrainedCount >= 2) return "Multi-Constraint Interaction";
-    if (hotSpotRisk === "HIGH") return "Reactor Temperature (RIT)";
-    if (!equipment?.h2Compressor) return "Quench Response";
-    if (coolingCapacity !== "NORMAL") return "Cooling Capacity (E-2)";
-    return "Reactor Temperature (RIT)";
-  }
-  return null;
-};
-
 export default function HeroMetric({
   timeToNearest,
   escalationLevel,
@@ -56,10 +28,6 @@ export default function HeroMetric({
   uiState,
   demoTimeMin,
   demoState,
-  hotSpotRisk,
-  coolingCapacity,
-  equipment,
-  currentTemp,
 }) {
   const useDemoClock = demoTimeMin !== null && demoTimeMin !== undefined;
   const activeState = useDemoClock ? demoState : uiState;
@@ -77,17 +45,6 @@ export default function HeroMetric({
   const hihiTime = useDemoClock && demoTimeMin > 0
     ? formatDemoTime(demoTimeMin + Math.max(1, demoTimeMin * 0.6))
     : null;
-
-  const timerState = activeTime <= 4 ? "IMMEDIATE_RISK" : activeTime <= 13 ? "SEVERE_DRIFT" : activeTime <= 35 ? "EARLY_DRIFT" : "NORMAL";
-  const resolvedState = activeState || timerState;
-  const dominantConstraint = stable ? null : getDominantConstraintLabel({
-    timerState: resolvedState,
-    hotSpotRisk,
-    coolingCapacity,
-    equipment,
-    currentTemp,
-    escalationLevel,
-  });
 
   const animationClass = (() => {
     if (stable) return "";
@@ -118,15 +75,6 @@ export default function HeroMetric({
       )}>
         {displayTime}
       </div>
-
-      {dominantConstraint && (
-        <div className="mt-4 flex flex-col items-center gap-0.5">
-          <p className="text-[#555] text-[10px] uppercase tracking-[0.12em] font-semibold">Dominant Constraint</p>
-          <p className={cn("text-sm font-medium transition-colors duration-700", colors.text)}>
-            {dominantConstraint}
-          </p>
-        </div>
-      )}
 
       {hiTime && (
         <div className="mt-4 text-center space-y-1">
