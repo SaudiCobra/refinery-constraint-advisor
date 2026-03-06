@@ -899,8 +899,8 @@ export default function ProcessMap({
         */}
         {(() => {
           const hihi = 370; const gap = hihi - tBed; const near = gap <= 15;
-          const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 52 - 18 - 14 - 12 - 12 - 18 - 18 - 36 - 36 + 40 + 40; // 1026 (shifted right 40px more)
-          const cy = ANCHORS.R1.y - 10 - 8 - 8 - 8 - 10 - 10 - 20 - 20 - 20 + 10;                            // 556 (shifted down 10px)
+          const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 52 - 18 - 14 - 12 - 12 - 18 - 18 - 36 - 36 + 40 + 40 + 10; // 1036
+          const cy = ANCHORS.R1.y - 10 - 8 - 8 - 8 - 10 - 10 - 20 - 20 - 20 + 10 + 10;                            // 566
           return (
             <g transform={`translate(${cx}, ${cy})`}>
               <rect x="-52" y="-20" width="104" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
