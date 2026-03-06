@@ -523,8 +523,11 @@ export default function ProcessMap({
             };
             
             const bedColor = getBedColor();
-            const glowIntensity = interactive && isDominant && hotSpotRisk === "HIGH" ? 0.5 : interactive && isDominant && hotSpotRisk === "MEDIUM" ? 0.3 : 0;
-            const bedOpacity = !interactive ? 0.12 : (0.15 + glowIntensity);
+            const bedOpacity = !interactive ? 0.12 :
+              effectiveState === "IMMEDIATE_RISK" ? 0.22 :
+              effectiveState === "SEVERE_DRIFT"   ? 0.17 :
+              effectiveState === "EARLY_DRIFT"    ? 0.13 :
+              0.12;
             
             return (
               <g key={bed.id}>
