@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { CheckCircleIcon, WrenchIcon, ActivityIcon } from "./DashboardIcons";
+import { CheckCircleIcon, WrenchIcon, ActivityIcon, ShieldIcon } from "./DashboardIcons";
 
 // Action preview definitions — static content + dynamic projection hook
 const ACTION_PREVIEWS = {
