@@ -425,7 +425,7 @@ export default function ProcessMap({
           x2={974}                           y2={ANCHORS.E1.y}
           {...getPathStyle()} className="transition-all duration-700"
         />
-        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + 974) / 2} cy={ANCHORS.E1.y} r="4" fill={tubeThermalColor}>
+        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + 974) / 2} cy={ANCHORS.E1.y} r="4" fill={getDotColor("feed")}>
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};974`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
@@ -435,7 +435,7 @@ export default function ProcessMap({
           x2={974} y2={536}
           {...getPathStyle()} className="transition-all duration-700"
         />
-        <circle cx={974} cy={(ANCHORS.E1.y + 536) / 2} r="4" fill={tubeThermalColor}>
+        <circle cx={974} cy={(ANCHORS.E1.y + 536) / 2} r="4" fill={getDotColor("feed")}>
           <animate attributeName="cy" values={`${ANCHORS.E1.y};536`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
@@ -445,7 +445,7 @@ export default function ProcessMap({
           x2={ANCHORS.R1.x}  y2={536}
           {...getPathStyle()} className="transition-all duration-700"
         />
-        <circle cx={(974 + ANCHORS.R1.x) / 2} cy={536} r="4" fill={tubeThermalColor}>
+        <circle cx={(974 + ANCHORS.R1.x) / 2} cy={536} r="4" fill={getDotColor("feed")}>
           <animate attributeName="cx" values={`974;${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
@@ -455,7 +455,7 @@ export default function ProcessMap({
           x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22}
           {...getPathStyle()} className="transition-all duration-700"
         />
-        <circle cx={ANCHORS.R1.x} cy={(536 + ANCHORS.R1.y - SIZES.R1.h/2) / 2} r="4" fill={tubeThermalColor}>
+        <circle cx={ANCHORS.R1.x} cy={(536 + ANCHORS.R1.y - SIZES.R1.h/2) / 2} r="4" fill={getDotColor("feed")}>
           <animate attributeName="cy" values={`536;${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
