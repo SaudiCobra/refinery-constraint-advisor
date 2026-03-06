@@ -688,7 +688,7 @@ export default function ProcessMap({
         </circle>
 
         {/* THREE-PHASE SEPARATOR D-1 — Terminal Unit */}
-        <g transform={`translate(${ANCHORS.D1.x}, ${ANCHORS.D1.y})`} onClick={() => handleUnitClick('d1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("separator")}>
+        <g transform={`translate(${ANCHORS.D1.x}, ${ANCHORS.D1.y})`} onClick={(e) => handleUnitClick(e, 'd1')} className={cn(interactive && "cursor-pointer hover:opacity-90 transition-all duration-400")} opacity={getNonAffectedOpacity("separator")}>
           <ellipse cx={-SIZES.D1.w/2} cy="0" rx="10" ry={SIZES.D1.h/2 - 4} fill="#1a1a1a" stroke={stateColors?.base || "#555"} strokeWidth="3" className="transition-all duration-700" />
           <rect x={-SIZES.D1.w/2} y={-SIZES.D1.h/2 + 4} width={SIZES.D1.w} height={SIZES.D1.h - 8} fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="3" filter="url(#equipmentShadow)" className="transition-all duration-700" />
           <ellipse cx={SIZES.D1.w/2} cy="0" rx="10" ry={SIZES.D1.h/2 - 4} fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="3" className="transition-all duration-700" />
