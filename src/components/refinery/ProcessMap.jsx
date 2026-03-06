@@ -664,7 +664,7 @@ export default function ProcessMap({
           {/* Rise to spine */}
           <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_LOWER_ZONE} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
-          <g transform={`translate(${VALVES.TCV03A.x}, ${VALVES.TCV03A.y})`} onClick={() => handleUnitClick('tcv03a')} className={cn(interactive && "cursor-pointer")}>
+          <g transform={`translate(${VALVES.TCV03A.x}, ${VALVES.TCV03A.y})`} onClick={(e) => handleUnitClick(e, 'tcv03a')} className={cn(interactive && "cursor-pointer")}>
             <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv03a === "OPEN" ? "#B47A1F" : "#333"} stroke="#555" strokeWidth="2" />
             {interactive && (
               <>
