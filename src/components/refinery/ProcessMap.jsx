@@ -183,6 +183,19 @@ export default function ProcessMap({
   const shellThermalColor = getThermalColor(reactorOutletTemp);
   const cooledThermalColor = getThermalColor(coolerOutletTemp);
 
+  // ── UNIFIED DOT COLOR — single source of truth for all animated pipe dots ──
+  // Maps advisory state → dot fill, independent of thermal calculations.
+  const getDotColor = (stream = "main") => {
+    if (effectiveState === "IMMEDIATE_RISK") return "#E8633A"; // bold orange-red
+    if (effectiveState === "SEVERE_DRIFT")   return "#D4953F"; // strong amber-orange
+    if (effectiveState === "EARLY_DRIFT")    return "#C8AA50"; // warm yellow-amber
+    // NORMAL / Stable — differentiate by stream
+    if (stream === "shell")   return "#4A7A9B"; // cooler blue for hot effluent
+    if (stream === "cooled")  return "#2F7A6F"; // teal-green for cooled product
+    if (stream === "bypass")  return "#7A6A3A"; // muted amber for bypasses
+    return "#2F7A9F"; // calm steel-blue for feed
+  };
+
   // Determine which unit is constrained (both modes - state-driven)
   const getConstrainedUnit = () => {
     if (effectiveState === "IMMEDIATE_RISK") {
