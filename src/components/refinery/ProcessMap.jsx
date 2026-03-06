@@ -668,7 +668,7 @@ export default function ProcessMap({
         <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_UPPER_ZONE - 60} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_UPPER_ZONE - 60} stroke="#555" strokeWidth="4" opacity="0.9" />
         {/* Vertical drop to E-2 inlet on spine */}
         <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_UPPER_ZONE - 60} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
-        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.E2.x - SIZES.E2.w/2)/2} cy={Y_UPPER_ZONE - 60} r="4" fill={getThermalColor(shellSideOutletTemp)}>
+        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.E2.x - SIZES.E2.w/2)/2} cy={Y_UPPER_ZONE - 60} r="4" fill={getDotColor("shell")}>
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.E2.x - SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
