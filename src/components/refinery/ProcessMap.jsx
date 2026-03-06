@@ -402,23 +402,48 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* E-1 Tube Out → Reactor Inlet (Top Nozzle Entry) */}
-        {/* Vertical rise from E-1 center nozzle to top nozzle elevation */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-        <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
+        {/* E-1 Tube Out → Reactor Inlet — L-shaped route via RIT indicator top */}
+        {/* RIT box: cx=1026, cy=556, half-width=52 → left edge x=974, top edge y=536 */}
+        {/* Reactor top: R1.y - R1.h/2 = 660 - 140 = 520 */}
+
+        {/* Leg 1: Horizontal right from E-1 center nozzle to left edge of RIT box */}
+        <line
+          x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y}
+          x2={974}                           y2={ANCHORS.E1.y}
+          {...getPathStyle()} className="transition-all duration-700"
+        />
+        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + 974) / 2} cy={ANCHORS.E1.y} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};974`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
-        
-        {/* Horizontal run to reactor centerline at top */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
+
+        {/* Leg 2: Vertical up from E-1 center elevation to top of RIT box */}
+        <line
+          x1={974} y1={ANCHORS.E1.y}
+          x2={974} y2={536}
+          {...getPathStyle()} className="transition-all duration-700"
+        />
+        <circle cx={974} cy={(ANCHORS.E1.y + 536) / 2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${ANCHORS.E1.y};536`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
-        
-        {/* Short vertical nozzle penetration into reactor top */}
-        <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} {...getPathStyle()} className="transition-all duration-700" />
-        <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={tubeThermalColor}>
-          <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
+
+        {/* Leg 3: Horizontal right along top-of-RIT elevation to reactor centerline */}
+        <line
+          x1={974}           y1={536}
+          x2={ANCHORS.R1.x}  y2={536}
+          {...getPathStyle()} className="transition-all duration-700"
+        />
+        <circle cx={(974 + ANCHORS.R1.x) / 2} cy={536} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cx" values={`974;${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
+
+        {/* Leg 4: Vertical drop into reactor top nozzle */}
+        <line
+          x1={ANCHORS.R1.x} y1={536}
+          x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22}
+          {...getPathStyle()} className="transition-all duration-700"
+        />
+        <circle cx={ANCHORS.R1.x} cy={(536 + ANCHORS.R1.y - SIZES.R1.h/2) / 2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`536;${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
