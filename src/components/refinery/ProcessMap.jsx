@@ -332,7 +332,7 @@ export default function ProcessMap({
         </circle>
         
         {/* TCV-01B: Main Feed Control (on spine) */}
-        <g transform={`translate(${VALVES.TCV01B.x}, ${VALVES.TCV01B.y})`} onClick={() => handleUnitClick('tcv01b')} className={cn(interactive && "cursor-pointer")}>
+        <g transform={`translate(${VALVES.TCV01B.x}, ${VALVES.TCV01B.y})`} onClick={(e) => handleUnitClick(e, 'tcv01b')} className={cn(interactive && "cursor-pointer")}>
           <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill="#2F5D80" stroke="#555" strokeWidth="2" />
           {interactive && <text x="0" y="-20" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-01B</text>}
         </g>
