@@ -431,7 +431,12 @@ export default function ProcessMap({
           <line x1={974} y1={Y_UPPER_ZONE} x2={974} y2={536} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV01A.x}, ${VALVES.TCV01A.y})`} onClick={(e) => handleUnitClick(e, 'tcv01a')} className={cn(interactive && "cursor-pointer")}>
-            <polygon points="-9,-9 9,-9 7,0 9,9 -9,9 -7,0" fill={valveStates.tcv01a === "OPEN" ? "#2F5D80" : "#333"} stroke={valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} strokeWidth="2" />
+            <g transform="translate(-14,-14) scale(0.28)" fill="none" stroke={valveStates.tcv01a === "OPEN" ? "#2F5D80" : valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} strokeWidth="5.5" strokeLinejoin="round" strokeMiterlimit="10">
+              <path d="M50 32 V56"/>
+              <path d="M37.648 31.852 C40.395 26.16 45.029 22.728 50 22.728 C54.971 22.728 59.605 26.16 62.352 31.852 Z"/>
+              <path d="M25 42 L50 57 L25 72 Z"/>
+              <path d="M75 42 L50 57 L75 72 Z"/>
+            </g>
             {interactive && (
               <>
                 <text x="0" y="-20" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-01A</text>
