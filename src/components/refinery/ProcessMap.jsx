@@ -373,7 +373,7 @@ export default function ProcessMap({
         
         {/* TCV-01B: Main Feed Control (on spine) */}
         <g transform={`translate(${VALVES.TCV01B.x}, ${VALVES.TCV01B.y})`} onClick={(e) => handleUnitClick(e, 'tcv01b')} className={cn(interactive && "cursor-pointer")}>
-          <g transform="translate(-19,-21.66) scale(0.38)" fill="none" stroke="#2F5D80" strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
+          <g transform="translate(-38,-43.32) scale(0.76)" fill="none" stroke="#2F5D80" strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
             <path d="M50 32 V56"/>
             <path d="M37.648 31.852 C40.395 26.16 45.029 22.728 50 22.728 C54.971 22.728 59.605 26.16 62.352 31.852 Z"/>
             <path d="M25 42 L50 57 L25 72 Z"/>
@@ -431,7 +431,7 @@ export default function ProcessMap({
           <line x1={974} y1={Y_UPPER_ZONE} x2={974} y2={536} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV01A.x}, ${VALVES.TCV01A.y})`} onClick={(e) => handleUnitClick(e, 'tcv01a')} className={cn(interactive && "cursor-pointer")}>
-            <g transform="translate(-19,-21.66) scale(0.38)" fill="none" stroke={valveStates.tcv01a === "OPEN" ? "#2F5D80" : valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
+            <g transform="translate(-38,-43.32) scale(0.76)" fill="none" stroke={valveStates.tcv01a === "OPEN" ? "#2F5D80" : valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
               <path d="M50 32 V56"/>
               <path d="M37.648 31.852 C40.395 26.16 45.029 22.728 50 22.728 C54.971 22.728 59.605 26.16 62.352 31.852 Z"/>
               <path d="M25 42 L50 57 L25 72 Z"/>
@@ -670,7 +670,7 @@ export default function ProcessMap({
           
           {/* Valve symbol */}
           <g transform={`translate(${VALVES.TCV02A.x}, ${VALVES.TCV02A.y})`} onClick={(e) => handleUnitClick(e, 'tcv02a')} className={cn(interactive && "cursor-pointer")}>
-            <g transform="translate(-19,-21.66) scale(0.38)" fill="none" stroke={valveStates.tcv02a === "OPEN" ? "#2F5D80" : "#B47A1F"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
+            <g transform="translate(-38,-43.32) scale(0.76)" fill="none" stroke={valveStates.tcv02a === "OPEN" ? "#2F5D80" : "#B47A1F"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
               <path d="M50 32 V56"/>
               <path d="M37.648 31.852 C40.395 26.16 45.029 22.728 50 22.728 C54.971 22.728 59.605 26.16 62.352 31.852 Z"/>
               <path d="M25 42 L50 57 L25 72 Z"/>
@@ -711,7 +711,7 @@ export default function ProcessMap({
           
           {/* Valve symbol */}
           <g transform={`translate(${VALVES.TCV02B.x}, ${VALVES.TCV02B.y})`} onClick={(e) => handleUnitClick(e, 'tcv02b')} className={cn(interactive && "cursor-pointer")}>
-            <g transform="translate(-19,-21.66) scale(0.38)" fill="none" stroke={valveStates.tcv02b === "OPEN" ? "#B47A1F" : "#555"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
+            <g transform="translate(-38,-43.32) scale(0.76)" fill="none" stroke={valveStates.tcv02b === "OPEN" ? "#B47A1F" : "#555"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
               <path d="M50 32 V56"/>
               <path d="M37.648 31.852 C40.395 26.16 45.029 22.728 50 22.728 C54.971 22.728 59.605 26.16 62.352 31.852 Z"/>
               <path d="M25 42 L50 57 L25 72 Z"/>
@@ -790,7 +790,7 @@ export default function ProcessMap({
           <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_LOWER_ZONE} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV03A.x}, ${VALVES.TCV03A.y})`} onClick={(e) => handleUnitClick(e, 'tcv03a')} className={cn(interactive && "cursor-pointer")}>
-            <g transform="translate(-19,-21.66) scale(0.38)" fill="none" stroke={valveStates.tcv03a === "OPEN" ? "#B47A1F" : "#555"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
+            <g transform="translate(-38,-43.32) scale(0.76)" fill="none" stroke={valveStates.tcv03a === "OPEN" ? "#B47A1F" : "#555"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
               <path d="M50 32 V56"/>
               <path d="M37.648 31.852 C40.395 26.16 45.029 22.728 50 22.728 C54.971 22.728 59.605 26.16 62.352 31.852 Z"/>
               <path d="M25 42 L50 57 L25 72 Z"/>
