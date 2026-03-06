@@ -402,20 +402,23 @@ export default function ProcessMap({
           )}
         </g>
 
-        {/* E-1 Tube Out → Reactor Inlet: orthogonal stepped route */}
-        {/* Segment 1: Vertical UP from E-1 center nozzle to reactor top inlet elevation */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-        {/* Segment 2: Horizontal RIGHT from E-1 right edge to reactor centerline */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
-        {/* Segment 3: Short vertical DROP into reactor top nozzle */}
+        {/* E-1 Tube Out → Reactor Inlet (Top Nozzle Entry) */}
+        {/* Vertical rise from E-1 center nozzle to top nozzle elevation */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_SPINE} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
+        <circle cx={ANCHORS.E1.x + SIZES.E1.w/2} cy={(Y_SPINE + ANCHORS.R1.y - SIZES.R1.h/2)/2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${Y_SPINE};${ANCHORS.R1.y - SIZES.R1.h/2}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
+        
+        {/* Horizontal run to reactor centerline at top */}
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2} {...getPathStyle()} className="transition-all duration-700" />
+        <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.R1.x)/2} cy={ANCHORS.R1.y - SIZES.R1.h/2} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.R1.x}`} dur={animationSpeed} repeatCount="indefinite" />
+        </circle>
+        
+        {/* Short vertical nozzle penetration into reactor top */}
         <line x1={ANCHORS.R1.x} y1={ANCHORS.R1.y - SIZES.R1.h/2} x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22} {...getPathStyle()} className="transition-all duration-700" />
-        {/* Moving dot — follows the stepped path via animateMotion */}
-        <circle r="4" fill={tubeThermalColor}>
-          <animateMotion
-            dur={animationSpeed}
-            repeatCount="indefinite"
-            path={`M ${ANCHORS.E1.x + SIZES.E1.w/2},${ANCHORS.E1.y} L ${ANCHORS.E1.x + SIZES.E1.w/2},${ANCHORS.R1.y - SIZES.R1.h/2} L ${ANCHORS.R1.x},${ANCHORS.R1.y - SIZES.R1.h/2} L ${ANCHORS.R1.x},${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`}
-          />
+        <circle cx={ANCHORS.R1.x} cy={ANCHORS.R1.y - SIZES.R1.h/2 + 11} r="4" fill={tubeThermalColor}>
+          <animate attributeName="cy" values={`${ANCHORS.R1.y - SIZES.R1.h/2};${ANCHORS.R1.y - SIZES.R1.h/2 + 22}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
 
         {/* REACTOR R-1 — Two-Bed Configuration (Visual Anchor) */}
