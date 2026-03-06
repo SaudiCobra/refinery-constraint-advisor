@@ -641,7 +641,7 @@ export default function ProcessMap({
           {/* After valve: Horizontal run on bus B to merge point before E-2 */}
           <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE + 85} x2={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y2={Y_LOWER_ZONE + 85} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {valveStates.tcv02b !== "CLOSED" && (
-            <circle cx={(VALVES.TCV02B.x + ANCHORS.E2.x - SIZES.E2.w/2 - 70)/2} cy={Y_LOWER_ZONE + 85} r="4" fill="#B47A1F">
+            <circle cx={(VALVES.TCV02B.x + ANCHORS.E2.x - SIZES.E2.w/2 - 70)/2} cy={Y_LOWER_ZONE + 85} r="4" fill={getDotColor("bypass")}>
               <animate attributeName="cx" values={`${VALVES.TCV02B.x};${ANCHORS.E2.x - SIZES.E2.w/2 - 70}`} dur={animationSpeed} repeatCount="indefinite" />
             </circle>
           )}
