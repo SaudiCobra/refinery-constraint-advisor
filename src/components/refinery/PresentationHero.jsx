@@ -128,6 +128,46 @@ export default function PresentationHero({
             </p>
           </div>
 
+          {/* Business Impact Metrics — Immediate Risk only */}
+          {isImmediate && (
+            <div style={{
+              marginTop: 32,
+              display: "flex",
+              justifyContent: "center",
+              gap: 24,
+              flexWrap: "wrap",
+            }}>
+              <div style={{
+                padding: "12px 28px",
+                background: "rgba(225,75,59,0.06)",
+                border: "1px solid rgba(225,75,59,0.20)",
+                borderRadius: 8,
+                textAlign: "center",
+              }}>
+                <p style={{ fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", fontWeight: 500, margin: "0 0 6px" }}>
+                  Projected Margin Loss
+                </p>
+                <p style={{ fontSize: "1.05rem", fontWeight: 700, color: "#E14B3B", margin: 0, letterSpacing: "0.02em" }}>
+                  $42,000 <span style={{ fontSize: "0.75rem", fontWeight: 400, color: "rgba(255,255,255,0.4)" }}>per day</span>
+                </p>
+              </div>
+              <div style={{
+                padding: "12px 28px",
+                background: "rgba(225,75,59,0.06)",
+                border: "1px solid rgba(225,75,59,0.20)",
+                borderRadius: 8,
+                textAlign: "center",
+              }}>
+                <p style={{ fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", fontWeight: 500, margin: "0 0 6px" }}>
+                  Est. Throughput Reduction
+                </p>
+                <p style={{ fontSize: "1.05rem", fontWeight: 700, color: "#E14B3B", margin: 0, letterSpacing: "0.02em" }}>
+                  8.5 <span style={{ fontSize: "0.75rem", fontWeight: 400, color: "rgba(255,255,255,0.4)" }}>%</span>
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Impact Line — Severe only, 260ms fade-in */}
           {isSevere && (
             <div style={{
