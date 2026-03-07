@@ -62,6 +62,7 @@ export default function PresentationHero({
   hotSpotRisk,
   scenarioName,
   awarenessPhase = 0,
+  businessImpact,
 }) {
   const execState = getExecState(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus);
   const copy = EXEC_COPY[execState];
