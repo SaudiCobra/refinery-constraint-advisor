@@ -148,8 +148,31 @@ export default function PresentationHero({
             </div>
           )}
 
+          {/* Awareness moment — Stable → Early Drift transition */}
+          <div style={{
+            marginTop: 20,
+            minHeight: 28,
+            opacity: awarenessPhase > 0 ? 1 : 0,
+            transition: "opacity 600ms ease",
+            pointerEvents: "none",
+          }}>
+            <p style={{
+              fontSize: "0.82rem",
+              fontWeight: 400,
+              letterSpacing: "0.04em",
+              color: "rgba(230,210,170,0.72)",
+              margin: 0,
+            }}>
+              {awarenessPhase === 1
+                ? "Analyzing process trajectory..."
+                : awarenessPhase === 2
+                  ? "Constraint developing: Reactor inlet temperature"
+                  : ""}
+            </p>
+          </div>
+
           {/* Confidence indicator */}
-          <div style={{ marginTop: 28, display: "flex", justifyContent: "center", alignItems: "center", gap: 8 }}>
+          <div style={{ marginTop: 16, display: "flex", justifyContent: "center", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", fontWeight: 500 }}>
               Confidence
             </span>
