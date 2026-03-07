@@ -1096,6 +1096,47 @@ export default function ProcessMap({
           );
         })()}
 
+        {/* === AWARENESS MOMENT: E-1 → Reactor feed path highlight === */}
+        {awarenessPhase === 1 && (
+          <g pointerEvents="none" style={{ transition: "opacity 600ms ease" }}>
+            {/* E-1 tube outlet → Leg 1 horizontal */}
+            <line
+              x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y}
+              x2={974}                           y2={ANCHORS.E1.y}
+              stroke="#C8AA50" strokeWidth="6" opacity="0.28"
+            />
+            {/* Leg 2 vertical up */}
+            <line
+              x1={974} y1={ANCHORS.E1.y}
+              x2={974} y2={536}
+              stroke="#C8AA50" strokeWidth="6" opacity="0.28"
+            />
+            {/* Leg 3 horizontal to reactor */}
+            <line
+              x1={974}          y1={536}
+              x2={ANCHORS.R1.x} y2={536}
+              stroke="#C8AA50" strokeWidth="6" opacity="0.28"
+            />
+            {/* Leg 4 vertical into reactor */}
+            <line
+              x1={ANCHORS.R1.x} y1={536}
+              x2={ANCHORS.R1.x} y2={ANCHORS.R1.y - SIZES.R1.h/2 + 22}
+              stroke="#C8AA50" strokeWidth="6" opacity="0.28"
+            />
+            {/* E-1 body soft glow */}
+            <rect
+              x={ANCHORS.E1.x - SIZES.E1.w/2 - 6}
+              y={ANCHORS.E1.y - SIZES.E1.h/2 - 6}
+              width={SIZES.E1.w + 12}
+              height={SIZES.E1.h + 12}
+              rx="8"
+              fill="none"
+              stroke="#C8AA50"
+              strokeWidth="4"
+              opacity="0.20"
+            />
+          </g>
+        )}
       </svg>
 
       {/* Interactive detail panel */}
