@@ -68,6 +68,7 @@ export default function ProcessMap({
   units = "°C",
   systemState = "NORMAL", // "NORMAL" | "EARLY_DRIFT" | "IMMEDIATE_RISK"
   awarenessPhase = 0,
+  preheatOverride = null, // { rit, quench, rot } — when Preheat Mode active
 }) {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const baseColor = LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0];
