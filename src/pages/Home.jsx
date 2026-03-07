@@ -773,6 +773,9 @@ export default function Home() {
               uiState={systemState}
               demoTimeMin={displayTTL}
               demoState={demoState}
+              isPreheatMode={isPreheatRunning}
+              preheatRIT={preheatTemps.rit}
+              preheatComplete={isPreheatDone}
             />
             
             <div className="max-w-3xl mx-auto space-y-3">
