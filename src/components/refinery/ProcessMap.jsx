@@ -1014,7 +1014,7 @@ export default function ProcessMap({
               </>
             )}
 
-            {/* IMPACT — Reactor outline pulse (always last, for both constraint types) */}
+            {/* IMPACT — Reactor vessel outline pulse */}
             <rect
               className="pfd-impact"
               x={ANCHORS.R1.x - SIZES.R1.w/2 - 6}
@@ -1027,6 +1027,38 @@ export default function ProcessMap({
               strokeWidth="5"
               opacity="0.08"
             />
+
+            {/* IMPACT — Reactor outlet pipe segment (R1 bottom → split point) */}
+            <line
+              className="pfd-impact"
+              x1={ANCHORS.R1.x}
+              y1={ANCHORS.R1.y + SIZES.R1.h/2}
+              x2={ANCHORS.R1.x}
+              y2={Y_LOWER_ZONE - 20}
+              stroke={pulseColor}
+              strokeWidth="7"
+              opacity="0.08"
+            />
+
+            {/* IMPACT — ROT indicator node highlight */}
+            {(() => {
+              const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 64;
+              const cy = ANCHORS.R1.y + SIZES.R1.h/2 + 38 + 16 + 10 + 8 + 16 + 16 + 32;
+              return (
+                <rect
+                  className="pfd-impact"
+                  x={cx - 64 - 6}
+                  y={cy - 20 - 6}
+                  width={128 + 12}
+                  height={56 + 12}
+                  rx="8"
+                  fill="none"
+                  stroke={pulseColor}
+                  strokeWidth="4"
+                  opacity="0.08"
+                />
+              );
+            })()}
           </g>
         )}
 
