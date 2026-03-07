@@ -133,6 +133,49 @@ export default function Home() {
   const sequenceRef = useRef(null);
   const demoRef = useRef(null);
 
+  // ── Preheat warm-up tick ─────────────────────────────────────────────────────
+  // Runs independently when preheatActive is true and preheat is not yet complete.
+  // RIT rises ~0.35°C/tick (1 s), Quench follows 5°C below, ROT follows 10°C below.
+  useEffect(() => {
+    if (!preheatActive || preheatCompleteRef.current || displayMode !== "interactive") return;
+    const tick = setInterval(() => {
+      const prev = preheatTempsRef.current;
+      // Slow ramp — 0.30–0.40°C per second with tiny noise for realism
+      const noise = (Math.random() - 0.5) * 0.12;
+      const newRIT = Math.min(prev.rit + 0.35 + noise, PREHEAT_COMPLETE_RIT + 2);
+      const newQuench = newRIT - 5 + (Math.random() - 0.5) * 0.08;
+      const newROT = newRIT - 10 + (Math.random() - 0.5) * 0.08;
+      const next = { rit: newRIT, quench: newQuench, rot: Math.min(newROT, newRIT - 1) };
+      preheatTempsRef.current = next;
+      setPreheatTemps({ ...next });
+
+      // Auto-complete
+      if (newRIT >= PREHEAT_COMPLETE_RIT && !preheatCompleteRef.current) {
+        preheatCompleteRef.current = true;
+        setPreheatComplete(true);
+        // After 3 s showing "Preheat Complete", restore normal sim
+        setTimeout(() => {
+          setPreheatActive(false);
+          setPreheatComplete(false);
+          preheatCompleteRef.current = false;
+          preheatTempsRef.current = PREHEAT_START;
+          setPreheatTemps(PREHEAT_START);
+        }, 3000);
+      }
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [preheatActive, displayMode]);
+
+  // Reset preheat state when toggled off manually
+  useEffect(() => {
+    if (!preheatActive) {
+      preheatCompleteRef.current = false;
+      setPreheatComplete(false);
+      preheatTempsRef.current = PREHEAT_START;
+      setPreheatTemps(PREHEAT_START);
+    }
+  }, [preheatActive]);
+
   // ── Real-time physics tick (1 000 ms = 1/90 of a demo-minute) ───────────────
   // DT = 1/90 min per real second — slower than before so the countdown feels
   // realistic rather than "fast AF". Band steering keeps TTL in the named band.
