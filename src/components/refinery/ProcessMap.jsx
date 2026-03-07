@@ -309,7 +309,7 @@ export default function ProcessMap({
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6 relative">
-      <ConstraintPropagationInsight systemState={effectiveState} />
+      <ConstraintPropagationInsight systemState={effectiveState} isPreheatMode={!!preheatOverride} />
       {isPropagating && (
         <style>{`
           @keyframes pfd-pulse {
