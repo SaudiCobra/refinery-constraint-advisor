@@ -284,7 +284,7 @@ function StripButton({ onClick, label }) {
   );
 }
 
-function ScenarioRow({ label, descriptor, active, onClick }) {
+function ScenarioRow({ label, descriptor, active, onClick, dimmed = false }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -296,6 +296,7 @@ function ScenarioRow({ label, descriptor, active, onClick }) {
         borderRadius: 10,
         cursor: "pointer",
         marginBottom: 4,
+        opacity: dimmed && !active ? 0.7 : 1,
         background: active
           ? "rgba(255,255,255,0.06)"
           : hovered
