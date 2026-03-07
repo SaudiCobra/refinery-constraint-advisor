@@ -2,7 +2,36 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { formatTime } from "./calcEngine";
 
-export default function ReasoningBlocks({ slope, nearest, constraints, equipment, sensorQuality, units, systemState, timeToNearest }) {
+export default function ReasoningBlocks({ slope, nearest, constraints, equipment, sensorQuality, units, systemState, timeToNearest, isPreheatMode = false, preheatRIT = 200 }) {
+  // ── Preheat override — replace all four blocks with warm-up context ──────
+  if (isPreheatMode) {
+    const pct = Math.min(100, Math.round(((preheatRIT - 200) / (335 - 200)) * 100));
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <Block title="System Reasoning" color="blue">
+          <Line>Operating mode: Reactor warm-up circulation</Line>
+          <Line>RIT rising at controlled rate (~0.35°C/s)</Line>
+          <Line>Drift escalation logic suspended</Line>
+        </Block>
+        <Block title="Reality Check" color="amber">
+          <Line>No process limits active during preheat</Line>
+          <Line>Heat contained in circulation loop</Line>
+          <Line>Normal operation resumes at RIT 335°C</Line>
+        </Block>
+        <Block title="Consequence (if unchanged)" color="red">
+          <Line>Preheat complete at ~{pct}% — target 335°C</Line>
+          <Line>No limit breach projected during warm-up</Line>
+          <Line>Auto-transition to normal simulation on completion</Line>
+        </Block>
+        <Block title="Shift Summary" color="green">
+          <Line>Status: Reactor Preheat Active</Line>
+          <Line>RIT: {Math.round(preheatRIT)}°C → target 335°C</Line>
+          <Line>Attention focus: Warm-up rate continuity</Line>
+        </Block>
+      </div>
+    );
+  }
+
   const stable = slope <= 0;
 
   const hiConstraint = constraints.find(c => c.name === "High");
