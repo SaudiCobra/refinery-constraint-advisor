@@ -67,6 +67,7 @@ export default function ProcessMap({
   interactive = true,
   units = "°C",
   systemState = "NORMAL", // "NORMAL" | "EARLY_DRIFT" | "IMMEDIATE_RISK"
+  awarenessPhase = 0,
 }) {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const baseColor = LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0];
