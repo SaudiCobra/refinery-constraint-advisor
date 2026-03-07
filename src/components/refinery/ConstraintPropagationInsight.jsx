@@ -16,11 +16,30 @@ const INSIGHT_CONFIG = {
   },
 };
 
-export default function ConstraintPropagationInsight({ systemState }) {
-  const isVisible = ["EARLY_DRIFT", "SEVERE_DRIFT", "IMMEDIATE_RISK"].includes(systemState);
+export default function ConstraintPropagationInsight({ systemState, isPreheatMode = false }) {
+  const isVisible = !isPreheatMode && ["EARLY_DRIFT", "SEVERE_DRIFT", "IMMEDIATE_RISK"].includes(systemState);
   const config = INSIGHT_CONFIG[systemState];
 
   if (!isVisible || !config) {
+    if (isPreheatMode) {
+      return (
+        <div
+          className="absolute top-6 right-6 max-w-xs bg-[#0D1117] border border-[#2a1a00] rounded-lg p-4 shadow-lg"
+          style={{ animation: "fadeIn 0.6s ease-out" }}
+        >
+          <style>{`@keyframes fadeIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }`}</style>
+          <div className="flex gap-3">
+            <InfoIcon className="w-5 h-5 flex-shrink-0 text-[#C8AA50] mt-0.5" />
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-[#C8AA50] mb-1.5">Reactor Preheat Mode Active</h4>
+              <p className="text-xs text-[#999] leading-relaxed">
+                Controlled warm-up circulation in progress. Constraint propagation monitoring suspended until normal operating temperature is reached.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
     return null;
   }
 
