@@ -3,7 +3,7 @@ import { InfoIcon } from "lucide-react";
 
 const INSIGHT_CONFIG = {
   EARLY_DRIFT: {
-    title: "Constraint propagation detected",
+    title: "Operational impact path detected",
     text: "Temperature rise at the reactor inlet is propagating downstream. The system is tracking the path and projecting time to limit.",
   },
   SEVERE_DRIFT: {
@@ -33,7 +33,7 @@ export default function ConstraintPropagationInsight({ systemState, isPreheatMod
             <div className="flex-1">
               <h4 className="text-sm font-semibold text-[#C8AA50] mb-1.5">Reactor Preheat Mode Active</h4>
               <p className="text-xs text-[#999] leading-relaxed">
-                Controlled warm-up circulation in progress. Constraint propagation monitoring suspended until normal operating temperature is reached.
+                Controlled warm-up circulation in progress. Operational impact path monitoring suspended until normal operating temperature is reached.
               </p>
             </div>
           </div>
