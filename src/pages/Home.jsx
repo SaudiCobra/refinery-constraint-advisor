@@ -897,6 +897,7 @@ export default function Home() {
                 hotSpotRisk={hotSpotRisk}
                 scenarioName={SCENARIOS[presScenario]?.name}
                 awarenessPhase={awarenessPhase}
+                businessImpact={SCENARIOS[presScenario]?.businessImpact}
               />
             </div>
 
