@@ -743,6 +743,24 @@ export default function Home() {
         {/* INTERACTIVE MODE */}
         {!alarmsOnly && displayMode === "interactive" && (
           <>
+            {/* Preheat mode status banner */}
+            {(isPreheatRunning || isPreheatDone) && (
+              <div style={{
+                textAlign: "center",
+                padding: "8px 0 4px",
+                fontSize: "0.82rem",
+                fontWeight: 500,
+                letterSpacing: "0.06em",
+                color: isPreheatDone ? "#6FD0C7" : "#C8AA50",
+                opacity: 0.88,
+                transition: "color 600ms ease",
+              }}>
+                {isPreheatDone
+                  ? "Preheat Complete — Normal Operation"
+                  : `Reactor Preheat Mode Active  ·  RIT ${Math.round(preheatTemps.rit)}°C`}
+              </div>
+            )}
+
             <QuickScenarioSelector
               activeScenario={derivedSystemState}
               onSelect={handleSelectScenario}
