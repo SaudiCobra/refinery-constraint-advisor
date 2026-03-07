@@ -84,13 +84,17 @@ export default function PresenterControls({ presScenario, onSelectScenario, onRe
 
   const prev = useCallback(() => {
     if (!total) return;
-    onSelectScenario(Math.max(0, (presScenario - 1 + total) % total));
-  }, [presScenario, total, onSelectScenario]);
+    const pos = primaryIndices.indexOf(presScenario);
+    const prevPos = (pos <= 0 ? total - 1 : pos - 1);
+    onSelectScenario(primaryIndices[prevPos]);
+  }, [presScenario, total, primaryIndices, onSelectScenario]);
 
   const next = useCallback(() => {
     if (!total) return;
-    onSelectScenario(Math.min(total - 1, (presScenario + 1) % total));
-  }, [presScenario, total, onSelectScenario]);
+    const pos = primaryIndices.indexOf(presScenario);
+    const nextPos = (pos < 0 || pos >= total - 1 ? 0 : pos + 1);
+    onSelectScenario(primaryIndices[nextPos]);
+  }, [presScenario, total, primaryIndices, onSelectScenario]);
 
   // Keyboard navigation — only in presentation mode (this component is mounted only then)
   useEffect(() => {
