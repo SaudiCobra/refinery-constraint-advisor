@@ -808,6 +808,7 @@ export default function Home() {
                 bedImbalance={bedImbalance}
                 hotSpotRisk={hotSpotRisk}
                 scenarioName={SCENARIOS[presScenario]?.name}
+                awarenessPhase={awarenessPhase}
               />
             </div>
 
