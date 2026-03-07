@@ -259,8 +259,10 @@ export const DEMO_SCENARIOS = {
   },
 };
 
-// Presentation Mode Scenarios (7 existing scenarios preserved)
+// Presentation Mode Scenarios
+// Primary (executive narrative) scenarios first, advanced/engineering scenarios flagged with advanced: true
 export const SCENARIOS = [
+  // ── Primary Presentation Scenarios ──────────────────────────────────────────
   {
     name: "1. Stable Baseline",
     samples: [348.0, 348.0, 348.0, 348.0, 348.0],
@@ -272,7 +274,6 @@ export const SCENARIOS = [
   },
   {
     name: "2. Predictive Drift Detection",
-    // slope ~0.5°C/min → TTL to hi(370) from 358 = 12÷0.5 = 24 min (Early→Severe as drift progresses)
     samples: [354.0, 355.0, 356.0, 357.0, 358.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
@@ -282,8 +283,6 @@ export const SCENARIOS = [
   },
   {
     name: "3. Dominant Driver Isolation",
-    // slope ~0.5°C/min → TTL to hi(370) from 358 = 12÷0.5 = 24 min (Early on load)
-    // effluentCooler: true but h2Compressor: false → cooling slightly strained at Severe
     samples: [354.0, 355.0, 356.0, 357.0, 358.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
@@ -292,7 +291,46 @@ export const SCENARIOS = [
     opMode: "steady",
   },
   {
-    name: "4. Four-Level Escalation Sequence",
+    name: "4. Hydrogen Availability Decreasing",
+    samples: [352, 354, 356, 358, 360],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
+    feedFlow: 86000,
+    sensorQuality: "good",
+    opMode: "steady",
+  },
+  {
+    name: "5. Multi-Constraint Interaction",
+    samples: [354.0, 355.0, 356.0, 357.0, 358.0],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
+    feedFlow: 87000,
+    sensorQuality: "good",
+    opMode: "steady",
+  },
+  {
+    name: "6. False Escalation (Sensor Conflict)",
+    samples: [355, 358, 362, 359, 361],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 84000,
+    sensorQuality: "suspect",
+    opMode: "transient",
+  },
+  {
+    name: "7. True Escalation (Aligned Signals)",
+    samples: [365, 367, 369, 371, 373],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 94000,
+    sensorQuality: "good",
+    opMode: "transient",
+  },
+
+  // ── Advanced / Engineering Scenarios ────────────────────────────────────────
+  {
+    name: "A1. Four-Level Escalation Sequence",
+    advanced: true,
     samples: [348, 350, 352, 354, 356],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
@@ -308,117 +346,25 @@ export const SCENARIOS = [
     ]
   },
   {
-    name: "5. Hydrogen Availability Decreasing",
-    samples: [352, 354, 356, 358, 360],
-    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
-    feedFlow: 86000,
-    sensorQuality: "good",
-    opMode: "steady",
-  },
-  {
-    name: "6. False Escalation (Sensor Conflict)",
-    samples: [355, 358, 362, 359, 361],
-    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 84000,
-    sensorQuality: "suspect",
-    opMode: "transient",
-  },
-  {
-    name: "7. True Escalation (Aligned)",
-    samples: [365, 367, 369, 371, 373],
-    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 94000,
-    sensorQuality: "good",
-    opMode: "transient",
-  },
-  {
-    // Stable → Early: h2Compressor false (H2 moderation limiting), cooling normal, mitigation Available
-    // Early → Severe: H2 limited, mitigation shifts to Constrained, action ranking reshuffles
-    // slope ~0.5°C/min → TTL to hi(370) from 358 = 12÷0.5 = 24 min (Early band)
-    name: "8. Multi-Constraint Interaction",
-    samples: [354.0, 355.0, 356.0, 357.0, 358.0],
-    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
-    feedFlow: 87000,
-    sensorQuality: "good",
-    opMode: "steady",
-  },
-  {
-    // Stable → Early: sudden temp spike, suspect sensor, moderate confidence, no dominant driver confirmed
-    // Early → Severe: signals further misaligned, no aggressive mitigation recommended
-    // Recovery: signals resolve, system returns to stable
-    name: "9. Signal Conflict",
+    name: "A2. Signal Conflict",
+    advanced: true,
     isSequence: true,
     stages: [
-      { 
-        samples: [348.0, 348.0, 348.0, 348.0, 348.0],
-        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-        equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-        sensorQuality: "good",
-      },
-      { 
-        samples: [348.0, 352.0, 356.0, 360.0, 363.0],
-        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-        equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-        sensorQuality: "suspect",
-      },
-      { 
-        samples: [363.0, 363.5, 363.2, 363.6, 363.3],
-        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-        equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-        sensorQuality: "suspect",
-      },
-      { 
-        samples: [363.3, 360.0, 356.0, 352.0, 348.0],
-        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-        equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-        sensorQuality: "good",
-      },
+      { samples: [348.0, 348.0, 348.0, 348.0, 348.0], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true }, sensorQuality: "good" },
+      { samples: [348.0, 352.0, 356.0, 360.0, 363.0], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true }, sensorQuality: "suspect" },
+      { samples: [363.0, 363.5, 363.2, 363.6, 363.3], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true }, sensorQuality: "suspect" },
+      { samples: [363.3, 360.0, 356.0, 352.0, 348.0], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true }, sensorQuality: "good" },
     ]
   },
   {
-    // Stable → Early: TTL ~30 min (slope ~0.4°C/min), mitigation Available
-    // Early progresses: TTL compresses, mitigation shifts Available → Constrained, cooling strains
-    // Early → Severe: TTL single-digit (slope ~2°C/min), dominant driver confirmed, High confidence
-    // Severe emphasizes cooling chain (effluentCooler offline)
-    name: "10. Escalation Window Compression",
+    name: "A3. Escalation Window Compression",
+    advanced: true,
     isSequence: true,
     stages: [
-      { 
-        samples: [348.0, 348.0, 348.0, 348.0, 348.0],
-        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-        equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-        feedFlow: 84000,
-        sensorQuality: "good",
-        opMode: "steady",
-      },
-      { 
-        samples: [356.0, 357.0, 358.0, 359.0, 360.0],
-        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-        equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-        feedFlow: 87000,
-        sensorQuality: "good",
-        opMode: "steady",
-      },
-      { 
-        samples: [360.0, 361.5, 363.0, 364.5, 366.0],
-        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-        equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: true },
-        feedFlow: 90000,
-        sensorQuality: "good",
-        opMode: "transient",
-      },
-      { 
-        samples: [366.0, 368.0, 370.0, 372.0, 374.0],
-        limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-        equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: false },
-        feedFlow: 94000,
-        sensorQuality: "good",
-        opMode: "transient",
-      },
+      { samples: [348.0, 348.0, 348.0, 348.0, 348.0], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true }, feedFlow: 84000, sensorQuality: "good", opMode: "steady" },
+      { samples: [356.0, 357.0, 358.0, 359.0, 360.0], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true }, feedFlow: 87000, sensorQuality: "good", opMode: "steady" },
+      { samples: [360.0, 361.5, 363.0, 364.5, 366.0], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: true }, feedFlow: 90000, sensorQuality: "good", opMode: "transient" },
+      { samples: [366.0, 368.0, 370.0, 372.0, 374.0], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: false }, feedFlow: 94000, sensorQuality: "good", opMode: "transient" },
     ]
   },
 ];
