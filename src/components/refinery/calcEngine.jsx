@@ -271,6 +271,7 @@ export const SCENARIOS = [
     feedFlow: 84000,
     sensorQuality: "good",
     opMode: "steady",
+    businessImpact: { marginLoss: null, throughputReduction: null },
   },
   {
     name: "2. Predictive Drift Detection",
@@ -280,6 +281,7 @@ export const SCENARIOS = [
     feedFlow: 88000,
     sensorQuality: "good",
     opMode: "steady",
+    businessImpact: { marginLoss: "$8,000", throughputReduction: "0.3%" },
   },
   {
     name: "3. Dominant Driver Isolation",
@@ -289,6 +291,7 @@ export const SCENARIOS = [
     feedFlow: 88000,
     sensorQuality: "good",
     opMode: "steady",
+    businessImpact: { marginLoss: "$28,000", throughputReduction: "1.1%" },
   },
   {
     name: "4. Hydrogen Availability Decreasing",
@@ -298,6 +301,7 @@ export const SCENARIOS = [
     feedFlow: 86000,
     sensorQuality: "good",
     opMode: "steady",
+    businessImpact: { marginLoss: "$35,000", throughputReduction: "1.4%" },
   },
   {
     name: "5. Multi-Constraint Interaction",
@@ -307,6 +311,7 @@ export const SCENARIOS = [
     feedFlow: 87000,
     sensorQuality: "good",
     opMode: "steady",
+    businessImpact: { marginLoss: "$75,000", throughputReduction: "2.8%" },
   },
   {
     name: "6. False Escalation (Sensor Conflict)",
@@ -316,6 +321,7 @@ export const SCENARIOS = [
     feedFlow: 84000,
     sensorQuality: "suspect",
     opMode: "transient",
+    businessImpact: { marginLoss: "$12,000", throughputReduction: "0.4%" },
   },
   {
     name: "7. True Escalation (Aligned Signals)",
@@ -325,6 +331,7 @@ export const SCENARIOS = [
     feedFlow: 94000,
     sensorQuality: "good",
     opMode: "transient",
+    businessImpact: { marginLoss: "$165,000", throughputReduction: "5.8%" },
   },
 
   // ── Advanced / Engineering Scenarios ────────────────────────────────────────
