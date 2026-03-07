@@ -29,9 +29,16 @@ function isInProximityZone(e) {
 
 export default function PresenterControls({ presScenario, onSelectScenario, onReset }) {
   const [panelOpen, setPanelOpen] = useState(false);
-  const [visible, setVisible] = useState(false);   // controls opacity
+  const [visible, setVisible] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const hideTimerRef = useRef(null);
-  const total = SCENARIOS.length;
+
+  // Split scenarios into primary and advanced
+  const primaryScenarios = SCENARIOS.filter(s => !s.advanced);
+  const advancedScenarios = SCENARIOS.filter(s => s.advanced);
+  // Arrow nav only cycles primary scenarios
+  const primaryIndices = primaryScenarios.map(s => SCENARIOS.indexOf(s));
+  const total = primaryIndices.length;
 
   const scheduleHide = useCallback(() => {
     clearTimeout(hideTimerRef.current);
