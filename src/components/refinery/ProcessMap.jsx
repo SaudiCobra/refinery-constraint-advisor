@@ -910,6 +910,40 @@ export default function ProcessMap({
         </g>
 
 
+        {/* === REACTOR OUTLET FLASH — temperature escalation (no equipment fault required) === */}
+        {isReactorOutletPropagating && !isPropagating && (
+          <g pointerEvents="none">
+            <line
+              className="pfd-impact"
+              x1={ANCHORS.R1.x}
+              y1={ANCHORS.R1.y + SIZES.R1.h/2}
+              x2={ANCHORS.R1.x}
+              y2={Y_LOWER_ZONE - 20}
+              stroke={pulseColor}
+              strokeWidth="7"
+              opacity="0.08"
+            />
+            {(() => {
+              const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 64;
+              const cy = ANCHORS.R1.y + SIZES.R1.h/2 + 38 + 16 + 10 + 8 + 16 + 16 + 32;
+              return (
+                <rect
+                  className="pfd-impact"
+                  x={cx - 64 - 6}
+                  y={cy - 20 - 6}
+                  width={128 + 12}
+                  height={56 + 12}
+                  rx="8"
+                  fill="none"
+                  stroke={pulseColor}
+                  strokeWidth="4"
+                  opacity="0.08"
+                />
+              );
+            })()}
+          </g>
+        )}
+
         {/* === CAUSE → EFFECT PROPAGATION OVERLAYS (pointer-events: none) === */}
         {isPropagating && (
           <g pointerEvents="none">
