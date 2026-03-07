@@ -789,6 +789,7 @@ export default function Home() {
                 currentTemp={currentValue}
                 demoTimeMin={displayTTL}
                 demoState={demoState}
+                isPreheatMode={isPreheatRunning}
               />
               
               <LeverContext 
