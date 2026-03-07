@@ -152,20 +152,54 @@ export default function PresenterControls({ presScenario, onSelectScenario, onRe
           <p style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: 18 }}>
             Select Scenario
           </p>
-          {SCENARIOS.map((s, idx) => {
+
+          {/* Primary scenarios */}
+          {primaryScenarios.map((s) => {
+            const idx = SCENARIOS.indexOf(s);
             const isActive = idx === presScenario;
-            const label = s.name.replace(/^\d+\.\s*/, "");
-            const descriptor = SCENARIO_DESCRIPTORS[idx] || "";
+            const label = s.name.replace(/^[\dA]+\.\s*/, "");
             return (
               <ScenarioRow
                 key={idx}
                 label={label}
-                descriptor={descriptor}
+                descriptor={getDescriptor(s.name)}
                 active={isActive}
                 onClick={() => { onSelectScenario(idx); setPanelOpen(false); }}
               />
             );
           })}
+
+          {/* Advanced scenarios — collapsible */}
+          <div style={{ marginTop: 16 }}>
+            <button
+              onClick={() => setAdvancedOpen(o => !o)}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "4px 0", width: "100%",
+              }}
+            >
+              <span style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.25)", fontWeight: 500 }}>
+                Advanced
+              </span>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.2)" }}>{advancedOpen ? "▲" : "▼"}</span>
+            </button>
+            {advancedOpen && advancedScenarios.map((s) => {
+              const idx = SCENARIOS.indexOf(s);
+              const isActive = idx === presScenario;
+              const label = s.name.replace(/^[A-Z]\d+\.\s*/, "");
+              return (
+                <ScenarioRow
+                  key={idx}
+                  label={label}
+                  descriptor={getDescriptor(s.name)}
+                  active={isActive}
+                  onClick={() => { onSelectScenario(idx); setPanelOpen(false); }}
+                  dimmed
+                />
+              );
+            })}
+          </div>
         </div>
       )}
 
