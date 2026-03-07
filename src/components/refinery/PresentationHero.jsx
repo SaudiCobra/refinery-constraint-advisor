@@ -69,6 +69,7 @@ export default function PresentationHero({
   const colorValue = config.text.replace("text-[", "").replace("]", "");
 
   const isSevere = escalationLevel >= 2;
+  const isImmediate = execState === "immediate";
 
   // Impact line: appears only at Severe, fades in
   const [impactVisible, setImpactVisible] = useState(false);
