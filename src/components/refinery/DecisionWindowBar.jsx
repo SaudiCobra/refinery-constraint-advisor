@@ -14,7 +14,32 @@ export default function DecisionWindowBar({
   currentTemp,
   demoTimeMin,
   demoState,
+  isPreheatMode = false,
 }) {
+  // ── Preheat override ──────────────────────────────────────────────────────
+  if (isPreheatMode) {
+    return (
+      <div className="space-y-2">
+        <div className="flex flex-col gap-1.5 bg-[#1e1e1e] border border-[#2a1a00] rounded-lg px-4 py-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ClockIcon className="w-3.5 h-3.5 text-[#C8AA50]" />
+              <span className="text-[#C8AA50] text-xs uppercase tracking-wider font-semibold">Warm-Up Phase</span>
+            </div>
+            <span className="text-[#C8AA50] text-sm font-semibold">Controlled</span>
+          </div>
+          <div className="w-full h-3 bg-[#0d0d0d] rounded-full border border-[#2a2a2a] overflow-hidden">
+            <div className="h-full rounded-full" style={{ width: "100%", backgroundColor: "#1a6a6a" }} />
+          </div>
+        </div>
+        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-4 py-2">
+          <p className="text-[#aaa] text-xs leading-relaxed">
+            Reactor warm-up in progress — no operating limit active. Escalation monitoring suspended until RIT reaches 335°C.
+          </p>
+        </div>
+      </div>
+    );
+  }
   const activeTime = (demoTimeMin !== null && demoTimeMin !== undefined) ? demoTimeMin : timeToNearest;
 
   // Bar fill clamps to 35 min scale so NORMAL overflows to 100% (that's fine).
