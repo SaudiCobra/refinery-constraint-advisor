@@ -61,6 +61,7 @@ export default function PresentationHero({
   bedImbalance,
   hotSpotRisk,
   scenarioName,
+  awarenessPhase = 0,
 }) {
   const execState = getExecState(escalationLevel, hotSpotRisk, timeToNearest, coolingCapacity, equipment, slope, preheatStatus);
   const copy = EXEC_COPY[execState];
