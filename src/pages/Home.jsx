@@ -835,6 +835,7 @@ export default function Home() {
               interactive={true}
               units={activeData.units}
               systemState={systemState}
+              preheatOverride={isPreheatRunning ? preheatTemps : null}
             />
 
             <InputPanel
