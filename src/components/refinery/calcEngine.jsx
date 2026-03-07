@@ -356,6 +356,7 @@ export const SCENARIOS = [
   {
     name: "A2. Signal Conflict",
     advanced: true,
+    businessImpact: { marginLoss: "$14,000", throughputReduction: "0.5%" },
     isSequence: true,
     stages: [
       { samples: [348.0, 348.0, 348.0, 348.0, 348.0], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true }, sensorQuality: "good" },
