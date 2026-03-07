@@ -818,6 +818,7 @@ export default function Home() {
                 coolingCapacity={coolingCapacity}
                 equipment={activeData.equipment}
                 slope={displaySlope}
+                isPreheatMode={isPreheatRunning}
               />
             </div>
 
