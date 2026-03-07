@@ -28,7 +28,40 @@ export default function HeroMetric({
   uiState,
   demoTimeMin,
   demoState,
+  isPreheatMode = false,
+  preheatRIT = 200,
+  preheatComplete = false,
 }) {
+  // ── Preheat override — show warm-up status instead of TTL ────────────────
+  if (isPreheatMode) {
+    const pct = Math.min(100, Math.round(((preheatRIT - 200) / (335 - 200)) * 100));
+    return (
+      <div className="flex flex-col items-center justify-center py-6 px-4">
+        <div className="px-3 py-1 text-[10px] font-bold tracking-[0.15em] uppercase mb-3 bg-[#1a1400]/60 text-[#C8AA50] border border-[#5a4a10]">
+          REACTOR PREHEAT MODE
+        </div>
+        <p className="text-[#666] text-xs tracking-wider mb-1 uppercase">Reactor Inlet Temperature</p>
+        <div className="text-[72px] md:text-[96px] font-extralight leading-none tracking-tight text-[#C8AA50]">
+          {Math.round(preheatRIT)}°C
+        </div>
+        <div className="mt-4 w-64">
+          <div className="flex justify-between text-[10px] text-[#666] mb-1">
+            <span>200°C Start</span>
+            <span>{pct}% complete</span>
+            <span>335°C Target</span>
+          </div>
+          <div className="w-full h-1.5 bg-[#1a1a1a] rounded-full border border-[#2a2a2a]">
+            <div
+              className="h-full rounded-full transition-all duration-1000"
+              style={{ width: `${pct}%`, background: "#C8AA50" }}
+            />
+          </div>
+        </div>
+        <p className="text-[#555] text-xs mt-3">Escalation logic suspended — controlled warm-up in progress</p>
+      </div>
+    );
+  }
+
   const useDemoClock = demoTimeMin !== null && demoTimeMin !== undefined;
   const activeState = useDemoClock ? demoState : uiState;
   const activeTime  = useDemoClock ? demoTimeMin : timeToNearest;
