@@ -281,8 +281,13 @@ export default function ProcessMap({
     (hotSpotRisk === "HIGH" && effectiveState !== "NORMAL")
   ) && effectiveState !== "NORMAL";
 
+  // Temperature escalation: any non-normal state qualifies reactor outlet for flashing
+  const isTempEscalation = effectiveState !== "NORMAL";
+
   // Only pulse when at least Early Drift — never in Stable
+  // Reactor outlet also pulses on pure temperature escalation (no equipment fault needed)
   const isPropagating = effectiveState !== "NORMAL" && (isCoolingConstraint || isQuenchConstraint);
+  const isReactorOutletPropagating = isTempEscalation;
 
   // Phase: 0=cause, 1=path, 2=impact — cycles on 1500ms interval
   const phaseRef = useRef(0);
