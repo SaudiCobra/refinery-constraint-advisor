@@ -161,10 +161,13 @@ export default function ProcessMap({
   const separatorInletTemp = coolerOutletTemp;
 
   // Live temperature indicator values
-  const tBed = Math.round(currentTemp);
-  const tOutlet = Math.round(reactorOutletTemp);
-  const tQuench = Math.round(currentTemp - 8);
-  const tCoolerOutlet = Math.round(separatorInletTemp);
+  // Preheat override: replace tag values with warm-up readings
+  const tBed = preheatOverride ? Math.round(preheatOverride.rit) : Math.round(currentTemp);
+  const tOutlet = preheatOverride ? Math.round(preheatOverride.rot) : Math.round(reactorOutletTemp);
+  const tQuench = preheatOverride ? Math.round(preheatOverride.quench) : Math.round(currentTemp - 8);
+  const tCoolerOutlet = preheatOverride
+    ? Math.round(preheatOverride.rot - 30)  // cooler barely active — minimal drop
+    : Math.round(separatorInletTemp);
 
   // Tag color based on escalation state
   const tagColors = (() => {
