@@ -308,7 +308,7 @@ export const SCENARIOS = [
     ]
   },
   {
-    name: "5. Hydrogen Moderation Limited",
+    name: "5. Hydrogen Availability Decreasing",
     samples: [352, 354, 356, 358, 360],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },

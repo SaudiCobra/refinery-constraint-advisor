@@ -38,7 +38,7 @@ const SEVERE_IMPACT_LINES = {
   "Dominant Driver": "Projected impact: Product yield deviation likely under sustained acceleration.",
   "Cooling Compression": "Effluent cooler offline — heat removal authority reduced by ~40%.",
   "Four-Level Escalation": "Constraint progression through all four severity bands active.",
-  "Hydrogen Moderation": "H₂ quench margin limited — exotherm response capacity reduced.",
+  "Hydrogen Availability": "Hydrogen availability decreasing → Quench effectiveness reduced → Reactor temperature control sensitivity increasing → Escalation probability increasing",
   "False Escalation": "Signal inconsistency detected — confidence qualified.",
   "True Escalation": "All sensors aligned — trajectory confirmed across instruments.",
   "Multi-Constraint": "Projected impact: Mitigation headroom reduced due to stacked constraints.",

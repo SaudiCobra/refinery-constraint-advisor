@@ -7,7 +7,7 @@ const SCENARIO_DESCRIPTORS = [
   "Temperature accelerating — intervention window open",
   "Effluent cooler offline — response window compressed",
   "Full escalation sequence across all four severity levels",
-  "H₂ compressor unavailable — quench margin limited",
+  "Hydrogen availability decreasing — quench moderation margin narrowing.",
   "Sensor conflict — differentiate noise from true drift",
   "All sensors aligned — confirmed escalation trajectory",
   "Stacked constraints — mitigation headroom reduced",
