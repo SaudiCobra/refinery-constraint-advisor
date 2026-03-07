@@ -546,6 +546,12 @@ export default function Home() {
 
   const [manarahOpen, setManarahOpen] = useState(false);
 
+  // ── System awareness moment (Presentation mode: Stable → Early Drift) ───────
+  // 0 = idle, 1 = "analyzing...", 2 = "constraint identified"
+  const [awarenessPhase, setAwarenessPhase] = useState(0);
+  const prevSystemStateRef = useRef(null);
+  const awarenessUsedRef   = useRef(false); // fires only once per session
+
   const handleManarahAutoOpen = () => {
     setManarahOpen(true);
   };
