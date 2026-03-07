@@ -67,6 +67,15 @@ export default function Home() {
   const [state, setState] = useState({ ...DEFAULTS });
   const [preheatActive, setPreheatActive] = useState(false);
 
+  // ── Preheat warm-up simulation state ─────────────────────────────────────────
+  // Tracks the three preheat temperatures independently, rising smoothly from cold.
+  const PREHEAT_START = { rit: 200, quench: 195, rot: 190 };
+  const PREHEAT_COMPLETE_RIT = 335; // °C — triggers auto-exit
+  const [preheatTemps, setPreheatTemps] = useState(PREHEAT_START);
+  const [preheatComplete, setPreheatComplete] = useState(false);
+  const preheatTempsRef = useRef(PREHEAT_START);
+  const preheatCompleteRef = useRef(false);
+
   // ── Physics simulation state (interactive mode only) ────────────────────────
   // These are the raw physics variables; all display values derive from them.
   const [simTemp,   setSimTemp]   = useState(358.0); // currentOutletTempC — seeds NORMAL mid-band
