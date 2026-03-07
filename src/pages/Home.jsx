@@ -141,8 +141,8 @@ export default function Home() {
     const tick = setInterval(() => {
       const prev = preheatTempsRef.current;
       // Slow ramp — 0.30–0.40°C per second with tiny noise for realism
-      const noise = (Math.random() - 0.5) * 0.12;
-      const newRIT = Math.min(prev.rit + 0.35 + noise, PREHEAT_COMPLETE_RIT + 2);
+      const noise = (Math.random() - 0.5) * 0.3;
+      const newRIT = Math.min(prev.rit + 1.8 + noise, PREHEAT_COMPLETE_RIT + 2);
       const newQuench = newRIT - 5 + (Math.random() - 0.5) * 0.08;
       const newROT = newRIT - 10 + (Math.random() - 0.5) * 0.08;
       const next = { rit: newRIT, quench: newQuench, rot: Math.min(newROT, newRIT - 1) };
