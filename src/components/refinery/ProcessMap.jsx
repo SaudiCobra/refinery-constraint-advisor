@@ -120,7 +120,10 @@ export default function ProcessMap({
   const stateColors = getStateColors();
   
   // Adjust animation speed based on mode
-  const flowSpeedMultiplier = escalationLevel === 0 ? 1.0 : escalationLevel === 1 ? 1.2 : escalationLevel === 2 ? 1.5 : 1.8;
+  // During preheat: slow circulation flow (1.5× slower than normal)
+  const flowSpeedMultiplier = preheatOverride
+    ? 0.65
+    : (escalationLevel === 0 ? 1.0 : escalationLevel === 1 ? 1.2 : escalationLevel === 2 ? 1.5 : 1.8);
   const baseAnimationSpeed = 8 / flowSpeedMultiplier;
   const animationSpeed = interactive ? `${baseAnimationSpeed}s` : `${baseAnimationSpeed * 1.8}s`;
   
