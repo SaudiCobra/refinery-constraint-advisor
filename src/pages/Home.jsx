@@ -860,6 +860,8 @@ export default function Home() {
               units={activeData.units}
               systemState={systemState}
               timeToNearest={displayTTL}
+              isPreheatMode={isPreheatRunning}
+              preheatRIT={preheatTemps.rit}
             />
 
             <div className="max-w-3xl mx-auto space-y-0">
