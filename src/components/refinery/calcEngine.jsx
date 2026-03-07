@@ -368,6 +368,7 @@ export const SCENARIOS = [
   {
     name: "A3. Escalation Window Compression",
     advanced: true,
+    businessImpact: { marginLoss: "$185,000", throughputReduction: "6.2%" },
     isSequence: true,
     stages: [
       { samples: [348.0, 348.0, 348.0, 348.0, 348.0], limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" }, equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true }, feedFlow: 84000, sensorQuality: "good", opMode: "steady" },
