@@ -1,19 +1,24 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SCENARIOS } from "./calcEngine";
 
-// Brief descriptors per scenario index
-const SCENARIO_DESCRIPTORS = [
-  "All equipment available — no constraint pressure",
-  "Temperature accelerating — intervention window open",
-  "Effluent cooler offline — response window compressed",
-  "Full escalation sequence across all four severity levels",
-  "Hydrogen availability decreasing — quench moderation margin narrowing.",
-  "Sensor conflict — differentiate noise from true drift",
-  "All sensors aligned — confirmed escalation trajectory",
-  "Stacked constraints — mitigation headroom reduced",
-  "Signal misalignment — no confirmed operational consequence",
-  "Rapid TTL compression — intervention window narrowing",
-];
+// Brief descriptors keyed by scenario name substring
+const SCENARIO_DESCRIPTORS = {
+  "Stable Baseline":              "All equipment available — no constraint pressure",
+  "Predictive Drift":             "Temperature accelerating — intervention window open",
+  "Dominant Driver":              "H₂ compressor offline — cooling response strained",
+  "Hydrogen Availability":        "Hydrogen availability decreasing — quench moderation margin narrowing",
+  "Multi-Constraint":             "Stacked constraints — mitigation headroom reduced",
+  "False Escalation":             "Sensor conflict — differentiate noise from true drift",
+  "True Escalation":              "All sensors aligned — confirmed escalation trajectory",
+  "Four-Level Escalation":        "Full escalation sequence across all four severity bands",
+  "Signal Conflict":              "Signal misalignment — no confirmed operational consequence",
+  "Escalation Window Compression":"Rapid TTL compression — intervention window narrowing",
+};
+
+function getDescriptor(name) {
+  const key = Object.keys(SCENARIO_DESCRIPTORS).find(k => name.includes(k));
+  return key ? SCENARIO_DESCRIPTORS[key] : "";
+}
 
 // Proximity zone: bottom center ± 220px wide, within 80px of bottom edge
 function isInProximityZone(e) {
