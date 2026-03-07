@@ -112,8 +112,7 @@ export default function PresenterControls({ presScenario, onSelectScenario, onRe
   }, [prev, next]);
 
   const scenarioName = SCENARIOS[presScenario]?.name || `Scenario ${presScenario + 1}`;
-  // Strip leading number prefix for strip display (e.g. "1. Stable Baseline" → "Stable Baseline")
-  const shortName = scenarioName.replace(/^\d+\.\s*/, "");
+  const shortName = scenarioName.replace(/^[\dA]+\.\s*/, "").replace(/^[A-Z]\d+\.\s*/, "");
 
   return (
     <>
