@@ -129,8 +129,8 @@ export default function PresentationHero({
             </p>
           </div>
 
-          {/* Business Impact Metrics — Immediate Risk only */}
-          {isImmediate && (
+          {/* Business Impact Metrics — Immediate Risk only, scenario-defined */}
+          {isImmediate && businessImpact?.marginLoss && (
             <div style={{
               marginTop: 32,
               display: "flex",
@@ -149,7 +149,7 @@ export default function PresentationHero({
                   Projected Margin Loss
                 </p>
                 <p style={{ fontSize: "1.05rem", fontWeight: 700, color: "#E14B3B", margin: 0, letterSpacing: "0.02em" }}>
-                  $42,000 <span style={{ fontSize: "0.75rem", fontWeight: 400, color: "rgba(255,255,255,0.4)" }}>per day</span>
+                  {businessImpact.marginLoss} <span style={{ fontSize: "0.75rem", fontWeight: 400, color: "rgba(255,255,255,0.4)" }}>per day</span>
                 </p>
               </div>
               <div style={{
@@ -163,7 +163,7 @@ export default function PresentationHero({
                   Est. Throughput Reduction
                 </p>
                 <p style={{ fontSize: "1.05rem", fontWeight: 700, color: "#E14B3B", margin: 0, letterSpacing: "0.02em" }}>
-                  8.5 <span style={{ fontSize: "0.75rem", fontWeight: 400, color: "rgba(255,255,255,0.4)" }}>%</span>
+                  {businessImpact.throughputReduction}
                 </p>
               </div>
             </div>
