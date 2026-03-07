@@ -556,6 +556,35 @@ export default function Home() {
     setManarahOpen(true);
   };
 
+  // ── System awareness moment trigger ─────────────────────────────────────────
+  useEffect(() => {
+    if (displayMode !== "presentation") return;
+    const prev = prevSystemStateRef.current;
+    const curr = systemState;
+    prevSystemStateRef.current = curr;
+
+    if (
+      curr === "EARLY_DRIFT" &&
+      prev === "NORMAL" &&
+      !awarenessUsedRef.current
+    ) {
+      awarenessUsedRef.current = true;
+      setAwarenessPhase(1); // "Analyzing..."
+      const t1 = setTimeout(() => setAwarenessPhase(2), 1500); // → "Constraint identified"
+      const t2 = setTimeout(() => setAwarenessPhase(0), 5000); // → clear
+      return () => { clearTimeout(t1); clearTimeout(t2); };
+    }
+  }, [systemState, displayMode]);
+
+  // Reset awareness flag when leaving presentation mode or resetting
+  useEffect(() => {
+    if (displayMode !== "presentation") {
+      awarenessUsedRef.current = false;
+      setAwarenessPhase(0);
+      prevSystemStateRef.current = null;
+    }
+  }, [displayMode]);
+
   // ── ESC key closes Manarah panel (both modes) ───────────────────────────────
   useEffect(() => {
     const handler = (e) => {
