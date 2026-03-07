@@ -845,6 +845,7 @@ export default function Home() {
                 interactive={false}
                 units={activeData.units}
                 systemState={systemState}
+                awarenessPhase={awarenessPhase}
               />
               <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.08)", pointerEvents: "none" }} />
             </div>
