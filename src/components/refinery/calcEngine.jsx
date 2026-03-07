@@ -338,6 +338,7 @@ export const SCENARIOS = [
   {
     name: "A1. Four-Level Escalation Sequence",
     advanced: true,
+    businessImpact: { marginLoss: "$110,000", throughputReduction: "3.8%" },
     samples: [348, 350, 352, 354, 356],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
