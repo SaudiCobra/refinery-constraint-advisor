@@ -446,8 +446,17 @@ export default function Home() {
   // Interactive: use live physics sim; Presentation: use scenario sample data.
   const isInteractive = displayMode === "interactive";
 
-  const currentValue  = isInteractive ? simTemp   : activeData.samples[activeData.samples.length - 1];
-  const effectiveSlope = isInteractive ? simRoR   : computeRateOfRise(activeData.samples, activeData.interval);
+  // When preheat is active, override temperature with warm-up values.
+  // Escalation logic is suppressed (preheat state maps to NORMAL band).
+  const isPreheatRunning = isInteractive && preheatActive && !preheatComplete;
+  const isPreheatDone    = isInteractive && preheatActive && preheatComplete;
+
+  const currentValue  = isPreheatRunning
+    ? preheatTemps.rit
+    : (isInteractive ? simTemp : activeData.samples[activeData.samples.length - 1]);
+  const effectiveSlope = isPreheatRunning
+    ? 0.05  // near-zero slope so TTL stays at Infinity → NORMAL band
+    : (isInteractive ? simRoR : computeRateOfRise(activeData.samples, activeData.interval));
 
   // ── Compute TTL (single source of truth) ────────────────────────────────────
   // Interactive: use smoothed physics TTL | Presentation: derive from samples
