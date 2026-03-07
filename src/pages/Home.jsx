@@ -869,6 +869,7 @@ export default function Home() {
                 timeToNearest={displayTTL}
                 equipment={activeData.equipment}
                 sensorQuality={activeData.sensorQuality}
+                isPreheatMode={isPreheatRunning}
               />
               <AcknowledgeSystem />
             </div>
