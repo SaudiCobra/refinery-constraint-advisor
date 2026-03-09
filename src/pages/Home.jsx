@@ -668,6 +668,19 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handler);
   }, [manarahOpen]);
 
+  // ── M key toggles Light/Dark theme ──────────────────────────────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "m" || e.key === "M") {
+        const tag = document.activeElement?.tagName?.toLowerCase();
+        if (tag === "input" || tag === "textarea" || tag === "select") return;
+        toggleTheme();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [theme]);
+
   // ── Keyboard quick-switch (Interactive mode only) ────────────────────────────
   // 1 = NORMAL | 2 = EARLY_DRIFT | 3 = SEVERE_DRIFT | 4 = IMMEDIATE_RISK
   // Ignored when focus is inside an input/textarea/select (prevents interference).
