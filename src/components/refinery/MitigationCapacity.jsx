@@ -18,6 +18,8 @@ const CONFIG = {
 };
 
 export default function MitigationCapacity({ systemState }) {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const state = systemState || "NORMAL";
   const cfg = CONFIG[state] || CONFIG.NORMAL;
   const target = MARGIN_TARGETS[state] ?? 95;
@@ -41,12 +43,12 @@ export default function MitigationCapacity({ systemState }) {
 
   return (
     <div
-      className="bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3"
+      className={`rounded-lg px-5 py-3 border transition-colors duration-300 ${isLight ? "bg-[#f4f6fb] border-[#d1d8e8]" : "bg-[#1e1e1e] border-[#333]"}`}
       style={{ transition: "border-color 400ms ease" }}
     >
       <div className="flex items-center justify-between">
          <div className="flex items-center gap-3">
-           <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">
+           <span className={`text-xs uppercase tracking-wider font-semibold ${isLight ? "text-[#9ca3af]" : "text-[#666]"}`}>
              Control Margin:
            </span>
            <div className="flex items-center gap-2">
@@ -70,7 +72,7 @@ export default function MitigationCapacity({ systemState }) {
           {Math.round(margin)}%
         </span>
       </div>
-      <p className="text-xs italic text-[#888] mt-1">
+      <p className={`text-xs italic mt-1 ${isLight ? "text-[#6b7280]" : "text-[#888]"}`}>
         {cfg.message}
       </p>
     </div>
