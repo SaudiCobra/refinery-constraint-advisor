@@ -742,7 +742,7 @@ export default function ProcessMap({
         {/* TCV-02B Path: Shell Bypass (Lane B) — Bypasses E-1, merges to E-2 line */}
         <g opacity={valveStates.tcv02b === "CLOSED" ? 0.3 : 1}>
           {/* Branch B: From split point horizontal to valve X, then drop to bus B */}
-          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 20} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE - 20} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 20} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE - 20} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {valveStates.tcv02b !== "CLOSED" && (
             <circle cx={(ANCHORS.R1.x + VALVES.TCV02B.x)/2} cy={Y_LOWER_ZONE - 20} r="4" fill={getDotColor("bypass")}>
               <animate attributeName="cx" values={`${ANCHORS.R1.x};${VALVES.TCV02B.x}`} dur={animationSpeed} repeatCount="indefinite" />
