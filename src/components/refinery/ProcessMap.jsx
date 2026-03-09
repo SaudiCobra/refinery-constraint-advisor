@@ -74,6 +74,7 @@ export default function ProcessMap({
   const [selectedUnit, setSelectedUnit] = useState(null);
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const pipeStroke = isLight ? "#2d3a52" : "#555";
   const baseColor = LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0];
   const coolerColor = COOLING_COLORS[coolingCapacity] || COOLING_COLORS.NORMAL;
   
@@ -316,25 +317,25 @@ export default function ProcessMap({
   const pulseOpacity = (phase, target) => propagationPhase === target ? 0.55 : 0.10;
 
   // Theme-derived colors for SVG elements
-  const pfdBg      = isLight ? "#f0f3f9" : "#1a1a1a";
-  const pfdBorder  = isLight ? "#c8d0e0" : "#2a2a2a";
-  const equipFill  = isLight ? "#e8ecf4" : "#2a2a2a";
-  const equipFill2 = isLight ? "#dde2ee" : "#1a1a1a";
-  const pipeFill   = isLight ? "#c4cad8" : "#555";
-  const tagBg      = isLight ? "#f8fafc" : "#0D1117";
-  const tagBorder  = isLight ? "rgba(0,0,0,0.15)" : tagColors.border;
-  const tagLabel   = isLight ? "#7a8490" : "#666";
-  const tagValue   = isLight ? tagColors.text : tagColors.text; // keep state-driven value color
-  const tagSublabel = isLight ? "#8a9ab0" : "#444";
-  const labelText  = isLight ? "#374151" : "#aaa";
-  const subText    = isLight ? "#6b7280" : "#888";
-  const splitNodeFill = isLight ? "#d1d8e8" : "#1a1a1a";
-  const splitNodeStroke = isLight ? "#8a96a8" : "#555";
-  const detailPanelBg  = isLight ? "#f4f6fb" : "#1e1e1e";
-  const detailPanelBorder = isLight ? "#c8d0e0" : "#444";
-  const detailHeading = isLight ? "#374151" : "#aaa";
-  const detailText = isLight ? "#4b5563" : "#ccc";
-  const hatchLine  = isLight ? "#aab2c4" : "#444";
+  const pfdBg      = isLight ? "#eef2f8" : "#1a1a1a";
+  const pfdBorder  = isLight ? "#b8c4d8" : "#2a2a2a";
+  const equipFill  = isLight ? "#cdd4e4" : "#2a2a2a";
+  const equipFill2 = isLight ? "#bec8da" : "#1a1a1a";
+  const pipeFill   = isLight ? "#5a6880" : "#555";
+  const tagBg      = isLight ? "#f0f4fa" : "#0D1117";
+  const tagBorder  = isLight ? "rgba(0,0,0,0.22)" : tagColors.border;
+  const tagLabel   = isLight ? "#4a5568" : "#666";
+  const tagValue   = isLight ? (effectiveState === "NORMAL" ? "#1a2540" : tagColors.text) : tagColors.text;
+  const tagSublabel = isLight ? "#5a6a80" : "#444";
+  const labelText  = isLight ? "#1a2540" : "#aaa";
+  const subText    = isLight ? "#4b5568" : "#888";
+  const splitNodeFill = isLight ? "#c4cede" : "#1a1a1a";
+  const splitNodeStroke = isLight ? "#5a6880" : "#555";
+  const detailPanelBg  = isLight ? "#e8edf6" : "#1e1e1e";
+  const detailPanelBorder = isLight ? "#b8c4d8" : "#444";
+  const detailHeading = isLight ? "#1a2540" : "#aaa";
+  const detailText = isLight ? "#2d3a52" : "#ccc";
+  const hatchLine  = isLight ? "#7a8899" : "#444";
 
   return (
     <div
