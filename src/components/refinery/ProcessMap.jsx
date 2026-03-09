@@ -736,7 +736,7 @@ export default function ProcessMap({
           )}
           
           {/* Rise vertically to E-1 shell inlet elevation */}
-          <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_LOWER_ZONE + 5} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke="#555" strokeWidth="3" opacity="0.9" />
+          <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_LOWER_ZONE + 5} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={ANCHORS.E1.y + SIZES.E1.h/2 - 18} stroke={pipeStroke} strokeWidth="3" opacity="0.9" />
         </g>
 
         {/* TCV-02B Path: Shell Bypass (Lane B) — Bypasses E-1, merges to E-2 line */}
