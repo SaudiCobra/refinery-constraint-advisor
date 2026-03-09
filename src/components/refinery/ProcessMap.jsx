@@ -701,7 +701,7 @@ export default function ProcessMap({
         {/* TCV-02A Path: Shell Return Control (Lane A) */}
         <g>
           {/* Branch A: From split point horizontal to valve X, then drop to bus A */}
-          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 20} x2={VALVES.TCV02A.x} y2={Y_LOWER_ZONE - 20} stroke="#555" strokeWidth="3" opacity="0.9" />
+          <line x1={ANCHORS.R1.x} y1={Y_LOWER_ZONE - 20} x2={VALVES.TCV02A.x} y2={Y_LOWER_ZONE - 20} stroke={pipeStroke} strokeWidth="3" opacity="0.9" />
           {valveStates.tcv02a !== "CLOSED" && (
             <circle cx={(ANCHORS.R1.x + VALVES.TCV02A.x)/2} cy={Y_LOWER_ZONE - 20} r="4" fill={getDotColor("shell")}>
               <animate attributeName="cx" values={`${ANCHORS.R1.x};${VALVES.TCV02A.x}`} dur={animationSpeed} repeatCount="indefinite" />
