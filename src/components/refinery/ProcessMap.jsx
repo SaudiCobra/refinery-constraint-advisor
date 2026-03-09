@@ -785,7 +785,7 @@ export default function ProcessMap({
           )}
           
           {/* Horizontal run on spine to E-2 inlet */}
-          <line x1={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y1={Y_SPINE} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y1={Y_SPINE} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           {/* Merge node indicator */}
           <circle cx={ANCHORS.E2.x - SIZES.E2.w/2 - 70} cy={Y_SPINE} r="5" fill={splitNodeFill} stroke="#B47A1F" strokeWidth="2" />
