@@ -4,6 +4,8 @@ import { CheckCircleIcon, TriangleAlertIcon } from "./DashboardIcons";
 import { useTheme } from "@/components/refinery/ThemeContext";
 
 export default function CoolingCapacityIndicator({ capacity }) {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const config = {
     NORMAL: { 
       color: "#2F5D80", 
@@ -25,9 +27,9 @@ export default function CoolingCapacityIndicator({ capacity }) {
   const current = config[capacity] || config.NORMAL;
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center gap-3 bg-[#1e1e1e] border border-[#333] rounded-lg px-5 py-3">
+    <div className={cn("flex flex-col md:flex-row items-start md:items-center gap-3 rounded-lg px-5 py-3 border transition-colors duration-300", isLight ? "bg-[#f4f6fb] border-[#d1d8e8]" : "bg-[#1e1e1e] border-[#333]")}>
       <div className="flex items-center gap-3">
-         <span className="text-[#666] text-xs uppercase tracking-wider">Cooling Capacity:</span>
+         <span className={`text-xs uppercase tracking-wider ${isLight ? "text-[#9ca3af]" : "text-[#666]"}`}>Cooling Capacity:</span>
          <div className="flex items-center gap-2">
            {capacity === "NORMAL" ? (
              <CheckCircleIcon className="w-4 h-4" style={{ color: current.color }} />
@@ -41,8 +43,8 @@ export default function CoolingCapacityIndicator({ capacity }) {
        </div>
       {current.advisory && (
         <>
-          <div className="w-px h-6 bg-[#444] hidden md:block" />
-          <span className="text-xs italic text-[#999]">{current.advisory}</span>
+          <div className={`w-px h-6 hidden md:block ${isLight ? "bg-[#d1d8e8]" : "bg-[#444]"}`} />
+          <span className={`text-xs italic ${isLight ? "text-[#6b7280]" : "text-[#999]"}`}>{current.advisory}</span>
         </>
       )}
     </div>
