@@ -793,11 +793,11 @@ export default function ProcessMap({
 
         {/* SPINE: E-1 Shell Out → E-2 */}
         {/* Vertical rise from E-1 shell outlet to upper corridor */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_UPPER_ZONE - 60} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={ANCHORS.E1.y + SIZES.E1.h/2 - 18} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_UPPER_ZONE - 60} stroke={pipeStroke} strokeWidth="4" opacity="0.9" />
         {/* Horizontal run in upper corridor above reactor */}
-        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_UPPER_ZONE - 60} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_UPPER_ZONE - 60} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1={ANCHORS.E1.x + SIZES.E1.w/2} y1={Y_UPPER_ZONE - 60} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_UPPER_ZONE - 60} stroke={pipeStroke} strokeWidth="4" opacity="0.9" />
         {/* Vertical drop to E-2 inlet on spine */}
-        <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_UPPER_ZONE - 60} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="4" opacity="0.9" />
+        <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_UPPER_ZONE - 60} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_SPINE} stroke={pipeStroke} strokeWidth="4" opacity="0.9" />
         <circle cx={(ANCHORS.E1.x + SIZES.E1.w/2 + ANCHORS.E2.x - SIZES.E2.w/2)/2} cy={Y_UPPER_ZONE - 60} r="4" fill={getDotColor("shell")}>
           <animate attributeName="cx" values={`${ANCHORS.E1.x + SIZES.E1.w/2};${ANCHORS.E2.x - SIZES.E2.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
         </circle>
