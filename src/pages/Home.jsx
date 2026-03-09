@@ -682,7 +682,9 @@ export default function Home() {
   }, [displayMode]);
 
   return (
-    <div className={`min-h-screen text-white transition-colors duration-700 ${bgDimming}`}>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <div className={`theme-${theme} min-h-screen transition-colors duration-300`}
+      style={{ background: "var(--t-bg-page)", color: "var(--t-text-1)", transition: "background-color 300ms ease, color 300ms ease" }}>
       {!manarahOpen && (
         <ManarahButton systemState={systemState} onClick={() => setManarahOpen(true)} drawerOpen={false} docked={false} />
       )}
