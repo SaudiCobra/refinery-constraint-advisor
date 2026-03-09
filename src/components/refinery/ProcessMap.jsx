@@ -1178,10 +1178,10 @@ export default function ProcessMap({
           const hihi = 365; const gap = hihi - tQuench; const near = gap <= 15;
           return (
             <g transform="translate(1472, 660)">
-              <rect x="-60" y="-20" width="120" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
-              <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">QUENCH ZONE</text>
-              <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tQuench}°C</text>
-              <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 355 · HIHI 365°C</text>
+              <rect x="-60" y="-20" width="120" height={near ? 72 : 56} rx="5" fill={tagBg} stroke={tagBorder} strokeWidth="1.5" />
+              <text x="0" y="-5" fill={tagLabel} fontSize="13" textAnchor="middle" letterSpacing="0.04em">QUENCH ZONE</text>
+              <text x="0" y="13" fill={tagValue} fontSize="17" textAnchor="middle" fontWeight="600">{tQuench}°C</text>
+              <text x="0" y="28" fill={tagSublabel} fontSize="11" textAnchor="middle">HI 355 · HIHI 365°C</text>
               {near && <text x="0" y="43" fill={gap <= 5 ? "#E14B3B" : gap <= 10 ? "#E06A2C" : "#D9A441"} fontSize="11" textAnchor="middle" fontWeight="600">{gap > 0 ? `${gap}°C to HIHI` : "AT HIHI"}</text>}
             </g>
           );
@@ -1192,10 +1192,10 @@ export default function ProcessMap({
           const hihi = 100; const gap = hihi - tCoolerOutlet; const near = gap <= 15;
           return (
             <g transform="translate(2068, 594)">
-              <rect x="-66" y="-20" width="132" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
-              <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">COOLER OUTLET</text>
-              <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tCoolerOutlet}°C</text>
-              <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 90 · HIHI 100°C</text>
+              <rect x="-66" y="-20" width="132" height={near ? 72 : 56} rx="5" fill={tagBg} stroke={tagBorder} strokeWidth="1.5" />
+              <text x="0" y="-5" fill={tagLabel} fontSize="13" textAnchor="middle" letterSpacing="0.04em">COOLER OUTLET</text>
+              <text x="0" y="13" fill={tagValue} fontSize="17" textAnchor="middle" fontWeight="600">{tCoolerOutlet}°C</text>
+              <text x="0" y="28" fill={tagSublabel} fontSize="11" textAnchor="middle">HI 90 · HIHI 100°C</text>
               {near && <text x="0" y="43" fill={gap <= 5 ? "#E14B3B" : gap <= 10 ? "#E06A2C" : "#D9A441"} fontSize="11" textAnchor="middle" fontWeight="600">{gap > 0 ? `${gap}°C to HIHI` : "AT HIHI"}</text>}
             </g>
           );
