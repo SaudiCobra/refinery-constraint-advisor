@@ -777,7 +777,7 @@ export default function ProcessMap({
           )}
           
           {/* Rise vertically to spine */}
-          <line x1={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y1={Y_LOWER_ZONE + 85} x2={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y1={Y_LOWER_ZONE + 85} x2={ANCHORS.E2.x - SIZES.E2.w/2 - 70} y2={Y_SPINE} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {valveStates.tcv02b !== "CLOSED" && (
             <circle cx={ANCHORS.E2.x - SIZES.E2.w/2 - 70} cy={(Y_LOWER_ZONE + 85 + Y_SPINE)/2} r="4" fill={getDotColor("bypass")}>
               <animate attributeName="cy" values={`${Y_LOWER_ZONE + 85};${Y_SPINE}`} dur={animationSpeed} repeatCount="indefinite" />
