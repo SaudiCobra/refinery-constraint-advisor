@@ -63,6 +63,8 @@ const DEFAULTS = {
 };
 
 export default function Home() {
+  const [theme, setTheme] = useState("dark");
+  const toggleTheme = () => setTheme(t => t === "dark" ? "light" : "dark");
   const [displayMode, setDisplayMode] = useState("interactive");
   const [alarmsOnly, setAlarmsOnly] = useState(false);
   const [state, setState] = useState({ ...DEFAULTS });
