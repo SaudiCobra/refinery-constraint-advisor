@@ -392,17 +392,17 @@ export default function ProcessMap({
         
         {/* FEED FILTER F-1 */}
         <g transform={`translate(${ANCHORS.F1.x}, ${ANCHORS.F1.y})`} onClick={(e) => handleUnitClick(e, 'f1')} className={cn(interactive && "cursor-pointer")}>
-          <ellipse cx="0" cy={-SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#1a1a1a" stroke={stateColors?.base || "#555"} strokeWidth="2.5" />
-          <rect x={-SIZES.F1.w/2} y={-SIZES.F1.h/2} width={SIZES.F1.w} height={SIZES.F1.h} fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="3" filter="url(#equipmentShadow)" />
-          <ellipse cx="0" cy={SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill="#2a2a2a" stroke={stateColors?.base || "#555"} strokeWidth="2.5" />
+          <ellipse cx="0" cy={-SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill={equipFill2} stroke={stateColors?.base || pipeFill} strokeWidth="2.5" />
+          <rect x={-SIZES.F1.w/2} y={-SIZES.F1.h/2} width={SIZES.F1.w} height={SIZES.F1.h} fill={equipFill} stroke={stateColors?.base || pipeFill} strokeWidth="3" filter="url(#equipmentShadow)" />
+          <ellipse cx="0" cy={SIZES.F1.h/2} rx={SIZES.F1.w/5} ry="6" fill={equipFill} stroke={stateColors?.base || pipeFill} strokeWidth="2.5" />
           {[-30, -10, 10, 30].map(y => (
-            <line key={y} x1={-SIZES.F1.w/3} y1={y} x2={SIZES.F1.w/3} y2={y} stroke="#444" strokeWidth="1.8" opacity="0.9" />
+            <line key={y} x1={-SIZES.F1.w/3} y1={y} x2={SIZES.F1.w/3} y2={y} stroke={hatchLine} strokeWidth="1.8" opacity="0.9" />
           ))}
-          <text x="0" y={SIZES.F1.h/2 + 24} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">F-1</text>
+          <text x="0" y={SIZES.F1.h/2 + 24} fill={labelText} fontSize="22" textAnchor="middle" fontWeight="600">F-1</text>
           {interactive && (
             <>
-              <text x="0" y={SIZES.F1.h/2 + 42} fill="#888" fontSize="16" textAnchor="middle">Filter</text>
-              <text x="0" y={-SIZES.F1.h/2 - 16} fill="#888" fontSize="16" textAnchor="middle">{feedFlow.toLocaleString()} kg/h</text>
+              <text x="0" y={SIZES.F1.h/2 + 42} fill={subText} fontSize="16" textAnchor="middle">Filter</text>
+              <text x="0" y={-SIZES.F1.h/2 - 16} fill={subText} fontSize="16" textAnchor="middle">{feedFlow.toLocaleString()} kg/h</text>
             </>
           )}
         </g>
