@@ -826,11 +826,11 @@ export default function ProcessMap({
         {/* TCV-03A: Cooler Bypass (Lower Zone) */}
         <g opacity={valveStates.tcv03a === "CLOSED" ? 0.3 : 1}>
           {/* Drop from spine */}
-          <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_SPINE} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_LOWER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_SPINE} x2={ANCHORS.E2.x - SIZES.E2.w/2} y2={Y_LOWER_ZONE} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {/* Horizontal run in lower zone */}
-          <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_LOWER_ZONE} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_LOWER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={ANCHORS.E2.x - SIZES.E2.w/2} y1={Y_LOWER_ZONE} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_LOWER_ZONE} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {/* Rise to spine */}
-          <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_LOWER_ZONE} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_SPINE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={ANCHORS.E2.x + SIZES.E2.w/2} y1={Y_LOWER_ZONE} x2={ANCHORS.E2.x + SIZES.E2.w/2} y2={Y_SPINE} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV03A.x}, ${VALVES.TCV03A.y})`} onClick={(e) => handleUnitClick(e, 'tcv03a')} className={cn(interactive && "cursor-pointer")}>
             <g transform="translate(-38,-43.32) scale(0.76)" fill="none" stroke={valveStates.tcv03a === "OPEN" ? "#B47A1F" : "#555"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
