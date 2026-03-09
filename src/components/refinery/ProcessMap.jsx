@@ -806,7 +806,7 @@ export default function ProcessMap({
           {(() => {
             const stroke = getEquipmentStroke("cooler");
             return (
-              <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill="#2a2a2a" stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+              <rect x={-SIZES.E2.w/2} y={-SIZES.E2.h/2} width={SIZES.E2.w} height={SIZES.E2.h} rx="10" fill={equipFill} stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
             );
           })()}
           {[-60, -40, -20, 0, 20, 40, 60].map(y => (
@@ -818,8 +818,8 @@ export default function ProcessMap({
               <line x1={SIZES.E2.w/2 - 10} y1={-SIZES.E2.h/2 + 10} x2={-SIZES.E2.w/2 + 10} y2={SIZES.E2.h/2 - 10} stroke="#A13A1F" strokeWidth="4" pointerEvents="none" />
             </>
           )}
-          <text x="0" y={SIZES.E2.h/2 + 28} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">E-2</text>
-          {interactive && <text x="0" y={SIZES.E2.h/2 + 46} fill="#888" fontSize="16" textAnchor="middle">Cooler</text>}
+          <text x="0" y={SIZES.E2.h/2 + 28} fill={labelText} fontSize="22" textAnchor="middle" fontWeight="600">E-2</text>
+          {interactive && <text x="0" y={SIZES.E2.h/2 + 46} fill={subText} fontSize="16" textAnchor="middle">Cooler</text>}
         </g>
 
         {/* TCV-03A: Cooler Bypass (Lower Zone) */}
