@@ -11,25 +11,25 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
     const pct = Math.min(100, Math.round(((preheatRIT - 200) / (335 - 200)) * 100));
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-        <Block title="System Reasoning" color="blue">
-          <Line>Operating mode: Reactor warm-up circulation</Line>
-          <Line>RIT rising at controlled rate (~0.35°C/s)</Line>
-          <Line>Drift escalation logic suspended</Line>
+        <Block title="System Reasoning" color="blue" isLight={isLight}>
+          <Line isLight={isLight}>Operating mode: Reactor warm-up circulation</Line>
+          <Line isLight={isLight}>RIT rising at controlled rate (~0.35°C/s)</Line>
+          <Line isLight={isLight}>Drift escalation logic suspended</Line>
         </Block>
-        <Block title="Reality Check" color="amber">
-          <Line>No process limits active during preheat</Line>
-          <Line>Heat contained in circulation loop</Line>
-          <Line>Normal operation resumes at RIT 335°C</Line>
+        <Block title="Reality Check" color="amber" isLight={isLight}>
+          <Line isLight={isLight}>No process limits active during preheat</Line>
+          <Line isLight={isLight}>Heat contained in circulation loop</Line>
+          <Line isLight={isLight}>Normal operation resumes at RIT 335°C</Line>
         </Block>
-        <Block title="Consequence (if unchanged)" color="red">
-          <Line>Preheat complete at ~{pct}% — target 335°C</Line>
-          <Line>No limit breach projected during warm-up</Line>
-          <Line>Auto-transition to normal simulation on completion</Line>
+        <Block title="Consequence (if unchanged)" color="red" isLight={isLight}>
+          <Line isLight={isLight}>Preheat complete at ~{pct}% — target 335°C</Line>
+          <Line isLight={isLight}>No limit breach projected during warm-up</Line>
+          <Line isLight={isLight}>Auto-transition to normal simulation on completion</Line>
         </Block>
-        <Block title="Shift Summary" color="green">
-          <Line>Status: Reactor Preheat Active</Line>
-          <Line>RIT: {Math.round(preheatRIT)}°C → target 335°C</Line>
-          <Line>Attention focus: Warm-up rate continuity</Line>
+        <Block title="Shift Summary" color="green" isLight={isLight}>
+          <Line isLight={isLight}>Status: Reactor Preheat Active</Line>
+          <Line isLight={isLight}>RIT: {Math.round(preheatRIT)}°C → target 335°C</Line>
+          <Line isLight={isLight}>Attention focus: Warm-up rate continuity</Line>
         </Block>
       </div>
     );
@@ -60,48 +60,48 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       {/* System Reasoning */}
-      <Block title="System Reasoning" color="blue">
+      <Block title="System Reasoning" color="blue" isLight={isLight}>
         {stable ? (
-          <Line>Rate-of-rise: 0.0 {units}/min (stable)</Line>
+          <Line isLight={isLight}>Rate-of-rise: 0.0 {units}/min (stable)</Line>
         ) : (
           <>
-            <Line>Rate-of-rise: +{slope.toFixed(1)} {units}/min (confirmed)</Line>
-            {nearest && <Line>Margin to {nearest.name.toLowerCase()}: {nearest.margin.toFixed(1)} {units}</Line>}
-            <Line>Escalation window: {systemState === "IMMEDIATE_RISK" ? "critical" : "narrowing"}</Line>
+            <Line isLight={isLight}>Rate-of-rise: +{slope.toFixed(1)} {units}/min (confirmed)</Line>
+            {nearest && <Line isLight={isLight}>Margin to {nearest.name.toLowerCase()}: {nearest.margin.toFixed(1)} {units}</Line>}
+            <Line isLight={isLight}>Escalation window: {systemState === "IMMEDIATE_RISK" ? "critical" : "narrowing"}</Line>
           </>
         )}
       </Block>
 
       {/* Reality Check */}
-      <Block title="Reality Check" color="amber">
-        <Line>{realityLine1}</Line>
-        <Line>{realityLine2}</Line>
+      <Block title="Reality Check" color="amber" isLight={isLight}>
+        <Line isLight={isLight}>{realityLine1}</Line>
+        <Line isLight={isLight}>{realityLine2}</Line>
       </Block>
 
       {/* Consequence */}
-      <Block title="Consequence (if unchanged)" color="red">
+      <Block title="Consequence (if unchanged)" color="red" isLight={isLight}>
         {stable ? (
-          <Line>No escalation projected</Line>
+          <Line isLight={isLight}>No escalation projected</Line>
         ) : (
           <>
             {hiConstraint && hiConstraint.time < Infinity && (
-              <Line>High limit projected in {formatTime(hiConstraint.time)}</Line>
+              <Line isLight={isLight}>High limit projected in {formatTime(hiConstraint.time)}</Line>
             )}
             {hihiConstraint && hihiConstraint.time < Infinity && (
-              <Line>High-High escalation projected in {formatTime(hihiConstraint.time)}</Line>
+              <Line isLight={isLight}>High-High escalation projected in {formatTime(hihiConstraint.time)}</Line>
             )}
-            {!hiConstraint && !hihiConstraint && <Line>Constraints not configured</Line>}
+            {!hiConstraint && !hihiConstraint && <Line isLight={isLight}>Constraints not configured</Line>}
           </>
         )}
       </Block>
 
       {/* Shift Summary */}
-      <Block title="Shift Summary" color="green">
-        <Line>Status: {getShiftStatus()}</Line>
+      <Block title="Shift Summary" color="green" isLight={isLight}>
+        <Line isLight={isLight}>Status: {getShiftStatus()}</Line>
         {!stable && nearest && (
-          <Line>Nearest constraint: {nearest.name}</Line>
+          <Line isLight={isLight}>Nearest constraint: {nearest.name}</Line>
         )}
-        <Line>Attention focus: Rate-of-rise & margin</Line>
+        <Line isLight={isLight}>Attention focus: Rate-of-rise & margin</Line>
       </Block>
     </div>
   );
