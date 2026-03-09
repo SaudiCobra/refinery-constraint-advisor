@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/components/refinery/ThemeContext";
 import { ClockIcon, TrendingUpIcon } from "./DashboardIcons";
 
 import { formatDemoTime } from "./HeroMetric";

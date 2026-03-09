@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import ConstraintPropagationInsight from "./ConstraintPropagationInsight";
+import { useTheme } from "@/components/refinery/ThemeContext";
 
 const LEVEL_COLORS = {
   0: "#0F5F5F",

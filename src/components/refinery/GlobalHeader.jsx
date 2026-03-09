@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { Sun, Moon } from "lucide-react";
 import moment from "moment";
-import { useTheme } from "@/components/ThemeContext";
+import { useTheme } from "@/components/refinery/ThemeContext";
 
 export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, onAlarmsOnlyChange }) {
   const { theme, toggleTheme } = useTheme();
