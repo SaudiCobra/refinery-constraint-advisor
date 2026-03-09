@@ -144,49 +144,54 @@ export default function DecisionWindowBar({
   const constraintLeverRelationship = getConstraintLeverRelationship();
   
   const [expanded, setExpanded] = React.useState(false);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   
   return (
     <div className="space-y-2">
-      <div className="flex flex-col gap-1.5 bg-[#1e1e1e] border border-[#333] rounded-lg px-4 py-2">
+      <div className={cn(
+        "flex flex-col gap-1.5 rounded-lg px-4 py-2 border transition-colors duration-300",
+        isLight ? "bg-[#f4f6fb] border-[#d1d8e8]" : "bg-[#1e1e1e] border-[#333]"
+      )}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ClockIcon className="w-3.5 h-3.5 text-[#888]" />
-            <span className="text-[#666] text-xs uppercase tracking-wider font-semibold">Decision Window</span>
+            <ClockIcon className={cn("w-3.5 h-3.5", isLight ? "text-[#6b7280]" : "text-[#888]")} />
+            <span className={cn("text-xs uppercase tracking-wider font-semibold", isLight ? "text-[#6b7280]" : "text-[#666]")}>Decision Window</span>
           </div>
-          <span className="text-[#aaa] text-sm font-semibold">{timeDisplay}</span>
+          <span className={cn("text-sm font-semibold", isLight ? "text-[#374151]" : "text-[#aaa]")}>{timeDisplay}</span>
         </div>
-        <div className="w-full h-3 bg-[#0d0d0d] rounded-full border border-[#2a2a2a] overflow-hidden">
+        <div className={cn("w-full h-3 rounded-full border overflow-hidden", isLight ? "bg-[#e8ecf4] border-[#d1d8e8]" : "bg-[#0d0d0d] border-[#2a2a2a]")}>
           <div 
             className="h-full transition-all duration-1500 ease-in-out rounded-full"
-            style={{ 
-              width: `${fillPercent}%`,
-              backgroundColor: barColor,
-            }}
+            style={{ width: `${fillPercent}%`, backgroundColor: barColor }}
           />
         </div>
       </div>
       
       {primaryConstraint && (
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-4 py-2">
-          <p className="text-[#aaa] text-xs leading-relaxed">{primaryConstraint}</p>
+        <div className={cn(
+          "rounded-lg px-4 py-2 border transition-colors duration-300",
+          isLight ? "bg-[#f8fafc] border-[#d1d8e8]" : "bg-[#1a1a1a] border-[#2a2a2a]"
+        )}>
+          <p className={cn("text-xs leading-relaxed", isLight ? "text-[#374151]" : "text-[#aaa]")}>{primaryConstraint}</p>
           {(trendCredibility || constraintLeverRelationship) && (
             <>
               <button 
                 onClick={() => setExpanded(!expanded)}
-                className="text-[#666] text-xs mt-1.5 hover:text-[#888] transition-colors"
+                className={cn("text-xs mt-1.5 transition-colors", isLight ? "text-[#6b7280] hover:text-[#374151]" : "text-[#666] hover:text-[#888]")}
               >
                 {expanded ? "− Hide details" : "+ Show details"}
               </button>
               {expanded && (
-                <div className="mt-2 space-y-1 pl-2 border-l-2 border-[#2a2a2a]">
+                <div className={cn("mt-2 space-y-1 pl-2 border-l-2", isLight ? "border-[#d1d8e8]" : "border-[#2a2a2a]")}>
                   {trendCredibility && (
                     <div className="flex items-start gap-2">
-                      <TrendingUpIcon className="w-3.5 h-3.5 text-[#888] mt-0.5 flex-shrink-0" />
-                      <p className="text-[#666] text-xs italic">{trendCredibility}</p>
+                      <TrendingUpIcon className={cn("w-3.5 h-3.5 mt-0.5 flex-shrink-0", isLight ? "text-[#6b7280]" : "text-[#888]")} />
+                      <p className={cn("text-xs italic", isLight ? "text-[#4b5563]" : "text-[#666]")}>{trendCredibility}</p>
                     </div>
                   )}
                   {constraintLeverRelationship && (
-                    <p className="text-[#777] text-xs leading-relaxed">
+                    <p className={cn("text-xs leading-relaxed", isLight ? "text-[#6b7280]" : "text-[#777]")}>
                       {constraintLeverRelationship}
                     </p>
                   )}

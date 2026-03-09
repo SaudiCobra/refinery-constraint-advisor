@@ -72,6 +72,8 @@ export default function ProcessMap({
   preheatOverride = null, // { rit, quench, rot } — when Preheat Mode active
 }) {
   const [selectedUnit, setSelectedUnit] = useState(null);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const baseColor = LEVEL_COLORS[escalationLevel] || LEVEL_COLORS[0];
   const coolerColor = COOLING_COLORS[coolingCapacity] || COOLING_COLORS.NORMAL;
   
