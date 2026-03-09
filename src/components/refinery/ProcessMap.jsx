@@ -728,7 +728,7 @@ export default function ProcessMap({
           </g>
           
           {/* Horizontal run on bus A to E-1 shell inlet x-position */}
-          <line x1={VALVES.TCV02A.x} y1={Y_LOWER_ZONE + 5} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_LOWER_ZONE + 5} stroke="#555" strokeWidth="3" opacity="0.9" />
+          <line x1={VALVES.TCV02A.x} y1={Y_LOWER_ZONE + 5} x2={ANCHORS.E1.x + SIZES.E1.w/2} y2={Y_LOWER_ZONE + 5} stroke={pipeStroke} strokeWidth="3" opacity="0.9" />
           {valveStates.tcv02a !== "CLOSED" && (
             <circle cx={(VALVES.TCV02A.x + ANCHORS.E1.x + SIZES.E1.w/2)/2} cy={Y_LOWER_ZONE + 5} r="4" fill={getDotColor("shell")}>
               <animate attributeName="cx" values={`${VALVES.TCV02A.x};${ANCHORS.E1.x + SIZES.E1.w/2}`} dur={animationSpeed} repeatCount="indefinite" />
