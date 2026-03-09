@@ -507,7 +507,7 @@ export default function ProcessMap({
               type="translate"
               from="0 0"
               to={`${SIZES.E1.w - 24} 0`}
-              dur="10s"
+              dur="7s"
               repeatCount="indefinite"
             />
           </rect>
