@@ -69,6 +69,8 @@ const getStateColor = (state) => {
  };
 
 export default function H2AvailabilityIndicator({ equipment, coolingCapacity, slope }) {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const h2State = deriveH2Availability(equipment, coolingCapacity, slope);
   const stateColor = getStateColor(h2State);
   
@@ -80,7 +82,7 @@ export default function H2AvailabilityIndicator({ equipment, coolingCapacity, sl
   };
   
   return (
-     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-4 py-2">
+     <div className={`rounded-lg px-4 py-2 border transition-colors duration-300 ${isLight ? "bg-[#f4f6fb] border-[#d1d8e8]" : "bg-[#1a1a1a] border-[#2a2a2a]"}`}>
        <div className="flex items-start gap-2">
          {h2State === "Full" ? (
            <CheckCircleIcon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: getStateColorValue(h2State) }} />
