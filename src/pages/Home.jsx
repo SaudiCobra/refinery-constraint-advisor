@@ -731,7 +731,7 @@ export default function Home() {
 
       {!alarmsOnly && displayMode === "presentation" && (
         <div className="max-w-[2200px] mx-auto px-20 pt-4">
-          <p className="text-[#999] text-sm">
+          <p className="text-sm transition-colors duration-300" style={{ color: "var(--t-text-3)" }}>
             Constraint escalation driven by sustained temperature acceleration; intervention window remains intact.
           </p>
         </div>
@@ -753,14 +753,14 @@ export default function Home() {
             {/* Preheat mode status banner */}
             {(isPreheatRunning || isPreheatDone) && (
               <div style={{
-                textAlign: "center",
-                padding: "8px 0 4px",
-                fontSize: "0.82rem",
-                fontWeight: 500,
-                letterSpacing: "0.06em",
-                color: isPreheatDone ? "#6FD0C7" : "#C8AA50",
-                opacity: 0.88,
-                transition: "color 600ms ease",
+              textAlign: "center",
+              padding: "8px 0 4px",
+              fontSize: "0.82rem",
+              fontWeight: 500,
+              letterSpacing: "0.06em",
+              color: isPreheatDone ? "#4FB8B0" : "#C8AA50",
+              opacity: theme === "light" ? 1 : 0.88,
+              transition: "color 600ms ease",
               }}>
                 {isPreheatDone
                   ? "Preheat Complete — Normal Operation"
@@ -812,8 +812,8 @@ export default function Home() {
                 minutesRecovered={minutesRecovered}
               />
               
-              <div className="text-center pt-2 border-t border-[#2a2a2a]">
-                <p className="text-[#555] text-xs">
+              <div className="text-center pt-2 border-t transition-colors duration-300" style={{ borderColor: "var(--t-border)" }}>
+                <p className="text-xs transition-colors duration-300" style={{ color: "var(--t-text-4)" }}>
                   Advisory system — no control actions executed. Operator retains full control at all times.
                 </p>
               </div>
