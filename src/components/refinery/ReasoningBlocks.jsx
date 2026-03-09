@@ -115,14 +115,14 @@ function Block({ title, color, children, isLight }) {
     green: "border-green-800/50",
   };
   const lightBorders = {
-    blue: "border-blue-300/70",
-    amber: "border-amber-400/70",
-    red: "border-red-300/70",
-    green: "border-green-400/70",
+    blue: "border-blue-400",
+    amber: "border-amber-500",
+    red: "border-red-400",
+    green: "border-green-500",
   };
-  const borderClass = isLight ? (lightBorders[color] || "border-[#d1d8e8]") : (darkBorders[color] || "border-[#333]");
+  const borderClass = isLight ? (lightBorders[color] || "border-[#b0bcd4]") : (darkBorders[color] || "border-[#333]");
   return (
-    <div className={cn("rounded-lg p-4 border transition-colors duration-300", isLight ? "bg-[#f4f6fb]" : "bg-[#1e1e1e]", borderClass)}>
+    <div className={cn("rounded-lg p-4 border transition-colors duration-300", isLight ? "bg-[#e8ecf4]" : "bg-[#1e1e1e]", borderClass)}>
       <h4 className={cn("text-xs uppercase tracking-wider mb-2", isLight ? "text-[#9ca3af]" : "text-[#777]")}>{title}</h4>
       <div className="space-y-1">{children}</div>
     </div>

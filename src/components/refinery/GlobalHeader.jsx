@@ -11,7 +11,7 @@ export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, on
   return (
     <div className={cn(
       "border-b px-6 py-4 transition-colors duration-300",
-      isLight ? "bg-white border-[#d1d5db]" : "bg-[#161616] border-[#2a2a2a]"
+      isLight ? "bg-[#f0f3f9] border-[#cdd4e4]" : "bg-[#161616] border-[#2a2a2a]"
     )}>
       <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Left */}
