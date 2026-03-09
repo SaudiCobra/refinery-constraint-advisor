@@ -678,8 +678,8 @@ export default function ProcessMap({
             />
           )}
           
-          <text x={-SIZES.R1.w/2 - 40} y={SIZES.R1.h/2 + 12} fill="#aaa" fontSize="22" textAnchor="end" fontWeight="bold">R-1</text>
-          {interactive && <text x={-SIZES.R1.w/2 - 40} y={SIZES.R1.h/2 + 26} fill="#888" fontSize="18" textAnchor="end">Reactor</text>}
+          <text x={-SIZES.R1.w/2 - 40} y={SIZES.R1.h/2 + 12} fill={labelText} fontSize="22" textAnchor="end" fontWeight="bold">R-1</text>
+          {interactive && <text x={-SIZES.R1.w/2 - 40} y={SIZES.R1.h/2 + 26} fill={subText} fontSize="18" textAnchor="end">Reactor</text>}
         </g>
 
         {/* R-1 Outlet — label removed; replaced by ROT indicator below */}
@@ -693,7 +693,7 @@ export default function ProcessMap({
         </circle>
 
         {/* Split point — BELOW reactor body */}
-        <circle cx={ANCHORS.R1.x} cy={Y_LOWER_ZONE - 20} r="6" fill="#1a1a1a" stroke="#555" strokeWidth="2" />
+        <circle cx={ANCHORS.R1.x} cy={Y_LOWER_ZONE - 20} r="6" fill={splitNodeFill} stroke={splitNodeStroke} strokeWidth="2" />
 
         {/* === LOWER ZONE: SHELL-SIDE CONTROL === */}
         
