@@ -1246,49 +1246,52 @@ export default function ProcessMap({
 
       {/* Interactive detail panel */}
       {interactive && selectedUnit && (
-        <div className="absolute top-4 right-4 bg-[#1e1e1e] border-2 border-[#444] rounded-lg p-4 max-w-[280px] shadow-xl">
-          <button onClick={() => setSelectedUnit(null)} className="absolute top-2 right-2 text-[#888] hover:text-white text-sm font-bold w-6 h-6 flex items-center justify-center">✕</button>
+        <div
+          className="absolute top-4 right-4 rounded-lg p-4 max-w-[280px] shadow-xl border-2 transition-colors duration-300"
+          style={{ background: detailPanelBg, borderColor: detailPanelBorder }}
+        >
+          <button onClick={() => setSelectedUnit(null)} style={{ color: detailText }} className="absolute top-2 right-2 text-sm font-bold w-6 h-6 flex items-center justify-center hover:opacity-70">✕</button>
           
           {selectedUnit === 'f1' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">F-1 Feed Filter</h4>
-              <p className="text-[#ccc] text-xs">Flow: {feedFlow.toLocaleString()} kg/h</p>
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">F-1 Feed Filter</h4>
+              <p style={{ color: detailText }} className="text-xs">Flow: {feedFlow.toLocaleString()} kg/h</p>
             </>
           )}
           
           {selectedUnit === 'e1' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">E-1 Feed/Effluent Exchanger</h4>
-              <p className="text-[#ccc] text-xs">Tube out: {tubeSideOutletTemp.toFixed(1)}{units}</p>
-              <p className="text-[#ccc] text-xs mt-1">Shell out: {shellSideOutletTemp.toFixed(0)}{units}</p>
-              {preheatActive && <p className="text-[#ccc] text-xs mt-2 font-semibold">Status: {preheatStatus}</p>}
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">E-1 Feed/Effluent Exchanger</h4>
+              <p style={{ color: detailText }} className="text-xs">Tube out: {tubeSideOutletTemp.toFixed(1)}{units}</p>
+              <p style={{ color: detailText }} className="text-xs mt-1">Shell out: {shellSideOutletTemp.toFixed(0)}{units}</p>
+              {preheatActive && <p style={{ color: detailText }} className="text-xs mt-2 font-semibold">Status: {preheatStatus}</p>}
             </>
           )}
           
           {selectedUnit === 'tcv01a' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">TCV-01A Tube Bypass</h4>
-              <p className="text-[#ccc] text-xs">Status: {valveStates.tcv01a}</p>
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">TCV-01A Tube Bypass</h4>
+              <p style={{ color: detailText }} className="text-xs">Status: {valveStates.tcv01a}</p>
               {valveStates.tcv01a === "OPEN" && <p className="text-[#B47A1F] text-xs mt-2 italic">Lowers reactor inlet temperature</p>}
             </>
           )}
           
           {selectedUnit === 'tcv01b' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">TCV-01B Feed Control</h4>
-              <p className="text-[#ccc] text-xs">Status: {valveStates.tcv01b}</p>
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">TCV-01B Feed Control</h4>
+              <p style={{ color: detailText }} className="text-xs">Status: {valveStates.tcv01b}</p>
             </>
           )}
           
           {selectedUnit === 'r1' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">R-1 Reactor</h4>
-              <p className="text-[#ccc] text-xs">Temperature: {currentTemp.toFixed(1)}{units}</p>
-              <p className="text-[#ccc] text-xs mt-1">Rate: {slope.toFixed(2)} {units}/min</p>
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">R-1 Reactor</h4>
+              <p style={{ color: detailText }} className="text-xs">Temperature: {currentTemp.toFixed(1)}{units}</p>
+              <p style={{ color: detailText }} className="text-xs mt-1">Rate: {slope.toFixed(2)} {units}/min</p>
               {bedImbalance && bedImbalance.severity !== "NONE" && (
                 <>
-                  <p className="text-[#ccc] text-xs mt-1">Dominant Bed: B{bedImbalance.dominantBed}</p>
-                  <p className="text-[#ccc] text-xs">ΔBed: {bedImbalance.bedDelta}{units}</p>
+                  <p style={{ color: detailText }} className="text-xs mt-1">Dominant Bed: B{bedImbalance.dominantBed}</p>
+                  <p style={{ color: detailText }} className="text-xs">ΔBed: {bedImbalance.bedDelta}{units}</p>
                 </>
               )}
             </>
@@ -1296,42 +1299,42 @@ export default function ProcessMap({
           
           {selectedUnit === 'tcv02a' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">TCV-02A Shell Inlet Control</h4>
-              <p className="text-[#ccc] text-xs">Status: {valveStates.tcv02a}</p>
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">TCV-02A Shell Inlet Control</h4>
+              <p style={{ color: detailText }} className="text-xs">Status: {valveStates.tcv02a}</p>
               {valveStates.tcv02a === "MODULATING" && <p className="text-[#B47A1F] text-xs mt-2 italic">Restricts shell-side heat transfer</p>}
             </>
           )}
           
           {selectedUnit === 'tcv02b' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">TCV-02B Shell Bypass</h4>
-              <p className="text-[#ccc] text-xs">Status: {valveStates.tcv02b}</p>
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">TCV-02B Shell Bypass</h4>
+              <p style={{ color: detailText }} className="text-xs">Status: {valveStates.tcv02b}</p>
               {valveStates.tcv02b !== "CLOSED" && <p className="text-[#B47A1F] text-xs mt-2 italic">Reduces heat recovery</p>}
             </>
           )}
           
           {selectedUnit === 'e2' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">E-2 Effluent Cooler</h4>
-              <p className="text-[#ccc] text-xs">Capacity: {coolingCapacity === "SEVERELY_LIMITED" ? "Severely Limited" : coolingCapacity === "REDUCED" ? "Reduced" : "Normal"}</p>
-              <p className="text-[#ccc] text-xs mt-1">Status: {equipment.effluentCooler ? "Online" : "OFFLINE"}</p>
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">E-2 Effluent Cooler</h4>
+              <p style={{ color: detailText }} className="text-xs">Capacity: {coolingCapacity === "SEVERELY_LIMITED" ? "Severely Limited" : coolingCapacity === "REDUCED" ? "Reduced" : "Normal"}</p>
+              <p style={{ color: detailText }} className="text-xs mt-1">Status: {equipment.effluentCooler ? "Online" : "OFFLINE"}</p>
               {coolingCapacity === "SEVERELY_LIMITED" && <p className="text-[#A13A1F] text-xs mt-2 font-semibold">Heat removal severely limited</p>}
             </>
           )}
           
           {selectedUnit === 'tcv03a' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">TCV-03A Cooler Bypass</h4>
-              <p className="text-[#ccc] text-xs">Status: {valveStates.tcv03a}</p>
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">TCV-03A Cooler Bypass</h4>
+              <p style={{ color: detailText }} className="text-xs">Status: {valveStates.tcv03a}</p>
               {valveStates.tcv03a === "OPEN" && <p className="text-[#B47A1F] text-xs mt-2 italic">Bypassing cooler when not needed</p>}
             </>
           )}
           
           {selectedUnit === 'd1' && (
             <>
-              <h4 className="text-[#aaa] text-sm font-bold mb-2">D-1 Three-Phase Separator</h4>
-              <p className="text-[#ccc] text-xs">Separates gas, naphtha, and water</p>
-              <p className="text-[#ccc] text-xs mt-1">Gas recycled to H₂ compression</p>
+              <h4 style={{ color: detailHeading }} className="text-sm font-bold mb-2">D-1 Three-Phase Separator</h4>
+              <p style={{ color: detailText }} className="text-xs">Separates gas, naphtha, and water</p>
+              <p style={{ color: detailText }} className="text-xs mt-1">Gas recycled to H₂ compression</p>
             </>
           )}
         </div>
