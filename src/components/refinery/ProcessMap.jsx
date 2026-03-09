@@ -387,6 +387,39 @@ export default function ProcessMap({
               "#0F5F5F"
             } stopOpacity="0" />
           </radialGradient>
+
+          {/* ── FLUID ANIMATION ASSETS ── */}
+          <clipPath id="e1FluidClip">
+            <rect
+              x={ANCHORS.E1.x - SIZES.E1.w/2 + 12}
+              y={ANCHORS.E1.y - SIZES.E1.h/2 + 10}
+              width={SIZES.E1.w - 24}
+              height={SIZES.E1.h - 20}
+            />
+          </clipPath>
+          <clipPath id="e2FluidClip">
+            <rect
+              x={ANCHORS.E2.x - SIZES.E2.w/2 + 6}
+              y={ANCHORS.E2.y - SIZES.E2.h/2 + 6}
+              width={SIZES.E2.w - 12}
+              height={SIZES.E2.h - 12}
+              rx="8"
+            />
+          </clipPath>
+          <linearGradient id="naphthaFlowGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stopColor="#d0d0d0" stopOpacity="0" />
+            <stop offset="25%"  stopColor="#d0d0d0" stopOpacity="0.17" />
+            <stop offset="50%"  stopColor="#d0d0d0" stopOpacity="0" />
+            <stop offset="75%"  stopColor="#d0d0d0" stopOpacity="0.13" />
+            <stop offset="100%" stopColor="#d0d0d0" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="waterFlowGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stopColor="#4a9fd4" stopOpacity="0" />
+            <stop offset="25%"  stopColor="#4a9fd4" stopOpacity="0.26" />
+            <stop offset="50%"  stopColor="#4a9fd4" stopOpacity="0" />
+            <stop offset="75%"  stopColor="#4a9fd4" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#4a9fd4" stopOpacity="0" />
+          </linearGradient>
         </defs>
 
         {/* === MAIN PROCESS SPINE === */}
@@ -458,6 +491,26 @@ export default function ProcessMap({
           
           <text x="0" y={SIZES.E1.h/2 + 28} fill={labelText} fontSize="22" textAnchor="middle" fontWeight="600">E-1</text>
           {interactive && <text x="0" y={SIZES.E1.h/2 + 46} fill={subText} fontSize="16" textAnchor="middle">Exchanger</text>}
+        </g>
+
+        {/* E-1 naphtha fluid animation overlay */}
+        <g clipPath="url(#e1FluidClip)" pointerEvents="none">
+          <rect
+            x={ANCHORS.E1.x - SIZES.E1.w/2 + 12 - (SIZES.E1.w - 24)}
+            y={ANCHORS.E1.y - SIZES.E1.h/2 + 10}
+            width={(SIZES.E1.w - 24) * 2}
+            height={SIZES.E1.h - 20}
+            fill="url(#naphthaFlowGrad)"
+          >
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              from="0 0"
+              to={`${SIZES.E1.w - 24} 0`}
+              dur="10s"
+              repeatCount="indefinite"
+            />
+          </rect>
         </g>
 
 
@@ -821,6 +874,26 @@ export default function ProcessMap({
           )}
           <text x="0" y={SIZES.E2.h/2 + 28} fill={labelText} fontSize="22" textAnchor="middle" fontWeight="600">E-2</text>
           {interactive && <text x="0" y={SIZES.E2.h/2 + 46} fill={subText} fontSize="16" textAnchor="middle">Cooler</text>}
+        </g>
+
+        {/* E-2 cooler water animation overlay */}
+        <g clipPath="url(#e2FluidClip)" pointerEvents="none">
+          <rect
+            x={ANCHORS.E2.x - SIZES.E2.w/2 + 6 - (SIZES.E2.w - 12)}
+            y={ANCHORS.E2.y - SIZES.E2.h/2 + 6}
+            width={(SIZES.E2.w - 12) * 2}
+            height={SIZES.E2.h - 12}
+            fill="url(#waterFlowGrad)"
+          >
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              from="0 0"
+              to={`${SIZES.E2.w - 12} 0`}
+              dur="7s"
+              repeatCount="indefinite"
+            />
+          </rect>
         </g>
 
         {/* TCV-03A: Cooler Bypass (Lower Zone) */}
