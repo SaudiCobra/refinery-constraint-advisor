@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/components/refinery/ThemeContext";
 
 export const formatDemoTime = (t) => {
   if (t <= 0) return "NOW";

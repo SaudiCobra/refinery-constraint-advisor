@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/components/refinery/ThemeContext";
 
 const SCENARIOS = [
   { key: "NORMAL", label: "Normal", color: "text-[#0F9F9F] border-[#0F7F7F] hover:bg-[#0F5F5F]/20" },

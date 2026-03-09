@@ -1,5 +1,6 @@
 import React from "react";
 import { ShieldIcon } from "./DashboardIcons";
+import { useTheme } from "@/components/refinery/ThemeContext";
 import MitigationCapacity from "./MitigationCapacity";
 import CoolingCapacityIndicator from "./CoolingCapacityIndicator";
 import H2AvailabilityIndicator from "./H2AvailabilityIndicator";
