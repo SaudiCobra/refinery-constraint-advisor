@@ -346,8 +346,8 @@ export default function ProcessMap({
       {(isPropagating || isReactorOutletPropagating) && (
         <style>{`
           @keyframes pfd-pulse {
-            0%, 100% { opacity: 0.08; }
-            50%       { opacity: 0.55; }
+            0%, 100% { opacity: ${isLight ? "0.15" : "0.08"}; }
+            50%       { opacity: ${isLight ? "0.80" : "0.55"}; }
           }
           .pfd-cause  { animation: pfd-pulse 1.5s ease-in-out infinite 0s;   }
           .pfd-path   { animation: pfd-pulse 1.5s ease-in-out infinite 0.5s; }
@@ -376,9 +376,9 @@ export default function ProcessMap({
               effectiveState === "EARLY_DRIFT"    ? "#2F5D80" :
               "#0F5F5F"
             } stopOpacity={
-              effectiveState === "IMMEDIATE_RISK" ? "0.18" :
-              effectiveState === "SEVERE_DRIFT"   ? "0.13" :
-              effectiveState === "EARLY_DRIFT"    ? "0.08" :
+              effectiveState === "IMMEDIATE_RISK" ? (isLight ? "0.35" : "0.18") :
+              effectiveState === "SEVERE_DRIFT"   ? (isLight ? "0.25" : "0.13") :
+              effectiveState === "EARLY_DRIFT"    ? (isLight ? "0.15" : "0.08") :
               "0.05"
             } />
             <stop offset="100%" stopColor={
@@ -670,9 +670,9 @@ export default function ProcessMap({
                 "1.5"
               }
               opacity={
-                effectiveState === "IMMEDIATE_RISK" ? 0.45 :
-                effectiveState === "SEVERE_DRIFT"   ? 0.30 :
-                0.15
+                effectiveState === "IMMEDIATE_RISK" ? (isLight ? 0.75 : 0.45) :
+                effectiveState === "SEVERE_DRIFT"   ? (isLight ? 0.55 : 0.30) :
+                (isLight ? 0.30 : 0.15)
               }
               className="transition-all duration-700"
               pointerEvents="none"
