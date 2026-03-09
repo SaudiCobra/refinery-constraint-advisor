@@ -934,7 +934,7 @@ export default function ProcessMap({
           
           {/* Gas recycle to H₂ system */}
           <line x1={ANCHORS.D1.x} y1={ANCHORS.D1.y - SIZES.D1.h/2 - 50} x2={ANCHORS.D1.x} y2={ANCHORS.D1.y - SIZES.D1.h/2 - 90} stroke="#4A90E2" strokeWidth="2" strokeDasharray="4,4" />
-          {interactive && <text x={ANCHORS.D1.x} y={ANCHORS.D1.y - SIZES.D1.h/2 - 98} fill="#888" fontSize="14" textAnchor="middle">H₂ System</text>}
+          {interactive && <text x={ANCHORS.D1.x} y={ANCHORS.D1.y - SIZES.D1.h/2 - 98} fill={subText} fontSize="14" textAnchor="middle">H₂ System</text>}
         </g>
 
 
