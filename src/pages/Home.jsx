@@ -49,7 +49,7 @@ import {
   computeHotSpotRisk,
   adjustEscalationForHotSpot,
 } from "@/components/refinery/bedLogic";
-import { useEffect, useCallback, useRef } from "react";
+
 
 const DEFAULTS = {
   varName: "NHT Reactor Inlet Temperature",
