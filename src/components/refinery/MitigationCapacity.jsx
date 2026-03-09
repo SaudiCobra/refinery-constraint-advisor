@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CheckCircleIcon, TriangleAlertIcon } from "./DashboardIcons";
+import { useTheme } from "@/components/refinery/ThemeContext";
 
 // Control margin percentage targets per state
 const MARGIN_TARGETS = {

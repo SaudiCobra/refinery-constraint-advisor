@@ -1,6 +1,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { CheckCircleIcon, TriangleAlertIcon } from "./DashboardIcons";
+import { useTheme } from "@/components/refinery/ThemeContext";
 
 export default function CoolingCapacityIndicator({ capacity }) {
   const config = {

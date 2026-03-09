@@ -1,6 +1,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { formatTime } from "./calcEngine";
+import { useTheme } from "@/components/refinery/ThemeContext";
 
 export default function ReasoningBlocks({ slope, nearest, constraints, equipment, sensorQuality, units, systemState, timeToNearest, isPreheatMode = false, preheatRIT = 200 }) {
   // ── Preheat override — replace all four blocks with warm-up context ──────
