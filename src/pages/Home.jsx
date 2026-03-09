@@ -66,6 +66,13 @@ const DEFAULTS = {
 export default function Home() {
   const [theme, setTheme] = useState("dark");
   const toggleTheme = () => setTheme(t => t === "dark" ? "light" : "dark");
+
+  // Sync root/body background with active theme so page layer never stays white
+  useEffect(() => {
+    const bg = theme === "dark" ? "#080d14" : "#f4f6f8";
+    document.documentElement.style.background = bg;
+    document.body.style.background = bg;
+  }, [theme]);
   const [displayMode, setDisplayMode] = useState("interactive");
   const [alarmsOnly, setAlarmsOnly] = useState(false);
   const [state, setState] = useState({ ...DEFAULTS });
