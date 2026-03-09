@@ -436,15 +436,15 @@ export default function ProcessMap({
             const stroke = getEquipmentStroke("exchanger");
             return (
               <>
-                <ellipse cx={-SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#1a1a1a" stroke={stroke.color} strokeWidth="2.5" className="transition-all duration-700" />
-                <rect x={-SIZES.E1.w/2} y={-SIZES.E1.h/2 + 8} width={SIZES.E1.w} height={SIZES.E1.h - 16} fill="#2a2a2a" stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
-                <ellipse cx={SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill="#2a2a2a" stroke={stroke.color} strokeWidth="2.5" className="transition-all duration-700" />
+                <ellipse cx={-SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill={equipFill2} stroke={stroke.color} strokeWidth="2.5" className="transition-all duration-700" />
+                <rect x={-SIZES.E1.w/2} y={-SIZES.E1.h/2 + 8} width={SIZES.E1.w} height={SIZES.E1.h - 16} fill={equipFill} stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+                <ellipse cx={SIZES.E1.w/2} cy="0" rx="10" ry={SIZES.E1.h/2 - 8} fill={equipFill} stroke={stroke.color} strokeWidth="2.5" className="transition-all duration-700" />
               </>
             );
           })()}
           
           {[-50, -35, -20, -5, 10, 25, 40, 55].map(yOffset => (
-            <line key={yOffset} x1={-SIZES.E1.w/2 + 12} y1={yOffset} x2={SIZES.E1.w/2 - 12} y2={yOffset} stroke="#444" strokeWidth="1.5" opacity="0.9" />
+            <line key={yOffset} x1={-SIZES.E1.w/2 + 12} y1={yOffset} x2={SIZES.E1.w/2 - 12} y2={yOffset} stroke={hatchLine} strokeWidth="1.5" opacity="0.9" />
           ))}
           
           <rect x={-SIZES.E1.w/2 + 12} y={-SIZES.E1.h/2 + 18} width={SIZES.E1.w - 24} height={SIZES.E1.h - 36} fill={tubeThermalColor} opacity="0.108" className="transition-all duration-500" />
