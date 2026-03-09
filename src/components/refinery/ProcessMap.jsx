@@ -269,7 +269,7 @@ export default function ProcessMap({
     if (!interactive && stateColors) {
       return { stroke: stateColors.pipes, strokeWidth: "4", opacity: 0.9 };
     }
-    return { stroke: "#555", strokeWidth: "4", opacity: 0.9 };
+    return { stroke: pipeStroke, strokeWidth: "4", opacity: 0.9 };
   };
 
   // ── CAUSE → EFFECT propagation highlight ────────────────────────────────────
