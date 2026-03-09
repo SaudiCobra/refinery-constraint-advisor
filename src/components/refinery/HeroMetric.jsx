@@ -33,6 +33,9 @@ export default function HeroMetric({
   preheatRIT = 200,
   preheatComplete = false,
 }) {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+
   // ── Preheat override — show warm-up status instead of TTL ────────────────
   if (isPreheatMode) {
     const pct = Math.min(100, Math.round(((preheatRIT - 200) / (335 - 200)) * 100));
@@ -98,7 +101,7 @@ export default function HeroMetric({
         </div>
       )}
 
-      <p className="text-[#666] text-xs tracking-wider mb-1 uppercase">
+      <p className={cn("text-xs tracking-wider mb-1 uppercase transition-colors duration-300", isLight ? "text-[#9ca3af]" : "text-[#666]")}>
         {stable ? "No operating limit projected" : "Time before nearest operating limit"}
       </p>
 
@@ -112,8 +115,8 @@ export default function HeroMetric({
 
       {hiTime && (
         <div className="mt-4 text-center space-y-1">
-          <p className="text-[#666] text-xs">If unchanged: High limit in {hiTime}</p>
-          <p className="text-[#555] text-xs">Hi-Hi escalation in {hihiTime}</p>
+          <p className={cn("text-xs transition-colors duration-300", isLight ? "text-[#6b7280]" : "text-[#666]")}>If unchanged: High limit in {hiTime}</p>
+          <p className={cn("text-xs transition-colors duration-300", isLight ? "text-[#9ca3af]" : "text-[#555]")}>Hi-Hi escalation in {hihiTime}</p>
         </div>
       )}
     </div>
