@@ -618,7 +618,7 @@ export default function ProcessMap({
                 })}
                 
                 {interactive && (
-                  <text x={-SIZES.R1.w/2 - 20} y={yStart + bedHeight / 2 + 4} fill="#666" fontSize="18" textAnchor="middle">B{bed.id}</text>
+                  <text x={-SIZES.R1.w/2 - 20} y={yStart + bedHeight / 2 + 4} fill={subText} fontSize="18" textAnchor="middle">B{bed.id}</text>
                 )}
                 
                 {idx < bedImbalance.beds.length - 1 && (
