@@ -886,15 +886,15 @@ export default function ProcessMap({
           {/* Naphtha outlet */}
           <line x1={SIZES.D1.w/2} y1={-SIZES.D1.h/2 + 52} x2={SIZES.D1.w/2 + 30} y2={-SIZES.D1.h/2 + 52} stroke="#D4A547" strokeWidth="2.5" />
           
-          <text x="0" y={SIZES.D1.h/2 + 28} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">D-1</text>
-          {interactive && <text x="85" y="55" fill="#888" fontSize="16" textAnchor="middle">Separator</text>}
+          <text x="0" y={SIZES.D1.h/2 + 28} fill={labelText} fontSize="22" textAnchor="middle" fontWeight="600">D-1</text>
+          {interactive && <text x="85" y="55" fill={subText} fontSize="16" textAnchor="middle">Separator</text>}
         </g>
 
         {/* H₂O Pot (below separator) */}
         <g transform={`translate(${ANCHORS.D1.x}, ${ANCHORS.D1.y + SIZES.D1.h/2 + 10})`}>
-          <ellipse cx="0" cy="0" rx="18" ry="5" fill="#1a1a1a" stroke="#555" strokeWidth="2.5" />
-          <rect x="-18" y="0" width="36" height="60" fill="#2a2a2a" stroke="#555" strokeWidth="2.5" />
-          <ellipse cx="0" cy="60" rx="18" ry="5" fill="#2a2a2a" stroke="#555" strokeWidth="2.5" />
+          <ellipse cx="0" cy="0" rx="18" ry="5" fill={equipFill2} stroke={pipeFill} strokeWidth="2.5" />
+          <rect x="-18" y="0" width="36" height="60" fill={equipFill} stroke={pipeFill} strokeWidth="2.5" />
+          <ellipse cx="0" cy="60" rx="18" ry="5" fill={equipFill} stroke={pipeFill} strokeWidth="2.5" />
           <line x1="0" y1="-5" x2="0" y2="0" stroke="#2F5D80" strokeWidth="2.5" />
           <rect x="-15" y="36" width="30" height="16" fill="#2F5D80" opacity="0.25" />
           <line x1="-12" y1="46" x2="12" y2="46" stroke="#2F5D80" strokeWidth="2" opacity="0.6" />
