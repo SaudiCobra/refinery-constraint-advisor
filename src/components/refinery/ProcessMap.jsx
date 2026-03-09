@@ -467,11 +467,11 @@ export default function ProcessMap({
         {/* TCV-01A: Tube Bypass (Upper Zone) — terminates at feed line second turn (x=974, beside RIT) */}
         <g opacity={valveStates.tcv01a === "OOS" ? 0.3 : 1}>
           {/* Riser from spine — starts BEFORE TCV-01B */}
-          <line x1={VALVES.TCV01B.x - 20} y1={Y_SPINE} x2={VALVES.TCV01B.x - 20} y2={Y_UPPER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={VALVES.TCV01B.x - 20} y1={Y_SPINE} x2={VALVES.TCV01B.x - 20} y2={Y_UPPER_ZONE} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {/* Horizontal run in upper zone — ends at x=974 (second turn of E-1 outlet feed line) */}
-          <line x1={VALVES.TCV01B.x - 20} y1={Y_UPPER_ZONE} x2={974} y2={Y_UPPER_ZONE} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={VALVES.TCV01B.x - 20} y1={Y_UPPER_ZONE} x2={974} y2={Y_UPPER_ZONE} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           {/* Drop to meet the E-1 outlet feed line at its second turn (y=536) */}
-          <line x1={974} y1={Y_UPPER_ZONE} x2={974} y2={536} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={974} y1={Y_UPPER_ZONE} x2={974} y2={536} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           <g transform={`translate(${VALVES.TCV01A.x}, ${VALVES.TCV01A.y})`} onClick={(e) => handleUnitClick(e, 'tcv01a')} className={cn(interactive && "cursor-pointer")}>
             <g transform="translate(-38,-43.32) scale(0.76)" fill="none" stroke={valveStates.tcv01a === "OPEN" ? "#2F5D80" : valveStates.tcv01a === "OOS" ? "#A13A1F" : "#555"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
