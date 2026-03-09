@@ -111,3 +111,43 @@
 .animate-hero-breathe {
   animation: hero-breathe 5s ease-in-out infinite;
 }
+
+/* ══════════════════════════════════════════════════
+   MANARAH THEME SYSTEM — CSS Custom Properties
+   ══════════════════════════════════════════════════ */
+
+/* Dark theme (default) */
+.theme-dark {
+  --t-bg-page:    #0b1220;
+  --t-bg-header:  #161616;
+  --t-bg-card:    #1a1a1a;
+  --t-bg-surface: #1e1e1e;
+  --t-bg-elevated:#222222;
+  --t-bg-input:   #141414;
+  --t-border:     #2a2a2a;
+  --t-border-sub: #333333;
+  --t-text-1:     #ffffff;
+  --t-text-2:     #aaaaaa;
+  --t-text-3:     #666666;
+  --t-text-4:     #444444;
+  --t-text-5:     #2e2e2e;
+  --t-divider:    rgba(255,255,255,0.04);
+}
+
+/* Light theme */
+.theme-light {
+  --t-bg-page:    #eef1f7;
+  --t-bg-header:  #ffffff;
+  --t-bg-card:    #ffffff;
+  --t-bg-surface: #f4f6fb;
+  --t-bg-elevated:#f0f3f9;
+  --t-bg-input:   #f8fafc;
+  --t-border:     #d1d8e8;
+  --t-border-sub: #e2e8f0;
+  --t-text-1:     #0f172a;
+  --t-text-2:     #374151;
+  --t-text-3:     #6b7280;
+  --t-text-4:     #9ca3af;
+  --t-text-5:     #c4cad6;
+  --t-divider:    rgba(0,0,0,0.06);
+}

@@ -1,52 +1,107 @@
 import React from "react";
-import { cn } from "@/lib/utils";
 import moment from "moment";
+import { Sun, Moon } from "lucide-react";
 
-export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, onAlarmsOnlyChange }) {
+export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, onAlarmsOnlyChange, theme = "dark", onThemeToggle }) {
+  const isLight = theme === "light";
+
   return (
-    <div className="bg-[#161616] border-b border-[#2a2a2a] px-6 py-4">
+    <div style={{
+      background: "var(--t-bg-header)",
+      borderBottom: "1px solid var(--t-border)",
+      padding: "16px 24px",
+      transition: "background-color 300ms ease, border-color 300ms ease",
+    }}>
       <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Left */}
         <div>
-          <h1 className="text-white text-xl font-bold tracking-normal">
+          <h1 style={{ color: "var(--t-text-1)", fontSize: "1.2rem", fontWeight: 700, letterSpacing: "normal", transition: "color 300ms ease" }}>
             Manarah
           </h1>
-          <p className="text-[#aaa] text-sm font-normal tracking-tight">
+          <p style={{ color: "var(--t-text-2)", fontSize: "0.875rem", fontWeight: 400, transition: "color 300ms ease" }}>
             Operating Limits Watchtower
           </p>
           {displayMode === "interactive" && (
             <div className="flex items-center gap-3 mt-2">
-              <span className="text-[#888] text-sm">Unit: NHT Preheat Section</span>
-              <span className="text-[#555]">|</span>
-              <span className="text-[#888] text-sm">Assessment as of: {moment().format("HH:mm")}</span>
+              <span style={{ color: "var(--t-text-3)", fontSize: "0.875rem", transition: "color 300ms ease" }}>Unit: NHT Preheat Section</span>
+              <span style={{ color: "var(--t-border-sub)", transition: "color 300ms ease" }}>|</span>
+              <span style={{ color: "var(--t-text-3)", fontSize: "0.875rem", transition: "color 300ms ease" }}>Assessment as of: {moment().format("HH:mm")}</span>
             </div>
           )}
         </div>
 
         {/* Right */}
         <div className="flex flex-col items-end gap-2">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <button
+              onClick={onThemeToggle}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "7px 13px",
+                borderRadius: 8,
+                border: "1px solid var(--t-border)",
+                background: "var(--t-bg-elevated)",
+                color: "var(--t-text-2)",
+                fontSize: "0.72rem",
+                fontWeight: 500,
+                cursor: "pointer",
+                letterSpacing: "0.06em",
+                transition: "all 300ms ease",
+              }}
+            >
+              {isLight ? <Moon size={13} /> : <Sun size={13} />}
+              <span>{isLight ? "DARK" : "LIGHT"}</span>
+            </button>
+
             {/* Display Mode Toggle */}
-            <div className="flex bg-[#222] rounded-lg border border-[#333] overflow-hidden">
+            <div style={{
+              display: "flex",
+              background: "var(--t-bg-elevated)",
+              borderRadius: 8,
+              border: "1px solid var(--t-border)",
+              overflow: "hidden",
+              transition: "background-color 300ms ease, border-color 300ms ease",
+            }}>
               <button
                 onClick={() => onModeChange("interactive")}
-                className={cn(
-                  "px-5 py-2 text-sm font-medium tracking-wide transition-all",
-                  displayMode === "interactive"
-                    ? "bg-white text-[#111]"
-                    : "text-[#777] hover:text-white"
-                )}
+                style={{
+                  padding: "8px 20px",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  letterSpacing: "0.08em",
+                  cursor: "pointer",
+                  border: "none",
+                  transition: "all 300ms ease",
+                  background: displayMode === "interactive"
+                    ? (isLight ? "#0f172a" : "#ffffff")
+                    : "transparent",
+                  color: displayMode === "interactive"
+                    ? (isLight ? "#ffffff" : "#111111")
+                    : "var(--t-text-3)",
+                }}
               >
                 INTERACTIVE
               </button>
               <button
                 onClick={() => onModeChange("presentation")}
-                className={cn(
-                  "px-5 py-2 text-sm font-medium tracking-wide transition-all",
-                  displayMode === "presentation"
-                    ? "bg-white text-[#111]"
-                    : "text-[#777] hover:text-white"
-                )}
+                style={{
+                  padding: "8px 20px",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  letterSpacing: "0.08em",
+                  cursor: "pointer",
+                  border: "none",
+                  transition: "all 300ms ease",
+                  background: displayMode === "presentation"
+                    ? (isLight ? "#0f172a" : "#ffffff")
+                    : "transparent",
+                  color: displayMode === "presentation"
+                    ? (isLight ? "#ffffff" : "#111111")
+                    : "var(--t-text-3)",
+                }}
               >
                 PRESENTATION
               </button>
@@ -56,21 +111,36 @@ export default function GlobalHeader({ displayMode, onModeChange, alarmsOnly, on
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <div
                 onClick={() => onAlarmsOnlyChange(!alarmsOnly)}
-                className={cn(
-                  "w-10 h-5 rounded-full border transition-all flex items-center px-0.5",
-                  alarmsOnly ? "bg-amber-600 border-amber-500" : "bg-[#333] border-[#555]"
-                )}
+                style={{
+                  width: 40,
+                  height: 20,
+                  borderRadius: 10,
+                  border: `1px solid ${alarmsOnly ? "#d97706" : "var(--t-border)"}`,
+                  background: alarmsOnly ? "#d97706" : "var(--t-bg-elevated)",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 2px",
+                  cursor: "pointer",
+                  transition: "all 300ms ease",
+                }}
               >
-                <div className={cn(
-                  "w-4 h-4 rounded-full bg-white transition-transform",
-                  alarmsOnly && "translate-x-5"
-                )} />
+                <div style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: "50%",
+                  background: "#ffffff",
+                  transform: alarmsOnly ? "translateX(20px)" : "translateX(0px)",
+                  transition: "transform 300ms ease",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+                }} />
               </div>
-              <span className="text-[#888] text-xs">DCS Alarm View</span>
+              <span style={{ color: "var(--t-text-3)", fontSize: "0.75rem", transition: "color 300ms ease" }}>DCS Alarm View</span>
             </label>
           </div>
 
-          <p className="text-[#555] text-xs italic">Advisory only — operator retains control.</p>
+          <p style={{ color: "var(--t-text-4)", fontSize: "0.7rem", fontStyle: "italic", transition: "color 300ms ease" }}>
+            Advisory only — operator retains control.
+          </p>
         </div>
       </div>
     </div>
