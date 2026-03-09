@@ -762,8 +762,8 @@ export default function ProcessMap({
             </g>
             {interactive && (
               <>
-                <text x="0" y="32" fill="#aaa" fontSize="16" textAnchor="middle" fontWeight="600">TCV-02B</text>
-                <text x="0" y="48" fill="#888" fontSize="14" textAnchor="middle">Shell Bypass</text>
+                <text x="0" y="32" fill={labelText} fontSize="16" textAnchor="middle" fontWeight="600">TCV-02B</text>
+                <text x="0" y="48" fill={subText} fontSize="14" textAnchor="middle">Shell Bypass</text>
               </>
             )}
           </g>
