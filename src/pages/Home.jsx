@@ -42,6 +42,7 @@ import {
   getLeverEffect,
   ACTION_PARAMS,
 } from "@/components/refinery/mitigationEngine";
+import { ThemeContext } from "@/components/refinery/ThemeContext";
 import {
   simulateBedTemperatures,
   computeBedImbalance,
