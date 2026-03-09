@@ -949,5 +949,6 @@ export default function Home() {
         )}
       </div>
     </div>
+    </ThemeContext.Provider>
   );
 }
