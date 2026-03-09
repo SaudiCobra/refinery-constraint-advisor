@@ -2,6 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { CheckCircleIcon, ActivityIcon } from "./DashboardIcons";
 import { formatTime } from "./calcEngine";
+import { useTheme } from "@/components/refinery/ThemeContext";
 
 export default function ExecutiveRibbon({ timeToNearest, equipment, sensorQuality, isPreheatMode = false }) {
   if (isPreheatMode) {

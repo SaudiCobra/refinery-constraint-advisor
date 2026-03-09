@@ -1,5 +1,6 @@
 import React from "react";
 import { CheckCircleIcon, TriangleAlertIcon } from "./DashboardIcons";
+import { useTheme } from "@/components/refinery/ThemeContext";
 
 /**
  * Derives H₂ Availability state from equipment status
