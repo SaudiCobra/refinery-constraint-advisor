@@ -51,6 +51,8 @@ export default function LeverContext({
 }) {
   const [expanded, setExpanded] = React.useState(false);
   const [hoveredAction, setHoveredAction] = React.useState(null);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   // Debounce clear so moving between buttons doesn't flash the preview off/on
   const clearTimerRef = React.useRef(null);
 
