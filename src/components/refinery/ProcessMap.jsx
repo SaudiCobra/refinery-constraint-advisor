@@ -450,13 +450,13 @@ export default function ProcessMap({
           <rect x={-SIZES.E1.w/2 + 12} y={-SIZES.E1.h/2 + 18} width={SIZES.E1.w - 24} height={SIZES.E1.h - 36} fill={tubeThermalColor} opacity="0.108" className="transition-all duration-500" />
           <rect x={-SIZES.E1.w/2 + 8} y={-SIZES.E1.h/2 + 14} width={SIZES.E1.w - 16} height={SIZES.E1.h - 28} fill={shellThermalColor} opacity="0.072" className="transition-all duration-500" />
           
-          <circle cx={-SIZES.E1.w/2} cy="0" r="5" fill="#333" stroke={tubeThermalColor} strokeWidth="2" />
-          <circle cx={SIZES.E1.w/2} cy="0" r="5" fill="#333" stroke={tubeThermalColor} strokeWidth="2" />
-          <circle cx={-SIZES.E1.w/2} cy={-SIZES.E1.h/2 + 18} r="5" fill="#333" stroke={shellThermalColor} strokeWidth="2" />
-          <circle cx={SIZES.E1.w/2} cy={SIZES.E1.h/2 - 18} r="5" fill="#333" stroke={shellThermalColor} strokeWidth="2" />
+          <circle cx={-SIZES.E1.w/2} cy="0" r="5" fill={equipFill} stroke={tubeThermalColor} strokeWidth="2" />
+          <circle cx={SIZES.E1.w/2} cy="0" r="5" fill={equipFill} stroke={tubeThermalColor} strokeWidth="2" />
+          <circle cx={-SIZES.E1.w/2} cy={-SIZES.E1.h/2 + 18} r="5" fill={equipFill} stroke={shellThermalColor} strokeWidth="2" />
+          <circle cx={SIZES.E1.w/2} cy={SIZES.E1.h/2 - 18} r="5" fill={equipFill} stroke={shellThermalColor} strokeWidth="2" />
           
-          <text x="0" y={SIZES.E1.h/2 + 28} fill="#aaa" fontSize="22" textAnchor="middle" fontWeight="600">E-1</text>
-          {interactive && <text x="0" y={SIZES.E1.h/2 + 46} fill="#888" fontSize="16" textAnchor="middle">Exchanger</text>}
+          <text x="0" y={SIZES.E1.h/2 + 28} fill={labelText} fontSize="22" textAnchor="middle" fontWeight="600">E-1</text>
+          {interactive && <text x="0" y={SIZES.E1.h/2 + 46} fill={subText} fontSize="16" textAnchor="middle">Exchanger</text>}
         </g>
 
 
@@ -544,9 +544,9 @@ export default function ProcessMap({
             const stroke = getEquipmentStroke("reactor");
             return (
               <>
-                <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#1a1a1a" stroke={stroke.color} strokeWidth="3" className="transition-all duration-700" />
-                <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill="#2a2a2a" stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
-                <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill="#2a2a2a" stroke={stroke.color} strokeWidth="3" className="transition-all duration-700" />
+                <ellipse cx="0" cy={-SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill={equipFill2} stroke={stroke.color} strokeWidth="3" className="transition-all duration-700" />
+                <rect x={-SIZES.R1.w/2} y={-SIZES.R1.h/2} width={SIZES.R1.w} height={SIZES.R1.h} fill={equipFill} stroke={stroke.color} strokeWidth={stroke.width} filter="url(#equipmentShadow)" className="transition-all duration-700" />
+                <ellipse cx="0" cy={SIZES.R1.h/2} rx={SIZES.R1.w/2} ry="10" fill={equipFill} stroke={stroke.color} strokeWidth="3" className="transition-all duration-700" />
               </>
             );
           })()}
