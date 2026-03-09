@@ -606,7 +606,7 @@ export default function Home() {
     if (demoRef.current) clearInterval(demoRef.current);
   }, []);
 
-  const bgDimming = escalationLevel >= 2 ? "bg-[#0b1220]" : escalationLevel >= 1 ? "bg-[#0b1324]" : "bg-[#0b1220]";
+  const bgDimming = ""; // replaced by CSS var theme
 
   const [manarahOpen, setManarahOpen] = useState(false);
 
