@@ -4,6 +4,8 @@ import { formatTime } from "./calcEngine";
 import { useTheme } from "@/components/refinery/ThemeContext";
 
 export default function ReasoningBlocks({ slope, nearest, constraints, equipment, sensorQuality, units, systemState, timeToNearest, isPreheatMode = false, preheatRIT = 200 }) {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   // ── Preheat override — replace all four blocks with warm-up context ──────
   if (isPreheatMode) {
     const pct = Math.min(100, Math.round(((preheatRIT - 200) / (335 - 200)) * 100));
@@ -105,21 +107,28 @@ export default function ReasoningBlocks({ slope, nearest, constraints, equipment
   );
 }
 
-function Block({ title, color, children }) {
-  const colors = {
+function Block({ title, color, children, isLight }) {
+  const darkBorders = {
     blue: "border-blue-800/50",
     amber: "border-amber-800/50",
     red: "border-red-800/50",
     green: "border-green-800/50",
   };
+  const lightBorders = {
+    blue: "border-blue-300/70",
+    amber: "border-amber-400/70",
+    red: "border-red-300/70",
+    green: "border-green-400/70",
+  };
+  const borderClass = isLight ? (lightBorders[color] || "border-[#d1d8e8]") : (darkBorders[color] || "border-[#333]");
   return (
-    <div className={cn("bg-[#1e1e1e] border rounded-lg p-4", colors[color] || "border-[#333]")}>
-      <h4 className="text-[#777] text-xs uppercase tracking-wider mb-2">{title}</h4>
+    <div className={cn("rounded-lg p-4 border transition-colors duration-300", isLight ? "bg-[#f4f6fb]" : "bg-[#1e1e1e]", borderClass)}>
+      <h4 className={cn("text-xs uppercase tracking-wider mb-2", isLight ? "text-[#9ca3af]" : "text-[#777]")}>{title}</h4>
       <div className="space-y-1">{children}</div>
     </div>
   );
 }
 
-function Line({ children }) {
-  return <p className="text-[#ccc] text-sm leading-snug">• {children}</p>;
+function Line({ children, isLight }) {
+  return <p className={cn("text-sm leading-snug", isLight ? "text-[#374151]" : "text-[#ccc]")}>• {children}</p>;
 }
