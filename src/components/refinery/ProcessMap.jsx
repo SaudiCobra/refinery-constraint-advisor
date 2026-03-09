@@ -1142,10 +1142,10 @@ export default function ProcessMap({
           const cy = ANCHORS.R1.y - 10 - 8 - 8 - 8 - 10 - 10 - 20 - 20 - 20 + 10 + 10;                            // 566
           return (
             <g transform={`translate(${cx}, ${cy})`}>
-              <rect x="-52" y="-20" width="104" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
-              <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">RIT</text>
-              <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tBed}°C</text>
-              <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 360 · HIHI 370°C</text>
+              <rect x="-52" y="-20" width="104" height={near ? 72 : 56} rx="5" fill={tagBg} stroke={tagBorder} strokeWidth="1.5" />
+              <text x="0" y="-5" fill={tagLabel} fontSize="13" textAnchor="middle" letterSpacing="0.04em">RIT</text>
+              <text x="0" y="13" fill={tagValue} fontSize="17" textAnchor="middle" fontWeight="600">{tBed}°C</text>
+              <text x="0" y="28" fill={tagSublabel} fontSize="11" textAnchor="middle">HI 360 · HIHI 370°C</text>
               {near && <text x="0" y="43" fill={gap <= 5 ? "#E14B3B" : gap <= 10 ? "#E06A2C" : "#D9A441"} fontSize="11" textAnchor="middle" fontWeight="600">{gap > 0 ? `${gap}°C to HIHI` : "AT HIHI"}</text>}
             </g>
           );
@@ -1164,10 +1164,10 @@ export default function ProcessMap({
           const cy = ANCHORS.R1.y + SIZES.R1.h/2 + 38 + 16 + 10 + 8 + 16 + 16 + 32; // 936 — shifted down 32px more
           return (
             <g transform={`translate(${cx}, ${cy})`}>
-              <rect x="-64" y="-20" width="128" height={near ? 72 : 56} rx="5" fill="#0D1117" stroke={tagColors.border} strokeWidth="1.5" />
-              <text x="0" y="-5" fill="#666" fontSize="13" textAnchor="middle" letterSpacing="0.04em">ROT</text>
-              <text x="0" y="13" fill={tagColors.text} fontSize="17" textAnchor="middle" fontWeight="600">{tOutlet}°C</text>
-              <text x="0" y="28" fill="#444" fontSize="11" textAnchor="middle">HI 370 · HIHI 380°C</text>
+              <rect x="-64" y="-20" width="128" height={near ? 72 : 56} rx="5" fill={tagBg} stroke={tagBorder} strokeWidth="1.5" />
+              <text x="0" y="-5" fill={tagLabel} fontSize="13" textAnchor="middle" letterSpacing="0.04em">ROT</text>
+              <text x="0" y="13" fill={tagValue} fontSize="17" textAnchor="middle" fontWeight="600">{tOutlet}°C</text>
+              <text x="0" y="28" fill={tagSublabel} fontSize="11" textAnchor="middle">HI 370 · HIHI 380°C</text>
               {near && <text x="0" y="43" fill={gap <= 5 ? "#E14B3B" : gap <= 10 ? "#E06A2C" : "#D9A441"} fontSize="11" textAnchor="middle" fontWeight="600">{gap > 0 ? `${gap}°C to HIHI` : "AT HIHI"}</text>}
             </g>
           );
