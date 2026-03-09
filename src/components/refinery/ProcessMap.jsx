@@ -750,7 +750,7 @@ export default function ProcessMap({
           )}
           
           {/* Vertical drop to bus B level */}
-          <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE - 20} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE + 85} stroke="#555" strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
+          <line x1={VALVES.TCV02B.x} y1={Y_LOWER_ZONE - 20} x2={VALVES.TCV02B.x} y2={Y_LOWER_ZONE + 85} stroke={pipeStroke} strokeWidth="3" strokeDasharray="6,6" opacity="0.9" />
           
           {/* Valve symbol */}
           <g transform={`translate(${VALVES.TCV02B.x + 31}, ${VALVES.TCV02B.y})`} onClick={(e) => handleUnitClick(e, 'tcv02b')} className={cn(interactive && "cursor-pointer")}>
