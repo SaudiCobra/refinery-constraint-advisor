@@ -16,6 +16,7 @@ export default function ExecutiveRibbon({ timeToNearest, equipment, sensorQualit
           value="N/A — Preheat mode"
           icon={<ActivityIcon className="w-4 h-4" />}
           valueClass="text-[#C8AA50]"
+          isLight={isLight}
         />
       </div>
     );
@@ -39,6 +40,7 @@ export default function ExecutiveRibbon({ timeToNearest, equipment, sensorQualit
           confidenceValue === "Reduced" && "text-amber-400",
           confidenceValue === "Low" && "text-red-400"
         )}
+        isLight={isLight}
       />
     </div>
   );
