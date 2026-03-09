@@ -898,7 +898,7 @@ export default function ProcessMap({
           <line x1="0" y1="-5" x2="0" y2="0" stroke="#2F5D80" strokeWidth="2.5" />
           <rect x="-15" y="36" width="30" height="16" fill="#2F5D80" opacity="0.25" />
           <line x1="-12" y1="46" x2="12" y2="46" stroke="#2F5D80" strokeWidth="2" opacity="0.6" />
-          {interactive && <text x="0" y="80" fill="#888" fontSize="14" textAnchor="middle">H₂O</text>}
+          {interactive && <text x="0" y="80" fill={subText} fontSize="14" textAnchor="middle">H₂O</text>}
         </g>
 
         {/* === SUPPORT SYSTEMS === */}
