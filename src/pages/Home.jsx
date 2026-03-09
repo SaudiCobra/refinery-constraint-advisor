@@ -704,8 +704,8 @@ export default function Home() {
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-    <div className={`theme-${theme} min-h-screen transition-colors duration-300`}
-      style={{ background: "var(--t-bg-page)", color: "var(--t-text-1)", transition: "background-color 300ms ease, color 300ms ease" }}>
+    <div className={`theme-${theme} min-h-screen`}
+      style={{ background: "var(--t-bg-page)", color: "var(--t-text-1)", transition: "background-color 250ms ease, color 250ms ease" }}>
       {!manarahOpen && (
         <ManarahButton systemState={systemState} onClick={() => setManarahOpen(true)} drawerOpen={false} docked={false} />
       )}
