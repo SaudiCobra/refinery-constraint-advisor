@@ -90,11 +90,11 @@ export default function LeverContext({
   const availableCount = levers.filter(l => l.available).length;
 
   return (
-    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-3">
+    <div className={cn("rounded-lg p-3 border transition-colors duration-300", isLight ? "bg-[#f4f6fb] border-[#d1d8e8]" : "bg-[#1a1a1a] border-[#2a2a2a]")}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ShieldIcon className="w-4 h-4 text-[#888]" />
-          <h4 className="text-[#888] text-xs font-semibold uppercase tracking-wider">
+          <ShieldIcon className={cn("w-4 h-4", isLight ? "text-[#6b7280]" : "text-[#888]")} />
+          <h4 className={cn("text-xs font-semibold uppercase tracking-wider", isLight ? "text-[#4b5563]" : "text-[#888]")}>
             Operational Flexibility
           </h4>
         </div>
@@ -117,8 +117,8 @@ export default function LeverContext({
               <span className="w-3 h-3 rounded-full border border-[#555] flex-shrink-0" />
             )}
             <span className={cn(
-              "text-xs",
-              lever.available ? "text-[#aaa]" : "text-[#666] line-through"
+              "text-xs transition-colors duration-300",
+              lever.available ? (isLight ? "text-[#374151]" : "text-[#aaa]") : (isLight ? "text-[#9ca3af] line-through" : "text-[#666] line-through")
             )}>
               {lever.label}
             </span>
@@ -127,10 +127,10 @@ export default function LeverContext({
       </div>
 
       {expanded && (
-        <div className="mt-3 pt-3 border-t border-[#2a2a2a] space-y-1.5">
+        <div className={cn("mt-3 pt-3 border-t space-y-1.5 transition-colors duration-300", isLight ? "border-[#d1d8e8]" : "border-[#2a2a2a]")}>
           {levers.map((lever, idx) => (
             lever.available && (
-              <p key={idx} className="text-[#777] text-xs">• {lever.description}</p>
+              <p key={idx} className={cn("text-xs", isLight ? "text-[#4b5563]" : "text-[#777]")}>• {lever.description}</p>
             )
           ))}
         </div>
@@ -138,17 +138,17 @@ export default function LeverContext({
 
       <button 
         onClick={() => setExpanded(!expanded)}
-        className="text-[#666] text-xs mt-2 hover:text-[#888] transition-colors"
+        className={cn("text-xs mt-2 transition-colors", isLight ? "text-[#6b7280] hover:text-[#374151]" : "text-[#666] hover:text-[#888]")}
       >
         {expanded ? "− Hide details" : "+ Show details"}
       </button>
 
       {/* Corrective action toggles — interactive mode only */}
       {onMitigate && (
-        <div className="mt-3 pt-3 border-t border-[#2a2a2a]">
+        <div className={cn("mt-3 pt-3 border-t transition-colors duration-300", isLight ? "border-[#d1d8e8]" : "border-[#2a2a2a]")}>
           <div className="flex items-center gap-2 mb-2">
-            <WrenchIcon className="w-3 h-3 text-[#666]" />
-            <p className="text-[#666] text-[10px] uppercase tracking-wider font-semibold">Corrective Actions</p>
+            <WrenchIcon className={cn("w-3 h-3", isLight ? "text-[#6b7280]" : "text-[#666]")} />
+            <p className={cn("text-[10px] uppercase tracking-wider font-semibold", isLight ? "text-[#6b7280]" : "text-[#666]")}>Corrective Actions</p>
           </div>
 
           {/* Wrapper: enter/leave on wrapper with debounce — buttons never fire leave */}
@@ -228,14 +228,14 @@ export default function LeverContext({
               {hoveredAction && ACTION_PREVIEWS[hoveredAction] && (() => {
                 const preview = ACTION_PREVIEWS[hoveredAction];
                 return (
-                  <div className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg p-3">
-                    <p className="text-[#555] text-[10px] uppercase tracking-wider font-semibold mb-1">Action Preview · {preview.title}</p>
+                  <div className={cn("rounded-lg p-3 border transition-colors duration-300", isLight ? "bg-[#f0f3f9] border-[#d1d8e8]" : "bg-[#0e0e0e] border-[#2a2a2a]")}>
+                    <p className={cn("text-[10px] uppercase tracking-wider font-semibold mb-1", isLight ? "text-[#9ca3af]" : "text-[#555]")}>Action Preview · {preview.title}</p>
                     {preview.effects.map((e, i) => (
-                      <p key={i} className="text-[#888] text-xs">• {e}</p>
+                      <p key={i} className={cn("text-xs", isLight ? "text-[#4b5563]" : "text-[#888]")}>• {e}</p>
                     ))}
-                    <div className="mt-1.5 pt-1.5 border-t border-[#1e1e1e]">
+                    <div className={cn("mt-1.5 pt-1.5 border-t", isLight ? "border-[#d1d8e8]" : "border-[#1e1e1e]")}>
                       <p className="text-[#3FC9B0] text-xs">{preview.projection(coolingCapacity)}</p>
-                      <p className="text-[#555] text-[10px] mt-0.5">{preview.stateShift(coolingCapacity)}</p>
+                      <p className={cn("text-[10px] mt-0.5", isLight ? "text-[#9ca3af]" : "text-[#555]")}>{preview.stateShift(coolingCapacity)}</p>
                     </div>
                   </div>
                 );
