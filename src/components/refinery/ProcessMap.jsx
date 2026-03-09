@@ -924,7 +924,7 @@ export default function ProcessMap({
             <text 
               x={ANCHORS.R1.x + SIZES.R1.w/2 + 40} 
               y={ANCHORS.R1.y - SIZES.R1.h/2 - 33} 
-              fill="#888" 
+              fill={subText} 
               fontSize="14" 
               textAnchor="middle"
             >
