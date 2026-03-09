@@ -882,7 +882,7 @@ export default function ProcessMap({
           
           {/* Gas outlet — Vertical only */}
           <line x1="0" y1={-SIZES.D1.h/2 + 4} x2="0" y2={-SIZES.D1.h/2 - 50} stroke="#888" strokeWidth="2.5" />
-          {interactive && <text x="0" y={-SIZES.D1.h/2 - 58} fill="#888" fontSize="16" textAnchor="middle">Gas</text>}
+          {interactive && <text x="0" y={-SIZES.D1.h/2 - 58} fill={subText} fontSize="16" textAnchor="middle">Gas</text>}
           
           {/* Naphtha outlet */}
           <line x1={SIZES.D1.w/2} y1={-SIZES.D1.h/2 + 52} x2={SIZES.D1.w/2 + 30} y2={-SIZES.D1.h/2 + 52} stroke="#D4A547" strokeWidth="2.5" />
