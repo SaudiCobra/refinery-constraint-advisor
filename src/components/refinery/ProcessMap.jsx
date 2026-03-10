@@ -417,9 +417,9 @@ export default function ProcessMap({
           </linearGradient>
           <linearGradient id="waterFlowGrad" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%"   stopColor="#4a9fd4" stopOpacity="0" />
-            <stop offset="25%"  stopColor="#4a9fd4" stopOpacity="0.26" />
+            <stop offset="25%"  stopColor="#4a9fd4" stopOpacity={isLight ? 0.60 : 0.26} />
             <stop offset="50%"  stopColor="#4a9fd4" stopOpacity="0" />
-            <stop offset="75%"  stopColor="#4a9fd4" stopOpacity="0.22" />
+            <stop offset="75%"  stopColor="#4a9fd4" stopOpacity={isLight ? 0.46 : 0.22} />
             <stop offset="100%" stopColor="#4a9fd4" stopOpacity="0" />
           </linearGradient>
         </defs>
