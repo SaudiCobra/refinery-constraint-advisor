@@ -1176,25 +1176,6 @@ export default function ProcessMap({
               opacity="0.08"
             />
 
-            {/* IMPACT — ROT indicator node highlight */}
-            {(() => {
-              const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 64;
-              const cy = ANCHORS.R1.y + SIZES.R1.h/2 + 38 + 16 + 10 + 8 + 16 + 16 + 32;
-              return (
-                <rect
-                  className="pfd-impact"
-                  x={cx - 64 - 6}
-                  y={cy - 20 - 6}
-                  width={128 + 12}
-                  height={56 + 12}
-                  rx="8"
-                  fill="none"
-                  stroke={pulseColor}
-                  strokeWidth="4"
-                  opacity="0.08"
-                />
-              );
-            })()}
           </g>
         )}
 
