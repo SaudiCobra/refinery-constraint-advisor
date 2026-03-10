@@ -339,8 +339,8 @@ export default function ProcessMap({
 
   return (
     <div
-      className="rounded-lg p-6 relative border transition-colors duration-300"
-      style={{ background: pfdBg, borderColor: pfdBorder }}
+      className="rounded-lg p-6 relative border"
+      style={{ background: pfdBg, borderColor: pfdBorder, transition: "background 700ms ease, border-color 700ms ease" }}
     >
       <ConstraintPropagationInsight systemState={effectiveState} isPreheatMode={!!preheatOverride} />
       {(isPropagating || isReactorOutletPropagating) && (
