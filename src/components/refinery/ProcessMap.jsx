@@ -336,6 +336,8 @@ export default function ProcessMap({
   const detailHeading = isLight ? "#1a2540" : "#aaa";
   const detailText = isLight ? "#2d3a52" : "#ccc";
   const hatchLine  = isLight ? "#7a8899" : "#444";
+  // Smooth CSS transition string reused across SVG elements
+  const themeTransition = "fill 600ms ease, stroke 600ms ease, opacity 400ms ease";
 
   return (
     <div
