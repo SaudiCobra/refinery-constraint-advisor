@@ -1338,8 +1338,8 @@ export default function ProcessMap({
       {/* Interactive detail panel */}
       {interactive && selectedUnit && (
         <div
-          className="absolute top-4 right-4 rounded-lg p-4 max-w-[280px] shadow-xl border-2 transition-colors duration-300"
-          style={{ background: detailPanelBg, borderColor: detailPanelBorder }}
+          className="absolute top-4 right-4 rounded-lg p-4 max-w-[280px] shadow-xl border-2"
+          style={{ background: detailPanelBg, borderColor: detailPanelBorder, transition: "background 600ms ease, border-color 600ms ease" }}
         >
           <button onClick={() => setSelectedUnit(null)} style={{ color: detailText }} className="absolute top-2 right-2 text-sm font-bold w-6 h-6 flex items-center justify-center hover:opacity-70">✕</button>
           
