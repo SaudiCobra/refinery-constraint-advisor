@@ -1239,6 +1239,9 @@ export default function ProcessMap({
           return (
             <g transform={`translate(${cx}, ${cy})`}>
               <rect x="-64" y="-20" width="128" height={near ? 72 : 56} rx="5" fill={tagBg} stroke={tagBorder} strokeWidth="1.5" />
+              {isReactorOutletPropagating && (
+                <rect x="-64" y="-20" width="128" height={near ? 72 : 56} rx="5" fill="none" stroke={pulseColor} strokeWidth="3" className="pfd-impact" />
+              )}
               <text x="0" y="-5" fill={tagLabel} fontSize="13" textAnchor="middle" letterSpacing="0.04em">ROT</text>
               <text x="0" y="13" fill={tagValue} fontSize="17" textAnchor="middle" fontWeight="600">{tOutlet}°C</text>
               <text x="0" y="28" fill={tagSublabel} fontSize="11" textAnchor="middle">HI 370 · HIHI 380°C</text>
