@@ -407,11 +407,11 @@ export default function ProcessMap({
             />
           </clipPath>
           <linearGradient id="naphthaFlowGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stopColor="#d0d0d0" stopOpacity="0" />
-            <stop offset="25%"  stopColor="#d0d0d0" stopOpacity="0.17" />
-            <stop offset="50%"  stopColor="#d0d0d0" stopOpacity="0" />
-            <stop offset="75%"  stopColor="#d0d0d0" stopOpacity="0.13" />
-            <stop offset="100%" stopColor="#d0d0d0" stopOpacity="0" />
+            <stop offset="0%"   stopColor={isLight ? "#3a4a6a" : "#d0d0d0"} stopOpacity="0" />
+            <stop offset="25%"  stopColor={isLight ? "#3a4a6a" : "#d0d0d0"} stopOpacity={isLight ? 0.38 : 0.17} />
+            <stop offset="50%"  stopColor={isLight ? "#3a4a6a" : "#d0d0d0"} stopOpacity="0" />
+            <stop offset="75%"  stopColor={isLight ? "#3a4a6a" : "#d0d0d0"} stopOpacity={isLight ? 0.28 : 0.13} />
+            <stop offset="100%" stopColor={isLight ? "#3a4a6a" : "#d0d0d0"} stopOpacity="0" />
           </linearGradient>
           <linearGradient id="waterFlowGrad" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%"   stopColor="#4a9fd4" stopOpacity="0" />
