@@ -1180,6 +1180,18 @@ export default function ProcessMap({
               opacity="0.08"
             />
 
+            {/* IMPACT — Line above TCV-02A (split point → valve) */}
+            <line
+              className="pfd-impact"
+              x1={ANCHORS.R1.x}
+              y1={Y_LOWER_ZONE - 20}
+              x2={VALVES.TCV02A.x}
+              y2={Y_LOWER_ZONE - 20}
+              stroke={pulseColor}
+              strokeWidth="7"
+              opacity="0.08"
+            />
+
             {/* IMPACT — ROT indicator node highlight */}
             {(() => {
               const cx = ANCHORS.R1.x - SIZES.R1.w/2 - 18 - 64;
