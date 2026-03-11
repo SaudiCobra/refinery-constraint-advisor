@@ -688,7 +688,7 @@ export default function ProcessMap({
                     {/* Quench Control Valve — centered on the pipe dot, left of Q label */}
                     {interactive && (
                       <g transform={`translate(${SIZES.R1.w/2 + 20}, ${yStart + bedHeight + 3})`}>
-                        <g transform="translate(-50,-57) scale(0.55)" fill="none" stroke={equipment.h2Compressor ? "#4A90E2" : "#888"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
+                        <g transform="translate(-27.5,-31.35) scale(0.55)" fill="none" stroke={equipment.h2Compressor ? "#4A90E2" : "#888"} strokeWidth="4" strokeLinejoin="round" strokeMiterlimit="10">
                           <path d="M50 32 V56"/>
                           <path d="M37.648 31.852 C40.395 26.16 45.029 22.728 50 22.728 C54.971 22.728 59.605 26.16 62.352 31.852 Z"/>
                           <path d="M25 42 L50 57 L25 72 Z"/>
