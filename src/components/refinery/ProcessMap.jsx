@@ -1306,17 +1306,17 @@ export default function ProcessMap({
           </g>
         )}
 
-        {/* Disclaimer footer — bottom center */}
+        {/* Disclaimer footer — bottom-left corner */}
         <text 
-          x="1400" 
+          x="20" 
           y="1080" 
           fill={isLight ? "#888888" : "#666666"} 
           fontSize="13" 
-          textAnchor="middle" 
+          textAnchor="start" 
           fontStyle="italic"
           opacity="0.7"
         >
-          Conceptual Process Flow Diagram - Demonstration Purposes Only; Not Representative Of Refinery Operations.
+          Conceptual Process Flow Diagram - Demonstration Purposes Only; Not Representative Of Actual Refinery Operations.
         </text>
       </svg>
 
