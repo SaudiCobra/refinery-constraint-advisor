@@ -1309,9 +1309,9 @@ export default function ProcessMap({
         {/* Disclaimer footer — bottom-left corner */}
         <text 
           x="20" 
-          y="1110" 
+          y="1170" 
           fill={isLight ? "#888888" : "#666666"} 
-          fontSize="13" 
+          fontSize="16" 
           textAnchor="start" 
           fontStyle="italic"
           opacity="0.7"
