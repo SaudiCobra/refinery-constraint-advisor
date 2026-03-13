@@ -1305,6 +1305,19 @@ export default function ProcessMap({
             />
           </g>
         )}
+
+        {/* Disclaimer footer — bottom center */}
+        <text 
+          x="1400" 
+          y="1080" 
+          fill={isLight ? "#888888" : "#666666"} 
+          fontSize="13" 
+          textAnchor="middle" 
+          fontStyle="italic"
+          opacity="0.7"
+        >
+          Conceptual Process Flow Diagram - Demonstration Purposes Only; Not Representative Of Refinery Operations.
+        </text>
       </svg>
 
       {/* Interactive detail panel */}
