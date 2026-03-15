@@ -367,17 +367,18 @@ export default function Home() {
   }, [autoCycling, displayMode]);
 
   // Four-stage escalation sequence logic
-  // Timing: Stable→Early: 4500ms pause, Early→Severe: 3000ms, Severe→Immediate: 5000ms, Immediate→loop: 6000ms
-  const SEQUENCE_STAGE_DURATIONS = [4500, 3000, 5000, 6000]; // All stages auto-advance
+  // Timing: Stable→Early: 4500ms pause, Early→Severe: 5000ms pause, Severe: manual only
+  const SEQUENCE_STAGE_DURATIONS = [4500, 3000, 5000, null]; // null = hold indefinitely
 
   useEffect(() => {
     const currentScenario = SCENARIOS[presScenario];
     if (displayMode === "presentation" && currentScenario?.isSequence && !autoCycling && !demonstrationActive) {
       const duration = SEQUENCE_STAGE_DURATIONS[sequenceStage];
+      if (duration === null) return; // Severe — manual advance only
       sequenceRef.current = setTimeout(() => {
         setSequenceStage(prev => {
           const nextStage = prev + 1;
-          if (nextStage >= currentScenario.stages.length) return 0; // Loop back to start
+          if (nextStage >= currentScenario.stages.length) return 0;
           return nextStage;
         });
       }, duration);
