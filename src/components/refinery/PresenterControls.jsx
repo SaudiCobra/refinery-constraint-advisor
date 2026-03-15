@@ -4,13 +4,14 @@ import { SCENARIOS } from "./calcEngine";
 // Brief descriptors keyed by scenario name substring
 const SCENARIO_DESCRIPTORS = {
   "Stable Baseline":              "All equipment available — no constraint pressure",
-  "Predictive Drift":             "Temperature accelerating — intervention window open",
-  "Dominant Driver":              "H₂ compressor offline — cooling response strained",
+  "Heat Transfer Degradation":    "Preheat exchanger efficiency declining — heat recovery margin narrowing",
+  "Hydrogen Quench Imbalance":    "Quench distribution uneven — reactor temperature moderation drifting",
+  "Cooling Constraint":           "Cooling duty reduced — downstream temperature stabilization limited",
+  "Four-Level Escalation":        "Progressive constraint escalation across four severity levels",
   "Hydrogen Availability":        "Hydrogen availability decreasing — quench moderation margin narrowing",
   "Multi-Constraint":             "Stacked constraints — mitigation headroom reduced",
   "False Escalation":             "Sensor conflict — differentiate noise from true drift",
   "True Escalation":              "All sensors aligned — confirmed escalation trajectory",
-  "Four-Level Escalation":        "Full escalation sequence across all four severity bands",
   "Signal Conflict":              "Signal misalignment — no confirmed operational consequence",
   "Escalation Window Compression":"Rapid TTL compression — intervention window narrowing",
 };
