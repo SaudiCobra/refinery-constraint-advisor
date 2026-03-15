@@ -260,9 +260,9 @@ export const DEMO_SCENARIOS = {
 };
 
 // Presentation Mode Scenarios
-// Primary Demonstration Scenarios first (1-5), then remaining scenarios (6-9), then Advanced section
+// Primary (executive narrative) scenarios first, advanced/engineering scenarios flagged with advanced: true
 export const SCENARIOS = [
-  // ── Primary Demonstration Scenarios ─────────────────────────────────────────
+  // ── Primary Presentation Scenarios ──────────────────────────────────────────
   {
     name: "1. Stable Baseline",
     samples: [348.0, 348.0, 348.0, 348.0, 348.0],
@@ -274,17 +274,27 @@ export const SCENARIOS = [
     businessImpact: { marginLoss: null, throughputReduction: null },
   },
   {
-    name: "2. Heat Transfer Degradation",
+    name: "2. Predictive Drift Detection",
     samples: [354.0, 355.0, 356.0, 357.0, 358.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: false, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
     feedFlow: 88000,
     sensorQuality: "good",
     opMode: "steady",
-    businessImpact: { marginLoss: "$18,000", throughputReduction: "0.7%" },
+    businessImpact: { marginLoss: "$8,000", throughputReduction: "0.3%" },
   },
   {
-    name: "3. Hydrogen Quench Imbalance",
+    name: "3. Dominant Driver Isolation",
+    samples: [354.0, 355.0, 356.0, 357.0, 358.0],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
+    feedFlow: 88000,
+    sensorQuality: "good",
+    opMode: "steady",
+    businessImpact: { marginLoss: "$28,000", throughputReduction: "1.1%" },
+  },
+  {
+    name: "4. Hydrogen Availability Decreasing",
     samples: [352, 354, 356, 358, 360],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
     equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
@@ -294,17 +304,40 @@ export const SCENARIOS = [
     businessImpact: { marginLoss: "$35,000", throughputReduction: "1.4%" },
   },
   {
-    name: "4. Cooling Constraint",
-    samples: [358, 360, 362, 364, 366],
+    name: "5. Multi-Constraint Interaction",
+    samples: [354.0, 355.0, 356.0, 357.0, 358.0],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: true },
-    feedFlow: 90000,
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
+    feedFlow: 87000,
     sensorQuality: "good",
-    opMode: "transient",
-    businessImpact: { marginLoss: "$62,000", throughputReduction: "2.5%" },
+    opMode: "steady",
+    businessImpact: { marginLoss: "$75,000", throughputReduction: "2.8%" },
   },
   {
-    name: "5. Four-Level Escalation Sequence",
+    name: "6. False Escalation (Sensor Conflict)",
+    samples: [355, 358, 362, 359, 361],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 84000,
+    sensorQuality: "suspect",
+    opMode: "transient",
+    businessImpact: { marginLoss: "$12,000", throughputReduction: "0.4%" },
+  },
+  {
+    name: "7. True Escalation (Aligned Signals)",
+    samples: [365, 367, 369, 371, 373],
+    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
+    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
+    feedFlow: 94000,
+    sensorQuality: "good",
+    opMode: "transient",
+    businessImpact: { marginLoss: "$165,000", throughputReduction: "5.8%" },
+  },
+
+  // ── Advanced / Engineering Scenarios ────────────────────────────────────────
+  {
+    name: "A1. Four-Level Escalation Sequence",
+    advanced: true,
     businessImpact: { marginLoss: "$110,000", throughputReduction: "3.8%" },
     samples: [348, 350, 352, 354, 356],
     limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
@@ -320,52 +353,8 @@ export const SCENARIOS = [
       { samples: [372, 374, 376, 378, 380], equipment: { preheatExchanger: true, effluentCooler: false, bypassValve: true, h2Compressor: false } },
     ]
   },
-
-  // ── Remaining Scenarios ─────────────────────────────────────────────────────
   {
-    name: "6. Hydrogen Availability Decreasing",
-    samples: [352, 354, 356, 358, 360],
-    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
-    feedFlow: 86000,
-    sensorQuality: "good",
-    opMode: "steady",
-    businessImpact: { marginLoss: "$35,000", throughputReduction: "1.4%" },
-  },
-  {
-    name: "7. Multi-Constraint Interaction",
-    samples: [354.0, 355.0, 356.0, 357.0, 358.0],
-    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: false },
-    feedFlow: 87000,
-    sensorQuality: "good",
-    opMode: "steady",
-    businessImpact: { marginLoss: "$75,000", throughputReduction: "2.8%" },
-  },
-  {
-    name: "8. False Escalation (Sensor Conflict)",
-    samples: [355, 358, 362, 359, 361],
-    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 84000,
-    sensorQuality: "suspect",
-    opMode: "transient",
-    businessImpact: { marginLoss: "$12,000", throughputReduction: "0.4%" },
-  },
-  {
-    name: "9. True Escalation (Aligned Signals)",
-    samples: [365, 367, 369, 371, 373],
-    limits: { hi: 370, hihi: 380, spec: "", trip: 390, rampRate: "" },
-    equipment: { preheatExchanger: true, effluentCooler: true, bypassValve: true, h2Compressor: true },
-    feedFlow: 94000,
-    sensorQuality: "good",
-    opMode: "transient",
-    businessImpact: { marginLoss: "$165,000", throughputReduction: "5.8%" },
-  },
-
-  // ── Advanced / Engineering Scenarios ────────────────────────────────────────
-  {
-    name: "Signal Conflict",
+    name: "A2. Signal Conflict",
     advanced: true,
     businessImpact: { marginLoss: "$14,000", throughputReduction: "0.5%" },
     isSequence: true,
@@ -377,7 +366,7 @@ export const SCENARIOS = [
     ]
   },
   {
-    name: "Escalation Window Compression",
+    name: "A3. Escalation Window Compression",
     advanced: true,
     businessImpact: { marginLoss: "$185,000", throughputReduction: "6.2%" },
     isSequence: true,
