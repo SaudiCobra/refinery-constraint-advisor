@@ -1,47 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import GlobalHeader from "@/components/refinery/GlobalHeader";
 import AlarmBanner from "@/components/refinery/AlarmBanner";
-import HeroMetric from "@/components/refinery/HeroMetric";
-import QuickScenarioSelector from "@/components/refinery/QuickScenarioSelector";
-import InputPanel from "@/components/refinery/InputPanel";
-import ReasoningBlocks from "@/components/refinery/ReasoningBlocks";
-import AcknowledgeSystem from "@/components/refinery/AcknowledgeSystem";
-import ExecutiveRibbon from "@/components/refinery/ExecutiveRibbon";
 import AlarmsOnlyView from "@/components/refinery/AlarmsOnlyView";
-import ScenarioSelector from "@/components/refinery/ScenarioSelector";
-import PresentationHero from "@/components/refinery/PresentationHero";
-import ScenarioAnnouncer from "@/components/refinery/ScenarioAnnouncer";
-import PresenterControls from "@/components/refinery/PresenterControls";
-import DecisionWindowBar from "@/components/refinery/DecisionWindowBar";
-import LeverContext from "@/components/refinery/LeverContext";
-import ProcessMap from "@/components/refinery/ProcessMap";
-import OpsCapacityPanel from "@/components/refinery/OpsCapacityPanel";
+import InteractiveModeView from "@/components/refinery/InteractiveModeView";
+import PresentationModeView from "@/components/refinery/PresentationModeView";
 import ManarahButton from "@/components/refinery/ManarahButton";
 import ManarahPanel from "@/components/refinery/ManarahPanel";
-import {
-  computeRateOfRise,
-  computeAllConstraints,
-  getNearestConstraint,
-  getSystemState,
-  getEscalationLevel,
-  getAlarmState,
-  getRecommendation,
-  formatTime,
-  computeCoolingCapacity,
-  adjustTimeToConstraint,
-  normalizeLimits,
-  SCENARIOS,
-  DEMONSTRATION_STAGES,
-  HOT_SPOT_SCENARIO,
-  DEMO_SCENARIOS,
-} from "@/components/refinery/calcEngine";
-import {
-  computeMitigatedRoR,
-  computeMitigatedTimeToLimit,
-  clampTimeToBaseline,
-  getLeverEffect,
-  ACTION_PARAMS,
-} from "@/components/refinery/mitigationEngine";
 import { ThemeContext } from "@/components/refinery/ThemeContext";
 import {
   simulateBedTemperatures,
@@ -769,203 +733,62 @@ export default function Home() {
 
         {/* INTERACTIVE MODE */}
         {!alarmsOnly && displayMode === "interactive" && (
-          <>
-            {/* Preheat mode status banner */}
-            {(isPreheatRunning || isPreheatDone) && (
-              <div style={{
-              textAlign: "center",
-              padding: "8px 0 4px",
-              fontSize: "0.82rem",
-              fontWeight: 500,
-              letterSpacing: "0.06em",
-              color: isPreheatDone ? "#4FB8B0" : "#C8AA50",
-              opacity: theme === "light" ? 1 : 0.88,
-              transition: "color 600ms ease",
-              }}>
-                {isPreheatDone
-                  ? "Preheat Complete — Normal Operation"
-                  : `Reactor Preheat Mode Active  ·  RIT ${Math.round(preheatTemps.rit)}°C`}
-              </div>
-            )}
-
-            <QuickScenarioSelector
-              activeScenario={derivedSystemState}
-              onSelect={handleSelectScenario}
-            />
-            
-            <HeroMetric
-              timeToNearest={displayTTL}
-              escalationLevel={escalationLevel}
-              slope={displaySlope}
-              uiState={systemState}
-              demoTimeMin={displayTTL}
-              demoState={demoState}
-              isPreheatMode={isPreheatRunning}
-              preheatRIT={preheatTemps.rit}
-              preheatComplete={isPreheatDone}
-            />
-            
-            <div className="max-w-3xl mx-auto space-y-3">
-              <DecisionWindowBar 
-                timeToNearest={displayTTL}
-                escalationLevel={escalationLevel}
-                coolingCapacity={coolingCapacity}
-                equipment={activeData.equipment}
-                hotSpotRisk={hotSpotRisk}
-                slope={displaySlope}
-                currentTemp={currentValue}
-                demoTimeMin={displayTTL}
-                demoState={demoState}
-                isPreheatMode={isPreheatRunning}
-              />
-              
-              <LeverContext 
-                equipment={activeData.equipment}
-                coolingCapacity={coolingCapacity}
-                escalationLevel={escalationLevel}
-                onMitigate={handleMitigate}
-                mitigationMsg={mitigationMsg}
-                feedReductionActive={feedReductionActive}
-                quenchBoostActive={quenchBoostActive}
-                coolingBoostActive={coolingBoostActive}
-                rampProgress={rampProgress}
-                minutesRecovered={minutesRecovered}
-              />
-              
-              <div className="text-center pt-2 border-t transition-colors duration-300" style={{ borderColor: "var(--t-border)" }}>
-                <p className="text-xs transition-colors duration-300" style={{ color: "var(--t-text-4)" }}>
-                  Advisory system — no control actions executed. Operator retains full control at all times.
-                </p>
-              </div>
-            </div>
-
-            <div className="max-w-3xl mx-auto">
-              <OpsCapacityPanel
-                systemState={systemState}
-                coolingCapacity={coolingCapacity}
-                equipment={activeData.equipment}
-                slope={displaySlope}
-                isPreheatMode={isPreheatRunning}
-              />
-            </div>
-
-            <ProcessMap
-              escalationLevel={escalationLevel}
-              slope={displaySlope}
-              currentTemp={currentValue}
-              feedFlow={activeData.feedFlow}
-              equipment={activeData.equipment}
-              preheatActive={preheatActive}
-              preheatStatus={preheatStatus}
-              coolingCapacity={coolingCapacity}
-              nearest={nearest}
-              timeToNearest={displayTTL}
-              sensorQuality={activeData.sensorQuality}
-              opMode={activeData.opMode}
-              bedImbalance={bedImbalance}
-              hotSpotRisk={hotSpotRisk}
-              interactive={true}
-              units={activeData.units}
-              systemState={systemState}
-              preheatOverride={isPreheatRunning ? preheatTemps : null}
-            />
-
-            <InputPanel
-              state={state}
-              onChange={setState}
-              onRunDemo={handleRunDemo}
-              preheatActive={preheatActive}
-              onPreheatToggle={setPreheatActive}
-            />
-
-            <ReasoningBlocks
-              slope={displaySlope}
-              nearest={nearest}
-              constraints={constraints}
-              equipment={activeData.equipment}
-              sensorQuality={activeData.sensorQuality}
-              units={activeData.units}
-              systemState={systemState}
-              timeToNearest={displayTTL}
-              isPreheatMode={isPreheatRunning}
-              preheatRIT={preheatTemps.rit}
-            />
-
-            <div className="max-w-3xl mx-auto space-y-0">
-              <ExecutiveRibbon
-                timeToNearest={displayTTL}
-                equipment={activeData.equipment}
-                sensorQuality={activeData.sensorQuality}
-                isPreheatMode={isPreheatRunning}
-              />
-              <AcknowledgeSystem />
-            </div>
-          </>
+          <InteractiveModeView
+            isPreheatRunning={isPreheatRunning}
+            isPreheatDone={isPreheatDone}
+            preheatTemps={preheatTemps}
+            theme={theme}
+            derivedSystemState={derivedSystemState}
+            handleSelectScenario={handleSelectScenario}
+            displayTTL={displayTTL}
+            escalationLevel={escalationLevel}
+            displaySlope={displaySlope}
+            systemState={systemState}
+            demoState={demoState}
+            currentValue={currentValue}
+            activeData={activeData}
+            coolingCapacity={coolingCapacity}
+            hotSpotRisk={hotSpotRisk}
+            nearest={nearest}
+            constraints={constraints}
+            bedImbalance={bedImbalance}
+            preheatActive={preheatActive}
+            preheatStatus={preheatStatus}
+            activePreheatMode={activePreheatMode}
+            handleMitigate={handleMitigate}
+            mitigationMsg={mitigationMsg}
+            feedReductionActive={feedReductionActive}
+            quenchBoostActive={quenchBoostActive}
+            coolingBoostActive={coolingBoostActive}
+            rampProgress={rampProgress}
+            minutesRecovered={minutesRecovered}
+            state={state}
+            setState={setState}
+            handleRunDemo={handleRunDemo}
+            setPreheatActive={setPreheatActive}
+          />
         )}
 
         {/* PRESENTATION MODE */}
         {!alarmsOnly && displayMode === "presentation" && (
-          <>
-            <ScenarioAnnouncer label={SCENARIOS[presScenario]?.name?.replace(/^\d+\.\s*/, "")} />
-            {/* Status block — isolated, 40px vertical breathing room */}
-            <div style={{ paddingTop: 40, paddingBottom: 40 }}>
-              <PresentationHero
-                timeToNearest={displayTTL}
-                nearestName={nearest?.name}
-                escalationLevel={escalationLevel}
-                slope={displaySlope}
-                equipment={activeData.equipment}
-                preheatActive={activePreheatMode}
-                preheatStatus={preheatStatus}
-                coolingCapacity={coolingCapacity}
-                sensorQuality={activeData.sensorQuality}
-                opMode={activeData.opMode}
-                bedImbalance={bedImbalance}
-                hotSpotRisk={hotSpotRisk}
-                scenarioName={SCENARIOS[presScenario]?.name}
-                awarenessPhase={awarenessPhase}
-                businessImpact={SCENARIOS[presScenario]?.businessImpact}
-              />
-            </div>
-
-            {/* Fixed bottom presenter strip */}
-            <PresenterControls
-              presScenario={presScenario}
-              onSelectScenario={(idx) => { setPresScenario(idx); setSequenceStage(0); }}
-              onReset={handleResetPresentation}
-            />
-
-            <OpsCapacityPanel
-              systemState={systemState}
-              coolingCapacity={coolingCapacity}
-              equipment={activeData.equipment}
-              slope={displaySlope}
-            />
-
-            <div style={{ position: "relative", opacity: 0.72, transition: "opacity 0.4s ease", pointerEvents: "none" }}>
-              <ProcessMap
-                escalationLevel={escalationLevel}
-                slope={displaySlope}
-                currentTemp={currentValue}
-                feedFlow={activeData.feedFlow}
-                equipment={activeData.equipment}
-                preheatActive={activePreheatMode}
-                preheatStatus={preheatStatus}
-                coolingCapacity={coolingCapacity}
-                nearest={nearest}
-                timeToNearest={displayTTL}
-                sensorQuality={activeData.sensorQuality}
-                opMode={activeData.opMode}
-                bedImbalance={bedImbalance}
-                hotSpotRisk={hotSpotRisk}
-                interactive={false}
-                units={activeData.units}
-                systemState={systemState}
-                awarenessPhase={awarenessPhase}
-              />
-              <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.08)", pointerEvents: "none" }} />
-            </div>
-          </>
+          <PresentationModeView
+            presScenario={presScenario}
+            onSelectScenario={(idx) => { setPresScenario(idx); setSequenceStage(0); }}
+            onReset={handleResetPresentation}
+            displayTTL={displayTTL}
+            nearest={nearest}
+            escalationLevel={escalationLevel}
+            displaySlope={displaySlope}
+            activeData={activeData}
+            activePreheatMode={activePreheatMode}
+            preheatStatus={preheatStatus}
+            coolingCapacity={coolingCapacity}
+            bedImbalance={bedImbalance}
+            hotSpotRisk={hotSpotRisk}
+            awarenessPhase={awarenessPhase}
+            systemState={systemState}
+            currentValue={currentValue}
+          />
         )}
       </div>
     </div>
