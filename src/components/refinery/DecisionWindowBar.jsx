@@ -17,10 +17,6 @@ export default function DecisionWindowBar({
   demoState,
   isPreheatMode = false,
 }) {
-  const [expanded, setExpanded] = React.useState(false);
-  const { theme } = useTheme();
-  const isLight = theme === "light";
-
   // ── Preheat override ──────────────────────────────────────────────────────
   if (isPreheatMode) {
     return (
@@ -146,6 +142,10 @@ export default function DecisionWindowBar({
   };
   
   const constraintLeverRelationship = getConstraintLeverRelationship();
+  
+  const [expanded, setExpanded] = React.useState(false);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   
   return (
     <div className="space-y-2">
