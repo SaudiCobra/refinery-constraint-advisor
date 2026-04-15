@@ -607,7 +607,8 @@ export default function ProcessMap({
             );
           })()}
           
-          {bedImbalance && bedImbalance.beds.map((bed, idx) => {
+          {bedImbalance && bedImbalance.beds && bedImbalance.beds.map((bed, idx) => {
+            if (!bed) return null;
             const bedHeight = 70;
             const yStart = -95 + (idx * 80);
             const isDominant = bed.id === bedImbalance.dominantBed;
